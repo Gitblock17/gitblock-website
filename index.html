@@ -1108,10 +1108,18 @@ window.addEventListener('scroll', () => {
 });
 
 // Reveal on scroll
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.1 });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); } });
+}, { threshold: 0.05, rootMargin: '0px 0px 50px 0px' });
+document.querySelectorAll('.reveal').forEach(el => {
+    // Immediately reveal elements already in viewport (handles direct hash navigation)
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+        el.classList.add('visible');
+    } else {
+        revealObserver.observe(el);
+    }
+});
 
 // Toast
 function showToast(msg, type) {
