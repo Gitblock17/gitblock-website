@@ -7,11 +7,7 @@
 <link rel="icon" href="assets/gitblock.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<script type="module">
-  import { EthereumProvider } from 'https://esm.sh/@walletconnect/ethereum-provider@2.17.3';
-  window.WalletConnectProvider = EthereumProvider;
-  window.dispatchEvent(new Event('wc-ready'));
-</script>
+
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#ffffff;--blue:#2563eb;--blue-light:#3b82f6;--blue-dark:#1d4ed8;--blue-glow:rgba(37,99,235,0.08);--card:rgba(37,99,235,0.04);--border:rgba(37,99,235,0.12);--text:#1e293b;--text-secondary:#64748b;--radius:16px;--max:1200px;--success:#22c55e;--warning:#eab308}
@@ -1273,14 +1269,15 @@ async function connectWalletConnect() {
     try {
         showToast('Loading WalletConnect...', 'success');
 
-        // Use pre-loaded UMD bundle from <head>
-        // Wait for the ESM module to load if not ready yet
+        // Lazy load WalletConnect SDK
         if (!window.WalletConnectProvider) {
-            showToast('Loading WalletConnect...', 'info');
             await new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.type = 'module';
+                s.textContent = `import { EthereumProvider } from 'https://esm.sh/@walletconnect/ethereum-provider@2.17.3';window.WalletConnectProvider=EthereumProvider;window.dispatchEvent(new Event('wc-ready'));`;
+                document.body.appendChild(s);
                 const timeout = setTimeout(() => reject(new Error('WalletConnect SDK load timeout')), 20000);
                 window.addEventListener('wc-ready', () => { clearTimeout(timeout); resolve(); }, { once: true });
-                // If event already fired while we were waiting
                 if (window.WalletConnectProvider) { clearTimeout(timeout); resolve(); }
             });
         }
@@ -1302,7 +1299,6 @@ async function connectWalletConnect() {
 
         await provider.connect();
 
-        // Get accounts from session (more reliable than eth_accounts after connect)
         let address;
         if (provider.accounts && provider.accounts.length > 0) {
             address = provider.accounts[0];
@@ -1313,7 +1309,6 @@ async function connectWalletConnect() {
 
         if (!address) throw new Error('No accounts returned from wallet');
 
-        // Sign verification message (free, no gas)
         const message = 'GitBlock API Key Verification\nAddress: ' + address + '\nTimestamp: ' + Date.now() + '\n\nThis signature proves you own this address. No funds will be moved.';
         await provider.request({ method: 'personal_sign', params: [message, address] });
 
