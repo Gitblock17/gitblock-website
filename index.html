@@ -901,7 +901,7 @@
             <a href="#features">Features</a>
             <a href="#how-it-works">How It Works</a>
             <a href="#api">API</a>
-            <a href="#usage">Usage</a>
+            <a href="usage.html">Usage</a>
             <a href="#models">Models</a>
             <a href="#benefits">Benefits</a>
             <a href="#faq">FAQ</a>
@@ -915,7 +915,7 @@
     <a href="#features" onclick="document.getElementById('mobile-menu').classList.remove('open')">Features</a>
     <a href="#how-it-works" onclick="document.getElementById('mobile-menu').classList.remove('open')">How It Works</a>
     <a href="#api" onclick="document.getElementById('mobile-menu').classList.remove('open')">API</a>
-    <a href="#usage" onclick="document.getElementById('mobile-menu').classList.remove('open')">Usage</a>
+    <a href="usage.html" onclick="document.getElementById('mobile-menu').classList.remove('open')">Usage</a>
     <a href="#models" onclick="document.getElementById('mobile-menu').classList.remove('open')">Models</a>
     <a href="#benefits" onclick="document.getElementById('mobile-menu').classList.remove('open')">Benefits</a>
     <a href="#faq" onclick="document.getElementById('mobile-menu').classList.remove('open')">FAQ</a>
@@ -1277,113 +1277,6 @@ export OPENAI_BASE_URL=https://api.gitblock.io/v1</pre>
     </div>
 </section>
 
-<!-- Section 5: Code Usage -->
-<section id="usage">
-    <div class="container">
-        <div class="section-label reveal">Code Examples</div>
-        <h2 class="section-title reveal">Use It Like Any API</h2>
-        <p class="section-desc reveal">Drop-in compatible with the OpenAI SDK. Switch one line and you're live.</p>
-        <div class="code-cards-grid">
-            <div class="code-card reveal">
-                <div class="code-card-header">
-                    <span><i class="fas fa-message" style="margin-right:8px;"></i>Chat Completion</span>
-                    <i class="fab fa-python"></i>
-                </div>
-<pre>from openai import OpenAI
-
-client = OpenAI(
-    api_key="gb_xxxx",
-    base_url="https://api.gitblock.io/v1"
-)
-
-resp = client.chat.completions.create(
-    model="llama-3.3-70b",
-    messages=[{"role": "user", "content": "Explain quantum computing in 3 sentences."}]
-)
-print(resp.choices[0].message.content)</pre>
-            </div>
-            <div class="code-card reveal">
-                <div class="code-card-header">
-                    <span><i class="fas fa-wave-square" style="margin-right:8px;"></i>Streaming</span>
-                    <i class="fab fa-python"></i>
-                </div>
-<pre>stream = client.chat.completions.create(
-    model="llama-3.3-70b",
-    messages=[{"role": "user", "content": "Write a haiku."}],
-    stream=True
-)
-
-for chunk in stream:
-    if chunk.choices[0].delta.content:
-        print(chunk.choices[0].delta.content, end="")</pre>
-            </div>
-            <div class="code-card reveal">
-                <div class="code-card-header">
-                    <span><i class="fas fa-code" style="margin-right:8px;"></i>Code Generation</span>
-                    <i class="fab fa-python"></i>
-                </div>
-<pre>resp = client.chat.completions.create(
-    model="deepseek-coder-33b",
-    messages=[{
-        "role": "user",
-        "content": "Write a Python function to find prime numbers."
-    }]
-)
-code = resp.choices[0].message.content
-print(code)</pre>
-            </div>
-            <div class="code-card reveal">
-                <div class="code-card-header">
-                    <span><i class="fas fa-terminal" style="margin-right:8px;"></i>cURL</span>
-                    <i class="fas fa-terminal"></i>
-                </div>
-<pre>curl -X POST https://api.gitblock.io/v1/chat/completions \
-  -H "Authorization: Bearer gb_xxxx" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "llama-3.3-70b",
-    "messages": [{"role":"user","content":"Hello!"}]
-  }'</pre>
-            </div>
-            <div class="code-card reveal">
-                <div class="code-card-header">
-                    <span><i class="fab fa-js" style="margin-right:8px;"></i>JavaScript</span>
-                    <i class="fab fa-js"></i>
-                </div>
-<pre>const res = await fetch("https://api.gitblock.io/v1/chat/completions", {
-  method: "POST",
-  headers: {
-    "Authorization": "Bearer gb_xxxx",
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    model: "llama-3.3-70b",
-    messages: [{ role: "user", content: "Hi!" }]
-  })
-});
-const data = await res.json();
-console.log(data.choices[0].message.content);</pre>
-            </div>
-            <div class="code-card reveal">
-                <div class="code-card-header">
-                    <span><i class="fas fa-server" style="margin-right:8px;"></i>Run a Node</span>
-                    <i class="fab fa-docker"></i>
-                </div>
-<pre># Run a contributor node with Docker
-docker run -d \
-  --name gitblock-node \
-  -e NODE_KEY=your_node_key \
-  -e MODELS=llama-3.3-70b \
-  -p 8080:8080 \
-  gitblock/node:latest
-
-# Check node status
-curl http://localhost:8080/health</pre>
-            </div>
-        </div>
-    </div>
-</section>
-
 <!-- Section 6: Models -->
 <section id="models">
     <div class="container">
@@ -1575,12 +1468,12 @@ curl http://localhost:8080/health</pre>
             <a href="#features">Features</a>
             <a href="#api">API Access</a>
             <a href="#models">Models</a>
-            <a href="#usage">Code Examples</a>
+            <a href="usage.html">Code Examples</a>
         </div>
         <div class="footer-col">
             <h4>Developers</h4>
             <a href="https://github.com/Gitblock17/Gitblock" target="_blank">GitHub</a>
-            <a href="#api">Documentation</a>
+            <a href="usage.html">Documentation</a>
             <a href="#faq">FAQ</a>
             <a href="https://github.com/Gitblock17/Gitblock/issues" target="_blank">Report Issue</a>
         </div>

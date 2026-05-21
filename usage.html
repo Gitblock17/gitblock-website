@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usage — GitBlock API Documentation</title>
+    <link rel="icon" href="assets/gitblock.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #ffffff;
+            color: #1e293b;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                linear-gradient(rgba(37, 99, 235, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.05) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        body > *:not(script) { position: relative; z-index: 1; }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(37, 99, 235, 0.1);
+            z-index: 1000;
+        }
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: 800;
+            font-size: 1.25rem;
+        }
+        .logo img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; }
+        nav { display: flex; align-items: center; gap: 28px; }
+        nav a {
+            text-decoration: none;
+            color: #475569;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        nav a:hover, nav a.active { color: #2563eb; }
+        nav a.active { font-weight: 600; }
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: #2563eb;
+            cursor: pointer;
+        }
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 64px; left: 0;
+            width: 100%;
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(37,99,235,0.1);
+            padding: 16px 24px;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 999;
+        }
+        .mobile-menu.open { display: flex; }
+        .mobile-menu a {
+            text-decoration: none;
+            color: #475569;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 8px 0;
+        }
+        .mobile-menu a:hover { color: #2563eb; }
+
+        /* Page Layout */
+        .page-wrapper {
+            padding-top: 64px;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 64px;
+            left: 0;
+            width: 260px;
+            height: calc(100vh - 64px);
+            background: #f8fafc;
+            border-right: 1px solid rgba(37,99,235,0.08);
+            padding: 32px 0;
+            overflow-y: auto;
+            z-index: 10;
+        }
+        .sidebar-section {
+            margin-bottom: 28px;
+        }
+        .sidebar-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 0 24px;
+            margin-bottom: 8px;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 24px;
+            text-decoration: none;
+            color: #475569;
+            font-size: 0.88rem;
+            font-weight: 500;
+            transition: all 0.15s;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-link:hover {
+            color: #2563eb;
+            background: rgba(37,99,235,0.04);
+        }
+        .sidebar-link.active {
+            color: #2563eb;
+            background: rgba(37,99,235,0.06);
+            border-left-color: #2563eb;
+            font-weight: 600;
+        }
+        .sidebar-link i {
+            width: 18px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 48px 56px 80px;
+            max-width: 960px;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid rgba(37,99,235,0.1);
+        }
+        .page-header .breadcrumb {
+            font-size: 0.82rem;
+            color: #94a3b8;
+            margin-bottom: 12px;
+        }
+        .page-header .breadcrumb a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        .page-header .breadcrumb a:hover { text-decoration: underline; }
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 10px;
+        }
+        .page-header p {
+            font-size: 1.05rem;
+            color: #64748b;
+            max-width: 600px;
+        }
+
+        /* Content Sections */
+        .content-section {
+            margin-bottom: 56px;
+            scroll-margin-top: 80px;
+        }
+        .content-section h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .content-section h2 .lang-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        .content-section h2 .lang-icon.python { background: #306998; color: #FFD43B; }
+        .content-section h2 .lang-icon.js { background: #f7df1e; color: #000; }
+        .content-section h2 .lang-icon.curl { background: #0f172a; color: #4ade80; }
+        .content-section h2 .lang-icon.node { background: #2496ED; color: #fff; }
+        .content-section h2 .lang-icon.agent { background: #7c3aed; color: #fff; }
+        .content-section > p {
+            font-size: 0.95rem;
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+
+        /* Endpoint Info */
+        .endpoint-box {
+            background: #f8fafc;
+            border: 1px solid rgba(37,99,235,0.1);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .endpoint-method {
+            padding: 4px 10px;
+            background: #2563eb;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .endpoint-url {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.88rem;
+            color: #0f172a;
+            font-weight: 500;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            position: relative;
+            background: #0f172a;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .code-block-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.04);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .code-block-header span {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #94a3b8;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .copy-btn {
+            padding: 6px 14px;
+            background: rgba(37,99,235,0.2);
+            color: #93c5fd;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .copy-btn:hover { background: rgba(37,99,235,0.4); }
+        .copy-btn.copied { background: #059669; color: #fff; }
+        .code-block pre {
+            padding: 20px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.84rem;
+            line-height: 1.75;
+            color: #e2e8f0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        /* Syntax Colors */
+        .code-block .kw { color: #c084fc; }
+        .code-block .fn { color: #60a5fa; }
+        .code-block .str { color: #4ade80; }
+        .code-block .cmt { color: #64748b; }
+        .code-block .num { color: #fbbf24; }
+
+        /* Env Vars */
+        .env-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .env-card {
+            background: #f8fafc;
+            border: 1px solid rgba(37,99,235,0.1);
+            border-radius: 10px;
+            padding: 16px 20px;
+        }
+        .env-card .env-key {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #2563eb;
+            margin-bottom: 4px;
+        }
+        .env-card .env-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            color: #64748b;
+        }
+
+        /* Steps */
+        .steps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .step-item {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .step-num {
+            min-width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #2563eb;
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .step-content h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+        .step-content p {
+            font-size: 0.88rem;
+            color: #64748b;
+        }
+
+        /* Inline code */
+        code.inline {
+            background: rgba(37,99,235,0.08);
+            color: #2563eb;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.84rem;
+            font-weight: 500;
+        }
+
+        /* Response Box */
+        .response-box {
+            background: #f0fdf4;
+            border: 1px solid rgba(5,150,105,0.2);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+        .response-box .label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #059669;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        /* Note Box */
+        .note-box {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            border-radius: 0 10px 10px 0;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+        .note-box .note-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #2563eb;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        .note-box p {
+            font-size: 0.88rem;
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            background: #0f172a;
+            padding: 64px 24px 32px;
+            color: #94a3b8;
+        }
+        .footer-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            margin-bottom: 48px;
+        }
+        .footer-col h4 {
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .footer-col img { width: 24px; height: 24px; border-radius: 6px; vertical-align: middle; margin-right: 8px; object-fit: cover; }
+        .footer-col a {
+            display: block;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.88rem;
+            margin-bottom: 10px;
+            transition: color 0.2s;
+        }
+        .footer-col a:hover { color: #2563eb; }
+        .footer-col p { font-size: 0.88rem; line-height: 1.6; }
+        .footer-socials {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+        }
+        .footer-socials a {
+            display: inline-flex !important;
+            width: 36px;
+            height: 36px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            color: #94a3b8 !important;
+            font-size: 1rem;
+            margin-bottom: 0 !important;
+            transition: background 0.2s, color 0.2s;
+        }
+        .footer-socials a:hover {
+            background: #2563eb;
+            color: #fff !important;
+        }
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            text-align: center;
+            font-size: 0.82rem;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+        }
+        .toast {
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: #fff;
+            background: #059669;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s;
+        }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes toastOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(40px); } }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 32px 24px 64px; }
+            .env-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            nav { display: none; }
+            .hamburger { display: block; }
+            .footer-grid { grid-template-columns: repeat(2, 1fr); }
+            .page-header h1 { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+    <div class="header-inner">
+        <a href="index.html" class="logo">
+            <img src="assets/gitblock.jpg" alt="GitBlock">
+            <span>GitBlock</span>
+        </a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="index.html#features">Features</a>
+            <a href="index.html#api">API</a>
+            <a href="usage.html" class="active">Usage</a>
+            <a href="index.html#models">Models</a>
+            <a href="index.html#faq">FAQ</a>
+        </nav>
+        <button class="hamburger" onclick="document.getElementById('mobile-menu').classList.toggle('open')">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+</header>
+<div class="mobile-menu" id="mobile-menu">
+    <a href="index.html">Home</a>
+    <a href="index.html#features">Features</a>
+    <a href="index.html#api">API</a>
+    <a href="usage.html">Usage</a>
+    <a href="index.html#models">Models</a>
+    <a href="index.html#faq">FAQ</a>
+</div>
+
+<div class="page-wrapper">
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-label">Getting Started</div>
+        <a href="#quickstart" class="sidebar-link active">
+            <i class="fas fa-rocket"></i> Quick Start
+        </a>
+        <a href="#authentication" class="sidebar-link">
+            <i class="fas fa-key"></i> Authentication
+        </a>
+        <a href="#endpoints" class="sidebar-link">
+            <i class="fas fa-plug"></i> Endpoints
+        </a>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-label">Languages</div>
+        <a href="#python" class="sidebar-link">
+            <i class="fab fa-python"></i> Python
+        </a>
+        <a href="#javascript" class="sidebar-link">
+            <i class="fab fa-js"></i> JavaScript
+        </a>
+        <a href="#curl" class="sidebar-link">
+            <i class="fas fa-terminal"></i> cURL
+        </a>
+        <a href="#node" class="sidebar-link">
+            <i class="fab fa-docker"></i> Run a Node
+        </a>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-label">Integrations</div>
+        <a href="#openai-sdk" class="sidebar-link">
+            <i class="fas fa-code"></i> OpenAI SDK
+        </a>
+        <a href="#langchain" class="sidebar-link">
+            <i class="fas fa-link"></i> LangChain
+        </a>
+        <a href="#hermes" class="sidebar-link">
+            <i class="fas fa-robot"></i> Hermes Agent
+        </a>
+    </div>
+</aside>
+
+<!-- Main Content -->
+<main class="main-content">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="breadcrumb"><a href="index.html">Home</a> / Usage</div>
+        <h1>API Usage Guide</h1>
+        <p>Everything you need to integrate GitBlock into your application. Drop-in compatible with the OpenAI SDK.</p>
+    </div>
+
+    <!-- Quick Start -->
+    <section class="content-section" id="quickstart">
+        <h2><i class="fas fa-rocket" style="color:#2563eb;"></i> Quick Start</h2>
+        <p>Get up and running in under 2 minutes.</p>
+
+        <div class="steps-list">
+            <div class="step-item">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <h4>Get your API key</h4>
+                    <p>Connect your wallet on the <a href="index.html#api" style="color:#2563eb;">home page</a> to generate a free API key.</p>
+                </div>
+            </div>
+            <div class="step-item">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <h4>Set environment variables</h4>
+                    <p>Export your key and the base URL in your terminal.</p>
+                </div>
+            </div>
+            <div class="step-item">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                    <h4>Make your first request</h4>
+                    <p>Use any of the code examples below. Same API format as OpenAI.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="env-grid">
+            <div class="env-card">
+                <div class="env-key">GITBLOCK_API_KEY</div>
+                <div class="env-val">gb_a1b2c3d4e5f6...</div>
+            </div>
+            <div class="env-card">
+                <div class="env-key">GITBLOCK_BASE_URL</div>
+                <div class="env-val">https://api.gitblock.io/v1</div>
+            </div>
+        </div>
+
+        <div class="code-block">
+            <div class="code-block-header">
+                <span>bash</span>
+                <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
+            </div>
+<pre>export GITBLOCK_API_KEY=your_api_key_here
+export GITBLOCK_BASE_URL=https://api.gitblock.io/v1</pre>
+        </div>
+    </section>
+
+    <!-- Authentication -->
+    <section class="content-section" id="authentication">
+        <h2><i class="fas fa-key" style="color:#2563eb;"></i> Authentication</h2>
+        <p>All requests require a Bearer token in the Authorization header.</p>
+
+        <div class="endpoint-box">
+            <span class="endpoint-method">HEADER</span>
+            <span class="endpoint-url">Authorization: Bearer YOUR_API_KEY</span>
+        </div>
+
+        <div class="note-box">
+            <div class="note-label">Note</div>
+            <p>Your API key is deterministically generated from your wallet address. You can regenerate it anytime from the <a href="index.html#api" style="color:#2563eb;">dashboard</a>.</p>
+        </div>
+    </section>
+
+    <!-- Endpoints -->
+    <section class="content-section" id="endpoints">
+        <h2><i class="fas fa-plug" style="color:#2563eb;"></i> Endpoints</h2>
+        <p>GitBlock exposes OpenAI-compatible endpoints.</p>
+
+        <div class="endpoint-box">
+            <span class="endpoint-method">POST</span>
+            <span class="endpoint-url">/v1/chat/completions</span>
+        </div>
+        <div class="endpoint-box">
+            <span class="endpoint-method">POST</span>
+            <span class="endpoint-url">/v1/embeddings</span>
+        </div>
+        <div class="endpoint-box">
+            <span class="endpoint-method">GET</span>
+            <span class="endpoint-url">/v1/models</span>
+        </div>
+
+        <div class="note-box">
+            <div class="note-label">Base URL</div>
+            <p>All endpoints are relative to <code class="inline">https://api.gitblock.io/v1</code></p>
+        </div>
+    </section>
+
+    <!-- Python -->
+    <section class="content-section" id="python">
+        <h2>
+            <span class="lang-icon python"><i class="fab fa-python"></i></span>
+            Python
+        </h2>
+        <p>Use the <code class="inline">requests</code> library or the OpenAI Python SDK.</p>
+
+        <div class="code-block">
+            <div class="code-block-header">
+                <span>chat_completion.py</span>
+                <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
+            </div>
+<pre><span class="kw">import</span> requests
+
+response = requests.post(
+    <span class="str">"https://api.gitblock.io/v1/chat/completions"</span>,
+    headers={
+        <span class="str">"Authorization"</span>: <span class="str">"Bearer YOUR_API_KEY"</span>,
+        <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>
+    },
+    json={
+        <span class="str">"model"</span>: <span class="str">"llama-3.3-70b"</span>,
+        <span class="str">"messages"</span>: [{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Hello!"</span>}]
+    }
+)
+<span class="fn">print</span>(response.json()[<span class="str">"choices"</span>][<span class="num">0</span>][<span class="str">"message"</span>][<span class="str">"content"</span>])</pre>
+        </div>
+
+        <div class="code-block">
+            <div class="code-block-header">
+                <span>streaming.py</span>
+                <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
+            </div>
+<pre>stream = client.chat.completions.create(
+    model=<span class="str">"llama-3.3-70b"</span>,
+    messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Write a haiku."</span>}],
+    stream=<span class="kw">True</span>
+)
+
+<span class="kw">for</span> chunk <span class="kw">in</span> stream:
+    <span class="kw">if</span> chunk.choices[<span class="num">0</span>].delta.content:
+        <span class="fn">print</span>(chunk.choices[<span class="num">0</span>].delta.content, end=<span class="str">""</span>)</pre>
+        </div>
+
+        <div class="code-block">
+            <div class="code-block-header">
+                <span>code_generation.py</span>
+                <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
+            </div>
+<pre>resp = client.chat.completions.create(
+    model=<span class="str">"deepseek-coder-33b"</span>,
+    messages=[{
+        <span class="str">"role"</span>: <span class="str">"user"</span>,
+        <span class="str">"content"</span>: <span class="str">"Write a Python function to find prime numbers."</span>
+    }]
+)
+code = resp.choices[<span class="num">0</span>].message.content
+<span class="fn">print</span>(code)</pre>
+        </div>
+    </section>
+
+    <!-- JavaScript -->
+    <section class="content-section" id="javascript">
+        <h2>
+            <span class="lang-icon js"><i class="fab fa-js"></i></span>
+            JavaScript
+        </h2>
+        <p>Use <code class="inline">fetch</code> or the OpenAI Node.js SDK.</p>
+
+        <div class="code-block">
+            <div class="code-block-header">
+                <span>chat.js</span>
+                <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
+            </div>
+<pre><span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">"https://api.gitblock.io/v1/chat/completions"</span>, {
+  method: <span class="str">"POST"</span>,
+  headers: {
+    <span class="str">"Authorization"</span>: <span class="str">"Bearer YOUR_API_KEY"</span>,
+    <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>
+  },
+  body: JSON.<span class="fn">stringify</span>({
+    model: <span class="str">"llama-3.3-70b"</span>,
+    messages: [{ role: <span class="str">"user"</span>, content: <span class="str">"Hello!"</span> }]
+  })
+});
+<span class="kw">const</span> data = <span class="kw">await</span> res.<span class="fn">json</span>();
+console.<span class="fn">log</span>(data.choices[<span class="num">0</span>].message.content);</pre>
+        </div>
+    </section>
+
+    <!-- cURL -->
+    <section class="content-section" id="curl">
+        <h2>
+            <span class="lang-icon curl"><i class="fas fa-terminal"></i></span>
+            cURL
+        </h2>
+        <p>Test directly from your terminal.</p>
+
+        <div class="code-block">
+            <div class="code-block-header">
+                <span>bash</span>
+                <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
+            </div>
+<pre>curl -X POST https://api.gitblock.io/v1/chat/completions \
+  -H <span class="str">"Authorization: Bearer YOUR_API_KEY"</span> \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -d <span class="str">'{
+    "model": "llama-3.3-70b",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'</span></pre>
+        </div>
+    </section>
+
+    <!-- Run a Node -->
+    <section class="content-section" id="node">
+        <h2>
+            <span class="lang-icon node"><i class="fab fa-docker"></i></span>
+            Run a Node
+        </h2>
+        <p>Contribute compute to the network by running a node.</p>
+
+        <div class="code-block">
+            <div class="code-block-header">
+                <span>docker</span>
+                <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
+            </div>
+<pre><span class="cmt"># Run a contributor node with Docker</span>
+docker run -d \
+  --name gitblock-node \
+  -e NODE_KEY=your_node_key \
+  -e MODELS=llama-3.3-70b \
+  -p <span class="num">8080</span>:<span class="num">8080</span> \
+  gitblock/node:latest
+
+<span class="cmt"># Check node status</span>
+curl http://localhost:<span class="num">8080</span>/health</pre>
+        </div>
+
+        <div class="note-box">
+            <div class="note-label">Requirements</div>
+            <p>You need a GPU with at least 8GB VRAM for smaller models. See the <a href="https://github.com/Gitblock17/Gitblock" target="_blank" style="color:#2563eb;">GitHub repo</a> for full setup instructions.</p>
+        </div>
+    </section>
+
+    <!-- OpenAI SDK -->
+    <section class="content-section" id="openai-sdk">
+        <h2>
+            <span class="lang-icon python"><i class="fas fa-code"></i></span>
+            OpenAI SDK
+        </h2>
+        <p>Drop-in replacement. Change the base URL and you're live.</p>
+
+        <div class="code-block">
+            <div class="code-block-header">
+                <span>openai_sdk.py</span>
+                <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
+            </div>
+<pre><span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+
+client = <span class="fn">OpenAI</span>(
+    api_key=<span class="str">"YOUR_API_KEY"</span>,
+    base_url=<span class="str">"https://api.gitblock.io/v1"</span>
+)
+
+response = client.chat.completions.<span class="fn">create</span>(
+    model=<span class="str">"llama-3.3-70b"</span>,
+    messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Explain quantum computing."</span>}]
+)
+<span class="fn">print</span>(response.choices[<span class="num">0</span>].message.content)</pre>
+        </div>
+    </section>
+
+    <!-- LangChain -->
+    <section class="content-section" id="langchain">
+        <h2>
+            <span class="lang-icon agent"><i class="fas fa-link"></i></span>
+            LangChain
+        </h2>
+        <p>Use GitBlock as the LLM backend for LangChain chains and agents.</p>
+
+        <div class="code-block">
+            <div class="code-block-header">
+                <span>langchain_example.py</span>
+                <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
+            </div>
+<pre><span class="kw">from</span> langchain_openai <span class="kw">import</span> ChatOpenAI
+
+llm = <span class="fn">ChatOpenAI</span>(
+    api_key=<span class="str">"YOUR_API_KEY"</span>,
+    base_url=<span class="str">"https://api.gitblock.io/v1"</span>,
+    model=<span class="str">"llama-3.3-70b"</span>
+)
+
+result = llm.<span class="fn">invoke</span>(<span class="str">"What is decentralized AI?"</span>)
+<span class="fn">print</span>(result.content)</pre>
+        </div>
+    </section>
+
+    <!-- Hermes Agent -->
+    <section class="content-section" id="hermes">
+        <h2>
+            <span class="lang-icon agent"><i class="fas fa-robot"></i></span>
+            Hermes Agent
+        </h2>
+        <p>Configure GitBlock as a provider in Hermes Agent.</p>
+
+        <div class="code-block">
+            <div class="code-block-header">
+                <span>config.yaml</span>
+                <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
+            </div>
+<pre><span class="cmt"># In your hermes-agent config (config.yaml):</span>
+providers:
+  gitblock:
+    type: openai
+    api_key: <span class="str">YOUR_API_KEY</span>
+    base_url: <span class="str">https://api.gitblock.io/v1</span>
+    model: <span class="str">llama-3.3-70b</span></pre>
+        </div>
+
+        <div class="code-block">
+            <div class="code-block-header">
+                <span>environment variables</span>
+                <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
+            </div>
+<pre><span class="cmt"># Or via environment variables:</span>
+export HERMES_PROVIDER=openai
+export OPENAI_API_KEY=YOUR_API_KEY
+export OPENAI_BASE_URL=https://api.gitblock.io/v1</pre>
+        </div>
+    </section>
+
+</main>
+</div>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-grid">
+        <div class="footer-col">
+            <h4><img src="assets/gitblock.jpg" alt="GitBlock">GitBlock</h4>
+            <p>Decentralized AI inference for everyone. Free, open, and unstoppable.</p>
+            <div class="footer-socials">
+                <a href="https://github.com/Gitblock17/Gitblock" target="_blank"><i class="fab fa-github"></i></a>
+                <a href="https://x.com/gitblock_" target="_blank"><i class="fab fa-x-twitter"></i></a>
+            </div>
+        </div>
+        <div class="footer-col">
+            <h4>Product</h4>
+            <a href="index.html#features">Features</a>
+            <a href="index.html#api">API Access</a>
+            <a href="index.html#models">Models</a>
+            <a href="usage.html">Code Examples</a>
+        </div>
+        <div class="footer-col">
+            <h4>Developers</h4>
+            <a href="https://github.com/Gitblock17/Gitblock" target="_blank">GitHub</a>
+            <a href="usage.html">Documentation</a>
+            <a href="index.html#faq">FAQ</a>
+            <a href="https://github.com/Gitblock17/Gitblock/issues" target="_blank">Report Issue</a>
+        </div>
+        <div class="footer-col">
+            <h4>Community</h4>
+            <a href="https://github.com/Gitblock17/Gitblock" target="_blank">Contribute</a>
+            <a href="https://x.com/gitblock_" target="_blank">Twitter</a>
+            <a href="https://github.com/Gitblock17/Gitblock" target="_blank">Run a Node</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        &copy; 2026 GitBlock. Open source under MIT License.
+    </div>
+</footer>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+    // Copy code block
+    function copyBlock(btn) {
+        const pre = btn.closest('.code-block').querySelector('pre');
+        const text = pre.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                btn.classList.remove('copied');
+            }, 2000);
+        });
+    }
+
+    // Sidebar active state on scroll
+    const sections = document.querySelectorAll('.content-section');
+    const sidebarLinks = document.querySelectorAll('.sidebar-link');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.id;
+                sidebarLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+                });
+            }
+        });
+    }, { threshold: 0.3, rootMargin: '-80px 0px -60% 0px' });
+
+    sections.forEach(section => observer.observe(section));
+</script>
+
+</body>
+</html>
