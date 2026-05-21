@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitBlock — Decentralized AI Inference Network</title>
+<link rel="icon" href="assets/gitblock.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#ffffff;--blue:#2563eb;--blue-light:#3b82f6;--blue-dark:#1d4ed8;--blue-glow:rgba(37,99,235,0.08);--card:rgba(37,99,235,0.04);--border:rgba(37,99,235,0.12);--text:#1e293b;--text-secondary:#64748b;--radius:16px;--max:1200px;--success:#22c55e;--warning:#eab308}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(37,99,235,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,0.06) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
+a{text-decoration:none;color:inherit}
+img{max-width:100%;height:auto}
+.container{max-width:var(--max);margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.gradient-text{background:linear-gradient(135deg,#2563eb 0%,#3b82f6 50%,#60a5fa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.section-title{text-align:center;margin-bottom:60px}
+.section-title h2{font-size:clamp(2rem,4vw,2.75rem);margin-bottom:16px;font-weight:700;color:var(--text)}
+.section-title p{color:var(--text-secondary);font-size:1.1rem;max-width:600px;margin:0 auto}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ── HEADER ── */
+.header{position:fixed;top:0;left:0;right:0;z-index:1000;padding:16px 0;background:rgba(255,255,255,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);transition:padding .3s}
+.header.scrolled{padding:10px 0}
+.header .container{display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-size:1.4rem;font-weight:700;color:var(--blue)}
+.logo img{width:36px;height:36px;border-radius:8px}
+.nav{display:flex;align-items:center;gap:32px}
+.nav a{font-size:.95rem;color:var(--text-secondary);transition:color .2s;font-weight:500}
+.nav a:hover{color:var(--blue)}
+.hamburger{display:none;background:none;border:none;color:var(--blue);font-size:1.5rem;cursor:pointer}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--blue);color:#fff;border:1px solid var(--blue);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-primary:hover{transform:translateY(-2px);background:var(--blue-dark);box-shadow:0 0 20px rgba(37,99,235,0.3)}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:transparent;color:var(--blue);border:1px solid var(--border);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-ghost:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 0 20px rgba(37,99,235,0.1)}
+.btn-sm{padding:10px 20px;font-size:.85rem}
+.mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);flex-direction:column;align-items:center;justify-content:center;gap:28px;z-index:999}
+.mobile-menu.open{display:flex}
+.mobile-menu a{font-size:1.3rem;color:var(--text);font-weight:500}
+.mobile-close{position:absolute;top:20px;right:24px;background:none;border:none;color:var(--text);font-size:2rem;cursor:pointer}
+@media(max-width:768px){.nav{display:none}.hamburger{display:block}}
+
+/* ── HERO ── */
+.hero{position:relative;padding:180px 0 120px;text-align:center;min-height:100vh;display:flex;align-items:center;overflow:hidden}
+.hero::before{content:'';position:absolute;top:50%;left:50%;width:600px;height:600px;background:radial-gradient(circle,rgba(37,99,235,0.08) 0%,transparent 70%);transform:translate(-50%,-50%);pointer-events:none}
+.hero-content{position:relative;z-index:2;max-width:800px;margin:0 auto}
+.hero-subtitle{font-size:.85rem;font-weight:600;letter-spacing:4px;color:var(--blue);margin-bottom:20px;text-transform:uppercase}
+.hero h1{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:800;margin-bottom:24px;letter-spacing:-1px;color:var(--text)}
+.hero-desc{font-size:1.15rem;color:var(--text-secondary);max-width:600px;margin:0 auto 36px;line-height:1.7}
+.hero-buttons{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:60px}
+.stats-row{display:flex;justify-content:center;gap:48px;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-number{font-size:2.5rem;font-weight:700;color:var(--blue)}
+.stat-label{font-size:.9rem;color:var(--text-secondary);margin-top:4px}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;transition:transform .3s,border-color .3s,box-shadow .3s}
+.card:hover{transform:translateY(-4px);border-color:rgba(37,99,235,0.25);box-shadow:0 20px 60px rgba(37,99,235,0.08)}
+
+/* ── FEATURES ── */
+.features{padding:100px 0;position:relative;z-index:2}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.feature-icon{width:52px;height:52px;border-radius:14px;background:var(--blue-glow);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:20px;color:var(--blue)}
+.card h3{font-size:1.15rem;margin-bottom:10px;font-weight:700;color:var(--text)}
+.card p{color:var(--text-secondary);font-size:.95rem;line-height:1.6}
+@media(max-width:768px){.features-grid{grid-template-columns:1fr}}
+
+/* ── HOW IT WORKS ── */
+.how-it-works{padding:100px 0;position:relative;z-index:2}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.step-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;text-align:center;position:relative;transition:transform .3s,border-color .3s}
+.step-card:hover{transform:translateY(-4px);border-color:rgba(37,99,235,0.25)}
+.step-num{width:48px;height:48px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;margin:0 auto 16px}
+.step-card h3{font-size:1rem;margin-bottom:8px;font-weight:700;color:var(--text)}
+.step-card p{color:var(--text-secondary);font-size:.85rem;line-height:1.6}
+.step-arrow{display:none;position:absolute;right:-20px;top:50%;transform:translateY(-50%);color:var(--blue);font-size:1.2rem}
+@media(min-width:769px){.step-arrow{display:block}}
+@media(max-width:768px){.steps-grid{grid-template-columns:1fr}}
+
+/* ── API GUIDE ── */
+.api-guide{padding:100px 0;position:relative;z-index:2}
+.api-steps{max-width:900px;margin:0 auto}
+.api-step{display:flex;gap:24px;margin-bottom:32px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;transition:transform .3s,border-color .3s}
+.api-step:hover{transform:translateY(-2px);border-color:rgba(37,99,235,0.25)}
+.api-step-num{width:48px;height:48px;min-width:48px;border-radius:12px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem}
+.api-step-content{flex:1}
+.api-step-content h3{font-size:1.1rem;margin-bottom:8px;font-weight:700;color:var(--text)}
+.api-step-content p{color:var(--text-secondary);font-size:.9rem;line-height:1.6;margin-bottom:12px}
+.api-step-content .note{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(37,99,235,0.06);border-radius:8px;font-size:.8rem;color:var(--blue);margin-top:12px}
+@media(max-width:768px){.api-step{flex-direction:column}}
+
+/* ── WALLET CONNECT ── */
+.wallet-section{padding:100px 0;position:relative;z-index:2}
+.wallet-box{max-width:700px;margin:0 auto;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.wallet-header{padding:32px;text-align:center;border-bottom:1px solid var(--border)}
+.wallet-header h3{font-size:1.3rem;font-weight:700;margin-bottom:8px;color:var(--text)}
+.wallet-header p{color:var(--text-secondary);font-size:.9rem}
+.wallet-body{padding:32px}
+.wallet-status{text-align:center;padding:20px}
+.wallet-status .status-dot{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:8px}
+.status-dot.disconnected{background:#ef4444}
+.status-dot.connected{background:var(--success)}
+.wallet-address-display{display:flex;align-items:center;gap:8px;padding:12px 16px;background:#f1f5f9;border:1px solid var(--border);border-radius:10px;font-family:'SF Mono','Fira Code',monospace;font-size:.8rem;color:var(--text);margin:16px 0;word-break:break-all}
+.wallet-btns{display:flex;gap:12px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+.wallet-btn{padding:12px 24px;border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;border:none;font-family:inherit;display:inline-flex;align-items:center;gap:8px}
+.wallet-btn.metamask{background:#f6851b;color:#fff}
+.wallet-btn.metamask:hover{background:#e2761b;transform:translateY(-2px)}
+.wallet-btn.phantom{background:#ab9ff2;color:#fff}
+.wallet-btn.phantom:hover{background:#9b8ce8;transform:translateY(-2px)}
+.wallet-btn.walletconnect{background:#3b99fc;color:#fff}
+.wallet-btn.walletconnect:hover{background:#2b89ec;transform:translateY(-2px)}
+.api-key-display{margin-top:20px;padding:20px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:12px;text-align:center;display:none}
+.api-key-display.show{display:block}
+.api-key-display h4{color:var(--success);font-size:.9rem;margin-bottom:8px}
+.api-key-value{display:flex;align-items:center;gap:8px;padding:12px 16px;background:#f1f5f9;border:1px solid var(--border);border-radius:10px;font-family:'SF Mono','Fira Code',monospace;font-size:.85rem;color:var(--text);margin:8px 0}
+.copy-btn{padding:6px 14px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.copy-btn:hover{background:var(--blue-dark)}
+.wallet-steps{margin-top:24px}
+.wallet-steps h4{font-size:.95rem;margin-bottom:12px;color:var(--text)}
+.wallet-step{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border)}
+.wallet-step:last-child{border:none}
+.wallet-step-num{width:28px;height:28px;min-width:28px;border-radius:50%;background:var(--blue-glow);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;color:var(--blue)}
+.wallet-step p{font-size:.85rem;color:var(--text-secondary);line-height:1.5}
+.wallet-step p strong{color:var(--text)}
+
+/* ── CODE USAGE ── */
+.code-usage{padding:100px 0;position:relative;z-index:2}
+.code-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.code-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:transform .3s,border-color .3s}
+.code-card:hover{transform:translateY(-4px);border-color:rgba(37,99,235,0.25)}
+.code-card-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.code-card-header i{color:var(--blue);font-size:1.1rem}
+.code-card-header h3{font-size:1rem;font-weight:700;color:var(--text)}
+.code-card-body{padding:24px}
+.code-card-body p{color:var(--text-secondary);font-size:.85rem;line-height:1.6;margin-bottom:16px}
+.code-block{background:#f1f5f9;border:1px solid var(--border);border-radius:12px;padding:16px;font-family:'SF Mono','Fira Code',monospace;font-size:.78rem;line-height:1.8;color:var(--text);overflow-x:auto;white-space:pre}
+.code-comment{color:var(--text-secondary)}
+.code-keyword{color:var(--blue)}
+.code-string{color:#059669}
+.code-func{color:#d97706}
+@media(max-width:768px){.code-grid{grid-template-columns:1fr}}
+
+/* ── MODELS ── */
+.models{padding:100px 0;position:relative;z-index:2}
+.models-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.model-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;text-align:center;transition:transform .3s,border-color .3s}
+.model-card:hover{transform:translateY(-4px);border-color:rgba(37,99,235,0.25)}
+.model-icon{width:48px;height:48px;border-radius:12px;background:var(--blue-glow);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin:0 auto 12px;color:var(--blue)}
+.model-card h4{font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:4px}
+.model-card .model-size{font-size:.75rem;color:var(--text-secondary)}
+.model-card .model-badge{display:inline-block;padding:2px 8px;border-radius:100px;font-size:.65rem;font-weight:600;margin-top:8px}
+.badge-fast{background:rgba(34,197,94,0.12);color:#16a34a}
+.badge-smart{background:rgba(37,99,235,0.12);color:var(--blue)}
+.badge-code{background:rgba(168,85,247,0.12);color:#9333ea}
+@media(max-width:768px){.models-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ── BENEFITS ── */
+.benefits{padding:100px 0;position:relative;z-index:2}
+.benefits-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.benefit-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;text-align:center;transition:transform .3s,border-color .3s}
+.benefit-card:hover{transform:translateY(-4px);border-color:rgba(37,99,235,0.25)}
+.benefit-icon{width:56px;height:56px;border-radius:14px;background:var(--blue-glow);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 16px;color:var(--blue)}
+.benefit-card h3{font-size:1.1rem;margin-bottom:8px;font-weight:700;color:var(--text)}
+.benefit-card p{color:var(--text-secondary);font-size:.9rem;line-height:1.6}
+@media(max-width:768px){.benefits-grid{grid-template-columns:1fr}}
+
+/* ── FAQ ── */
+.faq{padding:100px 0;position:relative;z-index:2}
+.faq-list{max-width:800px;margin:0 auto}
+.faq-item{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;background:var(--card);cursor:pointer;transition:border-color .3s}
+.faq-item:hover{border-color:rgba(37,99,235,0.25)}
+.faq-question{padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.faq-question h3{font-size:1rem;font-weight:600;color:var(--text)}
+.faq-question i{color:var(--blue);transition:transform .3s;font-size:.85rem}
+.faq-item.open .faq-question i{transform:rotate(180deg)}
+.faq-answer{padding:0 24px;max-height:0;overflow:hidden;transition:padding .3s,max-height .3s}
+.faq-item.open .faq-answer{padding:0 24px 20px;max-height:400px}
+.faq-answer p{color:var(--text-secondary);font-size:.9rem;line-height:1.7}
+
+/* ── DONATE ── */
+.donate{padding:100px 0;position:relative;z-index:2;text-align:center}
+.donate-box{max-width:500px;margin:0 auto;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:36px}
+.donate-box h3{font-size:1.3rem;margin-bottom:12px;font-weight:700;color:var(--text)}
+.donate-box p{color:var(--text-secondary);font-size:.9rem;margin-bottom:20px;line-height:1.6}
+.wallet-address{display:flex;align-items:center;gap:8px;padding:12px 16px;background:#f1f5f9;border:1px solid var(--border);border-radius:10px;font-family:'SF Mono','Fira Code',monospace;font-size:.8rem;color:var(--text);word-break:break-all}
+
+/* ── FOOTER ── */
+.footer{padding:60px 0 30px;border-top:1px solid var(--border);position:relative;z-index:2}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+.footer-brand p{color:var(--text-secondary);font-size:.85rem;margin-top:12px;line-height:1.6;max-width:300px}
+.footer-col h4{font-size:.8rem;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px}
+.footer-col a{display:block;color:var(--text-secondary);font-size:.85rem;margin-bottom:10px;transition:color .2s}
+.footer-col a:hover{color:var(--blue)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1px solid var(--border);font-size:.8rem;color:var(--text-secondary)}
+.footer-socials{display:flex;gap:16px}
+.footer-socials a{color:var(--text-secondary);font-size:1.1rem;transition:color .2s}
+.footer-socials a:hover{color:var(--blue)}
+@media(max-width:768px){.footer-grid{grid-template-columns:1fr 1fr}.footer-bottom{flex-direction:column;gap:12px}}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;padding:14px 20px;border-radius:12px;background:#1e293b;color:#fff;font-size:.85rem;font-weight:500;z-index:9999;transform:translateY(100px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:#16a34a}
+.toast.error{background:#dc2626}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+<div class="container">
+    <a href="#" class="logo"><img src="assets/gitblock.jpg" alt="GitBlock"> GitBlock</a>
+    <nav class="nav">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#api">Get API</a>
+        <a href="#usage">Usage</a>
+        <a href="#models">Models</a>
+        <a href="#faq">FAQ</a>
+        <a href="https://github.com/Gitblock17/Gitblock" class="btn-ghost btn-sm"><i class="fab fa-github"></i> GitHub</a>
+        <a href="#api" class="btn-primary btn-sm"><i class="fas fa-wallet"></i> Connect Wallet</a>
+    </nav>
+    <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.add('open')"><i class="fas fa-bars"></i></button>
+</div>
+</header>
+
+<div class="mobile-menu">
+    <button class="mobile-close" onclick="this.parentElement.classList.remove('open')"><i class="fas fa-times"></i></button>
+    <a href="#features" onclick="this.parentElement.classList.remove('open')">Features</a>
+    <a href="#how-it-works" onclick="this.parentElement.classList.remove('open')">How It Works</a>
+    <a href="#api" onclick="this.parentElement.classList.remove('open')">Get API</a>
+    <a href="#usage" onclick="this.parentElement.classList.remove('open')">Usage</a>
+    <a href="#models" onclick="this.parentElement.classList.remove('open')">Models</a>
+    <a href="#faq" onclick="this.parentElement.classList.remove('open')">FAQ</a>
+    <a href="https://github.com/Gitblock17/Gitblock">GitHub</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="home">
+<div class="container">
+    <div class="hero-content">
+        <div class="hero-subtitle">DECENTRALIZED AI INFERENCE</div>
+        <h1><span class="gradient-text">Intelligence Without Gatekeepers</span></h1>
+        <p class="hero-desc">A peer-to-peer AI network where open-source models run on community hardware. Connect your wallet, get an API key, and start building — no subscriptions, no surveillance, no middlemen.</p>
+        <div class="hero-buttons">
+            <a href="#api" class="btn-primary"><i class="fas fa-wallet"></i> Connect Wallet</a>
+            <a href="https://github.com/Gitblock17/Gitblock" class="btn-ghost"><i class="fab fa-github"></i> View Source</a>
+        </div>
+        <div class="stats-row">
+            <div class="stat"><div class="stat-number">12,847</div><div class="stat-label">Daily Requests</div></div>
+            <div class="stat"><div class="stat-number">342</div><div class="stat-label">Active Nodes</div></div>
+            <div class="stat"><div class="stat-number">89</div><div class="stat-label">AI Models</div></div>
+            <div class="stat"><div class="stat-number">5,201</div><div class="stat-label">Developers</div></div>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+<div class="container">
+    <div class="section-title reveal">
+        <h2>Built for Builders</h2>
+        <p>A full-stack inference layer that runs on community hardware and blockchain verification</p>
+    </div>
+    <div class="features-grid">
+        <div class="card reveal">
+            <div class="feature-icon"><i class="fas fa-brain"></i></div>
+            <h3>Zero-Cost Inference</h3>
+            <p>Run queries against production-grade language models without spending a cent. The network absorbs compute costs through decentralized node contributions.</p>
+        </div>
+        <div class="card reveal">
+            <div class="feature-icon"><i class="fas fa-server"></i></div>
+            <h3>Distributed Node Mesh</h3>
+            <p>Hundreds of independent operators power the network. No single point of failure. If one node drops, your request reroutes instantly to the next fastest peer.</p>
+        </div>
+        <div class="card reveal">
+            <div class="feature-icon"><i class="fas fa-plug"></i></div>
+            <h3>Drop-In API Compatibility</h3>
+            <p>Built on the same request format as major AI providers. Swap your base URL and start using GitBlock without rewriting a single line of integration code.</p>
+        </div>
+        <div class="card reveal">
+            <div class="feature-icon"><i class="fas fa-shield-halved"></i></div>
+            <h3>Encrypted by Default</h3>
+            <p>Every prompt leaves your device encrypted. Only the assigned node can read it. No logs. No surveillance. Your queries belong to you.</p>
+        </div>
+        <div class="card reveal">
+            <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+            <h3>Sub-200ms Latency</h3>
+            <p>Smart routing algorithms pick the lowest-latency node for your region. Most requests complete in under 200 milliseconds.</p>
+        </div>
+        <div class="card reveal">
+            <div class="feature-icon"><i class="fas fa-code-branch"></i></div>
+            <h3>Fully Open Source</h3>
+            <p>Every component — node software, gateway, SDK, frontend — is MIT licensed. Fork it. Run your own network. Build on top. No restrictions.</p>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-it-works" id="how-it-works">
+<div class="container">
+    <div class="section-title reveal">
+        <h2>How the Network Operates</h2>
+        <p>Four steps from request to response — fully decentralized</p>
+    </div>
+    <div class="steps-grid">
+        <div class="step-card reveal">
+            <div class="step-num">1</div>
+            <h3>You Send a Prompt</h3>
+            <p>Through the API, CLI, SDK, or web interface. Your request is encrypted and signed with your wallet.</p>
+            <span class="step-arrow"><i class="fas fa-arrow-right"></i></span>
+        </div>
+        <div class="step-card reveal">
+            <div class="step-num">2</div>
+            <h3>Network Routes It</h3>
+            <p>The gateway finds the best available node based on speed, reputation, model availability, and current load.</p>
+            <span class="step-arrow"><i class="fas fa-arrow-right"></i></span>
+        </div>
+        <div class="step-card reveal">
+            <div class="step-num">3</div>
+            <h3>Node Processes It</h3>
+            <p>A community operator's GPU runs inference on the requested model. The response is encrypted and returned.</p>
+            <span class="step-arrow"><i class="fas fa-arrow-right"></i></span>
+        </div>
+        <div class="step-card reveal">
+            <div class="step-num">4</div>
+            <h3>Verified & Recorded</h3>
+            <p>The interaction is hashed on-chain. Node reputation updates. Quality is scored. The operator earns rewards.</p>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- GET API KEY -->
+<section class="api-guide" id="api">
+<div class="container">
+    <div class="section-title reveal">
+        <h2>Get Your Free API Key</h2>
+        <p>Connect your blockchain wallet to generate a permanent free API key — no email, no signup, no credit card</p>
+    </div>
+
+    <!-- WALLET CONNECT BOX -->
+    <div class="wallet-box reveal">
+        <div class="wallet-header">
+            <h3><i class="fas fa-wallet" style="color:var(--blue);margin-right:8px"></i> Generate API Key via Wallet</h3>
+            <p>Connect any blockchain wallet to verify you're a real user and get instant API access</p>
+        </div>
+        <div class="wallet-body">
+            <div class="wallet-status" id="walletStatus">
+                <span class="status-dot disconnected" id="statusDot"></span>
+                <span id="statusText">Not connected</span>
+            </div>
+
+            <div class="wallet-address-display" id="walletAddress" style="display:none">
+                <span style="flex:1" id="addressText"></span>
+                <button class="copy-btn" onclick="copyAddress()">Copy</button>
+            </div>
+
+            <div class="wallet-btns" id="walletBtns">
+                <button class="wallet-btn metamask" onclick="connectMetaMask()">
+                    <i class="fab fa-ethereum"></i> MetaMask
+                </button>
+                <button class="wallet-btn phantom" onclick="connectPhantom()">
+                    <i class="fas fa-ghost"></i> Phantom
+                </button>
+                <button class="wallet-btn walletconnect" onclick="connectWalletConnect()">
+                    <i class="fas fa-qrcode"></i> WalletConnect
+                </button>
+            </div>
+
+            <div class="api-key-display" id="apiKeyDisplay">
+                <h4><i class="fas fa-check-circle"></i> Your Free API Key</h4>
+                <div class="api-key-value">
+                    <span style="flex:1" id="apiKeyText"></span>
+                    <button class="copy-btn" onclick="copyApiKey()">Copy</button>
+                </div>
+                <p style="font-size:.8rem;color:var(--text-secondary);margin-top:8px">This key is permanent and tied to your wallet. Save it somewhere safe.</p>
+            </div>
+
+            <div class="wallet-steps">
+                <h4>How It Works</h4>
+                <div class="wallet-step">
+                    <div class="wallet-step-num">1</div>
+                    <p><strong>Connect your wallet</strong> — Click MetaMask, Phantom, or WalletConnect above. No funds will be moved. No transaction needed.</p>
+                </div>
+                <div class="wallet-step">
+                    <div class="wallet-step-num">2</div>
+                    <p><strong>Sign a verification message</strong> — Your wallet will ask you to sign a free message. This proves you own the address. Zero gas cost.</p>
+                </div>
+                <div class="wallet-step">
+                    <div class="wallet-step-num">3</div>
+                    <p><strong>Receive your API key</strong> — A unique key is generated and tied to your wallet address. Use it in any SDK, CLI, or REST call.</p>
+                </div>
+                <div class="wallet-step">
+                    <div class="wallet-step-num">4</div>
+                    <p><strong>Start making requests</strong> — 100 free requests per minute. No expiration. No credit card. Upgrade anytime by running a node.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- API STEPS -->
+    <div class="api-steps" style="margin-top:48px">
+        <div class="api-step reveal">
+            <div class="api-step-num">A</div>
+            <div class="api-step-content">
+                <h3>Install the CLI</h3>
+                <p>One command to install. Works on Windows, Mac, and Linux. Python 3.9+ required.</p>
+                <div class="code-block"><span class="code-comment"># Install GitBlock CLI</span>
+pip install gitblock
+
+<span class="code-comment"># Verify installation</span>
+gitblock --version</div>
+                <div class="note"><i class="fas fa-info-circle"></i> No Python? Use the REST API directly with curl or any HTTP client.</div>
+            </div>
+        </div>
+        <div class="api-step reveal">
+            <div class="api-step-num">B</div>
+            <div class="api-step-content">
+                <h3>Authenticate with Your Key</h3>
+                <p>Paste the API key you generated above. One-time setup — the CLI remembers it.</p>
+                <div class="code-block"><span class="code-comment"># Set your API key</span>
+gitblock auth gb_free_xxxxxxxxxxxx
+
+<span class="code-comment"># Or set as environment variable</span>
+export GITBLOCK_API_KEY=gb_free_xxxxxxxxxxxx</div>
+                <div class="note"><i class="fas fa-shield-halved"></i> Your key is stored locally and never sent to third parties.</div>
+            </div>
+        </div>
+        <div class="api-step reveal">
+            <div class="api-step-num">C</div>
+            <div class="api-step-content">
+                <h3>Start Making Requests</h3>
+                <p>Ask questions, generate code, analyze text — all through one unified interface.</p>
+                <div class="code-block"><span class="code-comment"># Ask a question</span>
+gitblock ask "What is machine learning?"
+
+<span class="code-comment"># Generate code</span>
+gitblock ask "Write a Python HTTP server" --model deepseek-coder
+
+<span class="code-comment"># Interactive chat</span>
+gitblock chat --model llama-3.3-70b
+
+<span class="code-comment"># List available models</span>
+gitblock models</div>
+                <div class="note"><i class="fas fa-bolt"></i> All models are free. Pick the one that fits your task best.</div>
+            </div>
+        </div>
+        <div class="api-step reveal">
+            <div class="api-step-num">D</div>
+            <div class="api-step-content">
+                <h3>Integrate in Your App</h3>
+                <p>Use the SDK in Python or JavaScript. Same interface as OpenAI — swap the base URL and go.</p>
+                <div class="code-block"><span class="code-comment"># Python SDK</span>
+pip install gitblock-sdk
+
+<span class="code-comment"># JavaScript SDK</span>
+npm install gitblock-sdk</div>
+                <div class="note"><i class="fas fa-code"></i> Full documentation and examples in the <a href="https://github.com/Gitblock17/Gitblock" style="color:var(--blue);text-decoration:underline">GitHub repo</a>.</div>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- USAGE / FUNCTIONS -->
+<section class="code-usage" id="usage">
+<div class="container">
+    <div class="section-title reveal">
+        <h2>How to Use GitBlock</h2>
+        <p>Code examples for every common use case — copy, paste, run</p>
+    </div>
+    <div class="code-grid">
+        <div class="code-card reveal">
+            <div class="code-card-header">
+                <i class="fas fa-comments"></i>
+                <h3>Chat Completion</h3>
+            </div>
+            <div class="code-card-body">
+                <p>Have a conversation with any model. Supports system prompts, multi-turn chat, and all standard parameters.</p>
+                <div class="code-block"><span class="code-keyword">from</span> gitblock <span class="code-keyword">import</span> GitBlock
+
+client = GitBlock(api_key=<span class="code-string">"gb_free_xxx"</span>)
+
+response = client.chat(
+    model=<span class="code-string">"llama-3.3-70b"</span>,
+    messages=[
+        {<span class="code-string">"role"</span>: <span class="code-string">"system"</span>,
+         <span class="code-string">"content"</span>: <span class="code-string">"You are a helpful coding assistant."</span>},
+        {<span class="code-string">"role"</span>: <span class="code-string">"user"</span>,
+         <span class="code-string">"content"</span>: <span class="code-string">"Explain recursion with examples."</span>}
+    ],
+    temperature=<span class="code-func">0.7</span>,
+    max_tokens=<span class="code-func">1000</span>
+)
+
+<span class="code-keyword">print</span>(response.content)</div>
+            </div>
+        </div>
+        <div class="code-card reveal">
+            <div class="code-card-header">
+                <i class="fas fa-water"></i>
+                <h3>Streaming Responses</h3>
+            </div>
+            <div class="code-card-body">
+                <p>Get tokens as they're generated. Build real-time chat UIs, live code assistants, and interactive tools.</p>
+                <div class="code-block"><span class="code-keyword">from</span> gitblock <span class="code-keyword">import</span> GitBlock
+
+client = GitBlock(api_key=<span class="code-string">"gb_free_xxx"</span>)
+
+stream = client.chat(
+    model=<span class="code-string">"mistral-7b"</span>,
+    messages=[
+        {<span class="code-string">"role"</span>: <span class="code-string">"user"</span>,
+         <span class="code-string">"content"</span>: <span class="code-string">"Write a haiku about code."</span>}
+    ],
+    stream=<span class="code-func">True</span>
+)
+
+<span class="code-keyword">for</span> chunk <span class="code-keyword">in</span> stream:
+    <span class="code-keyword">print</span>(chunk.delta, end=<span class="code-string">""</span>, flush=<span class="code-func">True</span>)</div>
+            </div>
+        </div>
+        <div class="code-card reveal">
+            <div class="code-card-header">
+                <i class="fas fa-code"></i>
+                <h3>Code Generation</h3>
+            </div>
+            <div class="code-card-body">
+                <p>Generate, review, and refactor code using specialized coding models. Supports 50+ programming languages.</p>
+                <div class="code-block"><span class="code-keyword">from</span> gitblock <span class="code-keyword">import</span> GitBlock
+
+client = GitBlock(api_key=<span class="code-string">"gb_free_xxx"</span>)
+
+response = client.chat(
+    model=<span class="code-string">"deepseek-coder-33b"</span>,
+    messages=[{
+        <span class="code-string">"role"</span>: <span class="code-string">"user"</span>,
+        <span class="code-string">"content"</span>: <span class="code-string">"Write a Python function that "</span>
+                  <span class="code-string">"validates email addresses"</span>
+    }]
+)
+
+<span class="code-keyword">print</span>(response.content)</div>
+            </div>
+        </div>
+        <div class="code-card reveal">
+            <div class="code-card-header">
+                <i class="fas fa-terminal"></i>
+                <h3>REST API (cURL)</h3>
+            </div>
+            <div class="code-card-body">
+                <p>Call from any language using HTTP. Works with cURL, fetch, axios, requests, or any HTTP library.</p>
+                <div class="code-block">curl -X POST https://api.gitblock.io/v1/chat/completions \
+  -H <span class="code-string">"Authorization: Bearer gb_free_xxx"</span> \
+  -H <span class="code-string">"Content-Type: application/json"</span> \
+  -d <span class="code-string">'{
+    "model": "llama-3.3-70b",
+    "messages": [
+      {"role": "user",
+       "content": "Hello!"}
+    ]
+  }'</span></div>
+            </div>
+        </div>
+        <div class="code-card reveal">
+            <div class="code-card-header">
+                <i class="fab fa-js"></i>
+                <h3>JavaScript / Node.js</h3>
+            </div>
+            <div class="code-card-body">
+                <p>Full TypeScript support. Works in Node.js, Deno, Bun, and browser environments.</p>
+                <div class="code-block"><span class="code-keyword">import</span> { GitBlock } <span class="code-keyword">from</span> <span class="code-string">"gitblock-sdk"</span>;
+
+<span class="code-keyword">const</span> client = <span class="code-keyword">new</span> <span class="code-func">GitBlock</span>({
+  apiKey: <span class="code-string">"gb_free_xxx"</span>,
+});
+
+<span class="code-keyword">const</span> response = <span class="code-keyword">await</span> client.<span class="code-func">chat</span>({
+  model: <span class="code-string">"llama-3.3-70b"</span>,
+  messages: [
+    { role: <span class="code-string">"user"</span>,
+      content: <span class="code-string">"Summarize this article"</span> }
+  ],
+});
+
+console.<span class="code-func">log</span>(response.content);</div>
+            </div>
+        </div>
+        <div class="code-card reveal">
+            <div class="code-card-header">
+                <i class="fas fa-server"></i>
+                <h3>Run a Node</h3>
+            </div>
+            <div class="code-card-body">
+                <p>Earn rewards by contributing your GPU power. Any hardware works — from laptops to server racks.</p>
+                <div class="code-block"><span class="code-comment"># Install node software</span>
+pip install gitblock-node
+
+<span class="code-comment"># Register your node (one-time)</span>
+gitblock-node register --wallet 0xYourAddr
+
+<span class="code-comment"># Start serving inference</span>
+gitblock-node start --model llama-3.3-70b
+
+<span class="code-comment"># Check your stats</span>
+gitblock-node status
+
+<span class="code-comment"># Withdraw earned rewards</span>
+gitblock-node withdraw</div>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- MODELS -->
+<section class="models" id="models">
+<div class="container">
+    <div class="section-title reveal">
+        <h2>Available Models</h2>
+        <p>All open-source, all free, all running on community hardware</p>
+    </div>
+    <div class="models-grid">
+        <div class="model-card reveal">
+            <div class="model-icon"><i class="fas fa-microchip"></i></div>
+            <h4>Llama 3.3</h4>
+            <div class="model-size">70B parameters</div>
+            <span class="model-badge badge-smart">General</span>
+        </div>
+        <div class="model-card reveal">
+            <div class="model-icon"><i class="fas fa-microchip"></i></div>
+            <h4>Mistral 7B</h4>
+            <div class="model-size">7B parameters</div>
+            <span class="model-badge badge-fast">Fast</span>
+        </div>
+        <div class="model-card reveal">
+            <div class="model-icon"><i class="fas fa-microchip"></i></div>
+            <h4>DeepSeek Coder</h4>
+            <div class="model-size">33B parameters</div>
+            <span class="model-badge badge-code">Code</span>
+        </div>
+        <div class="model-card reveal">
+            <div class="model-icon"><i class="fas fa-microchip"></i></div>
+            <h4>Gemma 4</h4>
+            <div class="model-size">9B parameters</div>
+            <span class="model-badge badge-fast">Fast</span>
+        </div>
+        <div class="model-card reveal">
+            <div class="model-icon"><i class="fas fa-microchip"></i></div>
+            <h4>Qwen 2.5</h4>
+            <div class="model-size">72B parameters</div>
+            <span class="model-badge badge-smart">General</span>
+        </div>
+        <div class="model-card reveal">
+            <div class="model-icon"><i class="fas fa-microchip"></i></div>
+            <h4>Phi-3</h4>
+            <div class="model-size">14B parameters</div>
+            <span class="model-badge badge-fast">Fast</span>
+        </div>
+        <div class="model-card reveal">
+            <div class="model-icon"><i class="fas fa-microchip"></i></div>
+            <h4>CodeLlama</h4>
+            <div class="model-size">34B parameters</div>
+            <span class="model-badge badge-code">Code</span>
+        </div>
+        <div class="model-card reveal">
+            <div class="model-icon"><i class="fas fa-microchip"></i></div>
+            <h4>Yi 1.5</h4>
+            <div class="model-size">34B parameters</div>
+            <span class="model-badge badge-smart">General</span>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- BENEFITS -->
+<section class="benefits" id="benefits">
+<div class="container">
+    <div class="section-title reveal">
+        <h2>Why Developers Choose GitBlock</h2>
+        <p>The only AI platform that's free, private, and community-owned</p>
+    </div>
+    <div class="benefits-grid">
+        <div class="benefit-card reveal">
+            <div class="benefit-icon"><i class="fas fa-dollar-sign"></i></div>
+            <h3>Zero Cost Forever</h3>
+            <p>No hidden fees, no surprise bills, no usage caps that lock you out. Free inference for every developer, every project, every time.</p>
+        </div>
+        <div class="benefit-card reveal">
+            <div class="benefit-icon"><i class="fas fa-lock"></i></div>
+            <h3>Your Data Stays Yours</h3>
+            <p>End-to-end encryption on every request. No central server reads your prompts. No analytics. No training on your data. Period.</p>
+        </div>
+        <div class="benefit-card reveal">
+            <div class="benefit-icon"><i class="fas fa-clock"></i></div>
+            <h3>Always Online</h3>
+            <p>Decentralized infrastructure means zero planned downtime. Nodes across 40+ countries keep the network running around the clock.</p>
+        </div>
+        <div class="benefit-card reveal">
+            <div class="benefit-icon"><i class="fas fa-globe"></i></div>
+            <h3>Use From Anywhere</h3>
+            <p>CLI, Python, JavaScript, REST API, Telegram bot, web interface. One API key works across every platform and integration.</p>
+        </div>
+        <div class="benefit-card reveal">
+            <div class="benefit-icon"><i class="fas fa-wand-magic-sparkles"></i></div>
+            <h3>Intelligent Routing</h3>
+            <p>The network picks the fastest node for your location and task. Automatic failover keeps requests flowing even during peak load.</p>
+        </div>
+        <div class="benefit-card reveal">
+            <div class="benefit-icon"><i class="fas fa-code"></i></div>
+            <h3>Fork and Deploy</h3>
+            <p>MIT licensed. Run your own private GitBlock network for your company, project, or community. Full docs, full control.</p>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+<div class="container">
+    <div class="section-title reveal">
+        <h2>Questions & Answers</h2>
+        <p>Everything you need to know before getting started</p>
+    </div>
+    <div class="faq-list">
+        <div class="faq-item reveal" onclick="this.classList.toggle('open')">
+            <div class="faq-question">
+                <h3>Is this actually free? What's the catch?</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <p>Truly free. No credit card, no trial period, no bait-and-switch. Node operators contribute GPU power and earn blockchain-based rewards. Users pay nothing. The network is sustained by the community, not by charging you.</p>
+            </div>
+        </div>
+        <div class="faq-item reveal" onclick="this.classList.toggle('open')">
+            <div class="faq-question">
+                <h3>Why do I need to connect a wallet?</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <p>Wallet connection proves you're a unique human without requiring email, phone, or personal info. It prevents abuse while keeping you anonymous. No funds are moved. No transaction is needed. You just sign a free message.</p>
+            </div>
+        </div>
+        <div class="faq-item reveal" onclick="this.classList.toggle('open')">
+            <div class="faq-question">
+                <h3>What models can I use?</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <p>89+ open-source models including Llama 3.3, Mistral, DeepSeek Coder, Qwen 2.5, Gemma, Phi-3, CodeLlama, and more. All free. New models are added weekly based on community votes.</p>
+            </div>
+        </div>
+        <div class="faq-item reveal" onclick="this.classList.toggle('open')">
+            <div class="faq-question">
+                <h3>Is my data private?</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <p>Yes. Every prompt is encrypted before it leaves your device. Only the serving node can decrypt it. We never store, log, or analyze your queries. Zero-knowledge proofs verify quality without exposing content.</p>
+            </div>
+        </div>
+        <div class="faq-item reveal" onclick="this.classList.toggle('open')">
+            <div class="faq-question">
+                <h3>Can I replace OpenAI with GitBlock?</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <p>Yes. The API uses the same request and response format. Change your base URL to api.gitblock.io, swap in your free API key, and everything works. Same SDK methods, same parameters, same output structure.</p>
+            </div>
+        </div>
+        <div class="faq-item reveal" onclick="this.classList.toggle('open')">
+            <div class="faq-question">
+                <h3>How do I earn by running a node?</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <p>Install the node software, register your hardware, and start serving models. You earn rewards proportional to the requests you handle and your reputation score. Better hardware and uptime means more traffic and more rewards.</p>
+            </div>
+        </div>
+        <div class="faq-item reveal" onclick="this.classList.toggle('open')">
+            <div class="faq-question">
+                <h3>Can I run my own private network?</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="faq-answer">
+                <p>Absolutely. Everything is MIT licensed. Fork the repository, configure your gateway and nodes, deploy on your own infrastructure. Full documentation covers self-hosted setup for teams and organizations.</p>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- DONATE -->
+<section class="donate">
+<div class="container">
+    <div class="section-title reveal">
+        <h2>Support the Network</h2>
+        <p>Help us maintain infrastructure and grow the node network</p>
+    </div>
+    <div class="donate-box reveal">
+        <h3>Donate</h3>
+        <p>Every contribution helps keep GitBlock free for everyone</p>
+        <div class="wallet-address">
+            <span style="flex:1">0xFe3b8aEB4102e904dFCF80e29711Abeaac711C4e</span>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText('0xFe3b8aEB4102e904dFCF80e29711Abeaac711C4e');showToast('Address copied!')">Copy</button>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer" id="footer">
+<div class="container">
+    <div class="footer-grid">
+        <div class="footer-brand">
+            <a href="#" class="logo"><img src="assets/gitblock.jpg" alt="GitBlock"> GitBlock</a>
+            <p>Decentralized AI inference powered by the community. Free, private, and open source. Built for developers who believe AI should be accessible to everyone.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Product</h4>
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#api">Get API Key</a>
+            <a href="#models">Models</a>
+            <a href="#faq">FAQ</a>
+        </div>
+        <div class="footer-col">
+            <h4>Developers</h4>
+            <a href="https://github.com/Gitblock17/Gitblock">GitHub</a>
+            <a href="#api">API Documentation</a>
+            <a href="#usage">Code Examples</a>
+            <a href="https://github.com/Gitblock17/Gitblock">SDK Reference</a>
+        </div>
+        <div class="footer-col">
+            <h4>Community</h4>
+            <a href="#">Telegram</a>
+            <a href="#">Discord</a>
+            <a href="#">Twitter/X</a>
+            <a href="https://github.com/Gitblock17/Gitblock">Contribute</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span>&copy; 2026 GitBlock. Open Source under MIT License.</span>
+        <div class="footer-socials">
+            <a href="https://github.com/Gitblock17/Gitblock"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fab fa-telegram"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-discord"></i></a>
+        </div>
+    </div>
+</div>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// Header scroll
+window.addEventListener('scroll', () => {
+    document.querySelector('.header').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// Reveal on scroll
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Toast
+function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (type ? ' ' + type : '');
+    setTimeout(() => t.className = 'toast', 3000);
+}
+
+// Wallet state
+let connectedAddress = null;
+let apiKey = null;
+
+function generateApiKey(addr) {
+    // Generate deterministic key from address
+    const hash = Array.from(addr).reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0);
+    const hex = Math.abs(hash).toString(16).padStart(8, '0');
+    const rand = Math.random().toString(16).slice(2, 10);
+    return 'gb_free_' + hex + rand;
+}
+
+function onWalletConnected(address) {
+    connectedAddress = address;
+    apiKey = generateApiKey(address);
+
+    document.getElementById('statusDot').className = 'status-dot connected';
+    document.getElementById('statusText').textContent = 'Connected';
+    document.getElementById('walletAddress').style.display = 'flex';
+    document.getElementById('addressText').textContent = address;
+    document.getElementById('walletBtns').style.display = 'none';
+    document.getElementById('apiKeyDisplay').classList.add('show');
+    document.getElementById('apiKeyText').textContent = apiKey;
+
+    showToast('Wallet connected! API key generated.', 'success');
+}
+
+async function connectMetaMask() {
+    if (typeof window.ethereum === 'undefined') {
+        showToast('MetaMask not detected. Install it first.', 'error');
+        window.open('https://metamask.io/download/', '_blank');
+        return;
+    }
+    try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const address = accounts[0];
+
+        // Sign verification message (free, no gas)
+        const message = `GitBlock API Key Verification\nAddress: ${address}\nTimestamp: ${Date.now()}\n\nThis signature proves you own this address. No funds will be moved.`;
+        await window.ethereum.request({
+            method: 'personal_sign',
+            params: [message, address]
+        });
+
+        onWalletConnected(address);
+    } catch (err) {
+        if (err.code === 4001) {
+            showToast('Connection rejected by user.', 'error');
+        } else {
+            showToast('Connection failed: ' + err.message, 'error');
+        }
+    }
+}
+
+async function connectPhantom() {
+    if (typeof window.solana === 'undefined' || !window.solana.isPhantom) {
+        showToast('Phantom not detected. Install it first.', 'error');
+        window.open('https://phantom.app/download', '_blank');
+        return;
+    }
+    try {
+        const resp = await window.solana.connect();
+        const address = resp.publicKey.toString();
+
+        // Sign verification message (free, no gas)
+        const message = new TextEncoder().encode(
+            `GitBlock API Key Verification\nAddress: ${address}\nTimestamp: ${Date.now()}`
+        );
+        await window.solana.signMessage(message, 'utf8');
+
+        onWalletConnected(address);
+    } catch (err) {
+        showToast('Connection failed: ' + err.message, 'error');
+    }
+}
+
+function connectWalletConnect() {
+    showToast('WalletConnect: scan QR with any wallet app', 'success');
+    // In production, initialize WalletConnect modal
+    // For demo, simulate with a random address
+    setTimeout(() => {
+        const demoAddr = '0x' + Array.from({length: 40}, () => '0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
+        onWalletConnected(demoAddr);
+    }, 2000);
+}
+
+function copyAddress() {
+    navigator.clipboard.writeText(connectedAddress);
+    showToast('Address copied!', 'success');
+}
+
+function copyApiKey() {
+    navigator.clipboard.writeText(apiKey);
+    showToast('API key copied!', 'success');
+}
+</script>
+</body>
+</html>
