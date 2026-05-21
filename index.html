@@ -925,7 +925,7 @@
 <section id="home">
     <div class="container">
         <h1 class="reveal">Intelligence Without <span>Gatekeepers</span></h1>
-        <p class="hero-desc reveal">A decentralized AI inference network. Free, open, and powered by contributors worldwide. No API keys to buy. No accounts to create.</p>
+        <p class="hero-desc reveal">Free AI inference with OpenAI-compatible endpoints. No API keys to buy. No accounts to create. Connect a wallet, get a key, start building.</p>
         <div class="hero-actions reveal">
             <button class="btn-primary" onclick="document.getElementById('api').scrollIntoView({behavior:'smooth'})">
                 <i class="fas fa-wallet"></i> Connect Wallet &amp; Get API Key
@@ -936,20 +936,20 @@
         </div>
         <div class="stats-row reveal">
             <div class="stat-item">
-                <div class="number">12,847</div>
-                <div class="label">Daily Requests</div>
-            </div>
-            <div class="stat-item">
-                <div class="number">342</div>
-                <div class="label">Active Nodes</div>
-            </div>
-            <div class="stat-item">
-                <div class="number">89</div>
+                <div class="number">8</div>
                 <div class="label">AI Models</div>
             </div>
             <div class="stat-item">
-                <div class="number">5,201</div>
-                <div class="label">Developers</div>
+                <div class="number">100%</div>
+                <div class="label">Free</div>
+            </div>
+            <div class="stat-item">
+                <div class="number">OpenAI</div>
+                <div class="label">Compatible</div>
+            </div>
+            <div class="stat-item">
+                <div class="number">Phase 3</div>
+                <div class="label">Decentralized</div>
             </div>
         </div>
     </div>
@@ -969,8 +969,8 @@
             </div>
             <div class="card reveal">
                 <div class="card-icon"><i class="fas fa-globe"></i></div>
-                <h3>Fully Distributed</h3>
-                <p>Requests are routed across a global mesh of nodes. No single point of failure. No central server.</p>
+                <h3>Drop-In Compatible</h3>
+                <p>Works with any OpenAI-compatible client. Just change the base URL. No SDK changes needed.</p>
             </div>
             <div class="card reveal">
                 <div class="card-icon"><i class="fas fa-plug"></i></div>
@@ -979,13 +979,13 @@
             </div>
             <div class="card reveal">
                 <div class="card-icon"><i class="fas fa-shield-halved"></i></div>
-                <h3>End-to-End Encrypted</h3>
-                <p>Your prompts and responses are encrypted in transit. No logging. No data harvesting.</p>
+                <h3>Encrypted In Transit</h3>
+                <p>All requests use HTTPS encryption. Your prompts and responses are protected in transit.</p>
             </div>
             <div class="card reveal">
                 <div class="card-icon"><i class="fas fa-bolt"></i></div>
-                <h3>Sub-200ms Latency</h3>
-                <p>Intelligent routing selects the nearest available node. Streaming responses start in under 200ms.</p>
+                <h3>Fast Responses</h3>
+                <p>Optimized inference pipeline with streaming support. Token-by-token delivery starts immediately.</p>
             </div>
             <div class="card reveal">
                 <div class="card-icon"><i class="fas fa-code-branch"></i></div>
@@ -1001,7 +1001,7 @@
     <div class="container">
         <div class="section-label reveal">How It Works</div>
         <h2 class="section-title reveal">Four Steps to Free Inference</h2>
-        <p class="section-desc reveal">From prompt to response in milliseconds, with zero cost.</p>
+        <p class="section-desc reveal">From prompt to response in seconds, with zero cost.</p>
         <div class="steps-grid">
             <div class="step reveal">
                 <div class="step-number">1</div>
@@ -1010,18 +1010,18 @@
             </div>
             <div class="step reveal">
                 <div class="step-number">2</div>
-                <h3>Smart Route</h3>
-                <p>The network finds the optimal node based on latency, load, and model availability.</p>
+                <h3>Authenticate</h3>
+                <p>Your gb_ API key is validated to ensure authorized access to the inference API.</p>
             </div>
             <div class="step reveal">
                 <div class="step-number">3</div>
-                <h3>Process</h3>
-                <p>A contributor node runs inference using the requested model and returns your result.</p>
+                <h3>Inference</h3>
+                <p>The selected model processes your prompt and generates a response using optimized inference.</p>
             </div>
             <div class="step reveal">
                 <div class="step-number">4</div>
-                <h3>Verified Response</h3>
-                <p>Output is cryptographically verified and delivered to you in under 200ms.</p>
+                <h3>Stream Response</h3>
+                <p>Output is streamed token-by-token back to your client via the OpenAI-compatible API.</p>
             </div>
         </div>
     </div>
@@ -1282,7 +1282,7 @@ export OPENAI_BASE_URL=https://api.gitblock.io/v1</pre>
     <div class="container">
         <div class="section-label reveal">Models</div>
         <h2 class="section-title reveal">Available Models</h2>
-        <p class="section-desc reveal">All models are hosted on the decentralized network. Pick the right one for your task.</p>
+        <p class="section-desc reveal">Curated models optimized for different tasks. All accessible through a single API endpoint.</p>
         <div class="models-grid">
             <div class="model-card reveal">
                 <div class="model-badge">General</div>
@@ -1351,12 +1351,12 @@ export OPENAI_BASE_URL=https://api.gitblock.io/v1</pre>
             <div class="benefit-card reveal">
                 <div class="benefit-icon"><i class="fas fa-lock"></i></div>
                 <h3>Privacy First</h3>
-                <p>No prompt logging. No data retention. End-to-end encryption ensures your data stays yours.</p>
+                <p>All requests use HTTPS encryption. No prompts are stored or used for training.</p>
             </div>
             <div class="benefit-card reveal">
                 <div class="benefit-icon"><i class="fas fa-signal"></i></div>
                 <h3>Always Online</h3>
-                <p>Distributed architecture means no single point of failure. 99.97% uptime across the network.</p>
+                <p>Reliable hosted infrastructure with automatic failover. Designed for consistent availability.</p>
             </div>
             <div class="benefit-card reveal">
                 <div class="benefit-icon"><i class="fas fa-earth-americas"></i></div>
@@ -1365,8 +1365,8 @@ export OPENAI_BASE_URL=https://api.gitblock.io/v1</pre>
             </div>
             <div class="benefit-card reveal">
                 <div class="benefit-icon"><i class="fas fa-route"></i></div>
-                <h3>Smart Routing</h3>
-                <p>Requests are automatically routed to the fastest available node with the requested model.</p>
+                <h3>Roadmap: Distributed</h3>
+                <p>Phase 3 will add a decentralized node network. Community members will contribute GPU compute for shared access.</p>
             </div>
             <div class="benefit-card reveal">
                 <div class="benefit-icon"><i class="fas fa-code-fork"></i></div>
@@ -1390,7 +1390,7 @@ export OPENAI_BASE_URL=https://api.gitblock.io/v1</pre>
                     <i class="fas fa-chevron-down"></i>
                 </button>
                 <div class="faq-answer">
-                    <div class="faq-answer-inner">There's no catch. GitBlock is sustained by a network of contributor nodes who donate spare compute. Think of it like SETI@home but for AI inference. Node operators earn reputation and governance tokens, not dollars.</div>
+                    <div class="faq-answer-inner">There's no catch. GitBlock is a community-driven project sustained by the team. Free access is a core principle — the goal is to make AI inference available to everyone. We plan to support community compute contributions in Phase 3.</div>
                 </div>
             </div>
             <div class="faq-item reveal">
@@ -1399,7 +1399,7 @@ export OPENAI_BASE_URL=https://api.gitblock.io/v1</pre>
                     <i class="fas fa-chevron-down"></i>
                 </button>
                 <div class="faq-answer">
-                    <div class="faq-answer-inner">All traffic is end-to-end encrypted. Processing nodes receive encrypted payloads and return encrypted responses. No prompts are logged, stored, or used for training. The node operator never sees plaintext.</div>
+                    <div class="faq-answer-inner">All traffic is encrypted via HTTPS. Your prompts are not stored, logged, or used for training. We take privacy seriously and minimize data retention.</div>
                 </div>
             </div>
             <div class="faq-item reveal">
@@ -1417,7 +1417,7 @@ export OPENAI_BASE_URL=https://api.gitblock.io/v1</pre>
                     <i class="fas fa-chevron-down"></i>
                 </button>
                 <div class="faq-answer">
-                    <div class="faq-answer-inner">Currently 89 models are available including Llama 3.3, DeepSeek Coder, Qwen 2.5, Mistral, CodeLlama, Phi-3, Gemma 4, and Yi 1.5. New models are added as contributors bring them online.</div>
+                    <div class="faq-answer-inner">Currently 8 models are available including Llama 3.3, DeepSeek Coder, Qwen 2.5, Mistral, CodeLlama, Phi-3, Gemma 4, and Yi 1.5. We plan to expand the catalog as the project grows.</div>
                 </div>
             </div>
             <div class="faq-item reveal">
@@ -1426,7 +1426,7 @@ export OPENAI_BASE_URL=https://api.gitblock.io/v1</pre>
                     <i class="fas fa-chevron-down"></i>
                 </button>
                 <div class="faq-answer">
-                    <div class="faq-answer-inner">Yes! Running a node is as simple as pulling the Docker image and configuring your models. You'll need a GPU with at least 8GB VRAM for smaller models. See our GitHub for detailed setup instructions.</div>
+                    <div class="faq-answer-inner">Not yet — but it's coming. Phase 3 of our roadmap includes a decentralized node network where anyone can contribute GPU compute. Join our GitHub to stay updated on development progress.</div>
                 </div>
             </div>
             <div class="faq-item reveal">
@@ -1435,7 +1435,7 @@ export OPENAI_BASE_URL=https://api.gitblock.io/v1</pre>
                     <i class="fas fa-chevron-down"></i>
                 </button>
                 <div class="faq-answer">
-                    <div class="faq-answer-inner">GitBlock uses the exact same API format as OpenAI. The only difference is the base URL. Performance is comparable for most tasks, with sub-200ms latency. The key difference: it's completely free and decentralized.</div>
+                    <div class="faq-answer-inner">GitBlock uses the exact same API format as OpenAI. The only difference is the base URL — just point your client to api.gitblock.io. The key difference: it's completely free.</div>
                 </div>
             </div>
             <div class="faq-item reveal">
@@ -1444,7 +1444,7 @@ export OPENAI_BASE_URL=https://api.gitblock.io/v1</pre>
                     <i class="fas fa-chevron-down"></i>
                 </button>
                 <div class="faq-answer">
-                    <div class="faq-answer-inner">There are soft limits to prevent abuse (currently 100 requests per minute per key). If you need higher throughput, you can run your own node or request a limit increase via GitHub issues.</div>
+                    <div class="faq-answer-inner">There are soft limits to prevent abuse (currently 20 requests per minute per key). If you need higher throughput, open an issue on GitHub and we'll work with you.</div>
                 </div>
             </div>
         </div>
@@ -1456,7 +1456,7 @@ export OPENAI_BASE_URL=https://api.gitblock.io/v1</pre>
     <div class="footer-grid">
             <div class="footer-col">
                 <h4><img src="assets/gitblock.jpg" alt="GitBlock" style="width:24px;height:24px;border-radius:6px;vertical-align:middle;margin-right:8px;object-fit:cover;">GitBlock</h4>
-            <p>Decentralized AI inference for everyone. Free, open, and unstoppable.</p>
+            <p>Free AI inference for everyone. Open, accessible, and community-driven.</p>
             <div class="footer-socials">
                 <a href="https://github.com/Gitblock17/Gitblock" target="_blank"><i class="fab fa-github"></i></a>
                 <a href="https://x.com/gitblock_" target="_blank"><i class="fab fa-x-twitter"></i></a>

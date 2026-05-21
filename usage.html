@@ -817,28 +817,11 @@ console.<span class="fn">log</span>(data.choices[<span class="num">0</span>].mes
             <span class="lang-icon node"><i class="fab fa-docker"></i></span>
             Run a Node
         </h2>
-        <p>Contribute compute to the network by running a node.</p>
-
-        <div class="code-block">
-            <div class="code-block-header">
-                <span>docker</span>
-                <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
-            </div>
-<pre><span class="cmt"># Run a contributor node with Docker</span>
-docker run -d \
-  --name gitblock-node \
-  -e NODE_KEY=your_node_key \
-  -e MODELS=llama-3.3-70b \
-  -p <span class="num">8080</span>:<span class="num">8080</span> \
-  gitblock/node:latest
-
-<span class="cmt"># Check node status</span>
-curl http://localhost:<span class="num">8080</span>/health</pre>
-        </div>
+        <p>Contribute compute to the network by running a node. <strong style="color:#2563eb;">Coming in Phase 3.</strong></p>
 
         <div class="note-box">
-            <div class="note-label">Requirements</div>
-            <p>You need a GPU with at least 8GB VRAM for smaller models. See the <a href="https://github.com/Gitblock17/Gitblock" target="_blank" style="color:#2563eb;">GitHub repo</a> for full setup instructions.</p>
+            <div class="note-label">Roadmap</div>
+            <p>Node software is under development. In Phase 3, you'll be able to contribute GPU compute and earn tokens. Stay tuned on <a href="https://github.com/Gitblock17/Gitblock" target="_blank" style="color:#2563eb;">GitHub</a> for updates.</p>
         </div>
     </section>
 
