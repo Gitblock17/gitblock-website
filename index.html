@@ -6,7 +6,8 @@
 <title>GitBlock — Decentralized AI Inference Network</title>
 <link rel="icon" href="assets/gitblock.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://unpkg.com/@walletconnect/ethereum-provider@2.17.3/dist/index.umd.js" defer></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#ffffff;--blue:#2563eb;--blue-light:#3b82f6;--blue-dark:#1d4ed8;--blue-glow:rgba(37,99,235,0.08);--card:rgba(37,99,235,0.04);--border:rgba(37,99,235,0.12);--text:#1e293b;--text-secondary:#64748b;--radius:16px;--max:1200px;--success:#22c55e;--warning:#eab308}
@@ -152,6 +153,29 @@ img{max-width:100%;height:auto}
 .wallet-step p{font-size:.85rem;color:var(--text-secondary);line-height:1.5}
 .wallet-step p strong{color:var(--text)}
 
+/* ── LLM SHOWCASE ── */
+.llm-showcase{background:linear-gradient(135deg,rgba(37,99,235,0.03) 0%,rgba(37,99,235,0.08) 100%)}
+.llm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.llm-card{padding:14px;background:#fff;border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:all .2s;position:relative;text-align:center}
+.llm-card:hover,.llm-card.selected{border-color:var(--blue);box-shadow:0 4px 16px rgba(37,99,235,0.15);transform:translateY(-2px)}
+.llm-card.selected{background:rgba(37,99,235,0.06)}
+.llm-icon{width:36px;height:36px;border-radius:10px;background:var(--blue-glow);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.95rem;margin:0 auto 8px;color:var(--blue)}
+.llm-name{font-size:.82rem;font-weight:700;color:var(--text);font-family:'SF Mono','Fira Code',monospace}
+.llm-meta{font-size:.68rem;color:var(--text-secondary);margin-top:3px}
+.llm-tag{display:inline-block;padding:2px 8px;border-radius:100px;font-size:.6rem;font-weight:600;margin-top:6px}
+.tag-recommended{background:rgba(34,197,94,0.12);color:#16a34a}
+.tag-code{background:rgba(168,85,247,0.12);color:#9333ea}
+.tag-smart{background:rgba(37,99,235,0.12);color:var(--blue)}
+.tag-fast{background:rgba(234,179,8,0.12);color:#ca8a04}
+@media(max-width:768px){.llm-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ── CLI COMMANDS ── */
+.cli-commands{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.cli-cmd{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.cli-label{font-size:.75rem;font-weight:600;color:var(--blue);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.cli-line{display:flex;align-items:center;gap:8px}
+.cli-line code{flex:1;background:#f1f5f9;padding:8px 12px;border-radius:8px;font-size:.75rem;font-family:'SF Mono','Fira Code',monospace;color:var(--text);word-break:break-all;overflow-x:auto}
+
 /* ── CODE USAGE ── */
 .code-usage{padding:100px 0;position:relative;z-index:2}
 .code-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
@@ -220,6 +244,10 @@ img{max-width:100%;height:auto}
 .footer-socials a{color:var(--text-secondary);font-size:1.1rem;transition:color .2s}
 .footer-socials a:hover{color:var(--blue)}
 @media(max-width:768px){.footer-grid{grid-template-columns:1fr 1fr}.footer-bottom{flex-direction:column;gap:12px}}
+
+/* ── NEW KEY BTN ── */
+.copy-btn i{margin-right:2px}
+.llm-card.selected::after{content:'✓';position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700}
 
 /* ── TOAST ── */
 .toast{position:fixed;bottom:24px;right:24px;padding:14px 20px;border-radius:12px;background:#1e293b;color:#fff;font-size:.85rem;font-weight:500;z-index:9999;transform:translateY(100px);opacity:0;transition:all .3s}
@@ -362,14 +390,14 @@ img{max-width:100%;height:auto}
 <div class="container">
     <div class="section-title reveal">
         <h2>Get Your Free API Key</h2>
-        <p>Connect your blockchain wallet to generate a permanent free API key — no email, no signup, no credit card</p>
+        <p>Connect your wallet to generate a permanent free API key — unlimited requests, no rate limits, no email, no signup, no credit card</p>
     </div>
 
     <!-- WALLET CONNECT BOX -->
     <div class="wallet-box reveal">
         <div class="wallet-header">
-            <h3><i class="fas fa-wallet" style="color:var(--blue);margin-right:8px"></i> Generate API Key via Wallet</h3>
-            <p>Connect any blockchain wallet to verify you're a real user and get instant API access</p>
+            <h3><i class="fas fa-wallet" style="color:var(--blue);margin-right:8px"></i> Get Your Free API Key</h3>
+            <p>Connect any wallet to verify you're a real user — get instant, unlimited, free API access with no rate limits</p>
         </div>
         <div class="wallet-body">
             <div class="wallet-status" id="walletStatus">
@@ -401,74 +429,119 @@ img{max-width:100%;height:auto}
                     <div class="api-key-value">
                         <span style="flex:1" id="apiKeyText"></span>
                         <button class="copy-btn" onclick="copyApiKey()">Copy</button>
+                        <button class="copy-btn" onclick="regenerateApiKey()" style="background:#16a34a;margin-left:4px"><i class="fas fa-rotate"></i> New Key</button>
                     </div>
                     <div class="api-meta">
                         <span><i class="fas fa-link"></i> Base URL: <code>https://api.gitblock.io/v1</code></span>
-                        <span><i class="fas fa-bolt"></i> Rate Limit: 100 req/min</span>
-                        <span><i class="fas fa-infinity"></i> No Expiration</span>
+                        <span><i class="fas fa-infinity"></i> Unlimited Requests — No Rate Limit</span>
+                        <span><i class="fas fa-dollar-sign"></i> 100% Free — No Expiration</span>
                     </div>
                 </div>
 
-                <!-- Available Models -->
+                <!-- YOUR LLMs Section -->
+                <div class="dashboard-section llm-showcase">
+                    <h4><i class="fas fa-brain" style="color:var(--blue)"></i> Your Available LLMs</h4>
+                    <p class="dashboard-desc">Select your preferred model below. All models are free with unlimited requests — use in any CLI, code, or AI agent (Hermes, LangChain, CrewAI, etc).</p>
+                    <div class="llm-grid">
+                        <div class="llm-card" onclick="selectLLM(this,'llama-3.3-70b')">
+                            <div class="llm-icon"><i class="fas fa-fire"></i></div>
+                            <div class="llm-name">llama-3.3-70b</div>
+                            <div class="llm-meta">70B · Best quality · General purpose</div>
+                            <span class="llm-tag tag-recommended">Recommended</span>
+                        </div>
+                        <div class="llm-card" onclick="selectLLM(this,'deepseek-coder-33b')">
+                            <div class="llm-icon"><i class="fas fa-code"></i></div>
+                            <div class="llm-name">deepseek-coder-33b</div>
+                            <div class="llm-meta">33B · Code generation · Debugging</div>
+                            <span class="llm-tag tag-code">Best for Code</span>
+                        </div>
+                        <div class="llm-card" onclick="selectLLM(this,'qwen-2.5-72b')">
+                            <div class="llm-icon"><i class="fas fa-globe"></i></div>
+                            <div class="llm-name">qwen-2.5-72b</div>
+                            <div class="llm-meta">72B · Multilingual · Reasoning</div>
+                            <span class="llm-tag tag-smart">Most Capable</span>
+                        </div>
+                        <div class="llm-card" onclick="selectLLM(this,'mistral-7b')">
+                            <div class="llm-icon"><i class="fas fa-bolt"></i></div>
+                            <div class="llm-name">mistral-7b</div>
+                            <div class="llm-meta">7B · Ultra fast · Low latency</div>
+                            <span class="llm-tag tag-fast">Fastest</span>
+                        </div>
+                        <div class="llm-card" onclick="selectLLM(this,'codellama-34b')">
+                            <div class="llm-icon"><i class="fas fa-terminal"></i></div>
+                            <div class="llm-name">codellama-34b</div>
+                            <div class="llm-meta">34B · Code completion · CLI</div>
+                            <span class="llm-tag tag-code">Code</span>
+                        </div>
+                        <div class="llm-card" onclick="selectLLM(this,'phi-3-14b')">
+                            <div class="llm-icon"><i class="fas fa-feather"></i></div>
+                            <div class="llm-name">phi-3-14b</div>
+                            <div class="llm-meta">14B · Efficient · Balanced</div>
+                            <span class="llm-tag tag-fast">Lightweight</span>
+                        </div>
+                        <div class="llm-card" onclick="selectLLM(this,'gemma-4-9b')">
+                            <div class="llm-icon"><i class="fas fa-gem"></i></div>
+                            <div class="llm-name">gemma-4-9b</div>
+                            <div class="llm-meta">9B · Fast · Lightweight</div>
+                            <span class="llm-tag tag-fast">Quick</span>
+                        </div>
+                        <div class="llm-card" onclick="selectLLM(this,'yi-1.5-34b')">
+                            <div class="llm-icon"><i class="fas fa-scale-balanced"></i></div>
+                            <div class="llm-name">yi-1.5-34b</div>
+                            <div class="llm-meta">34B · Balanced · Versatile</div>
+                            <span class="llm-tag tag-smart">Balanced</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CLI Usage Section -->
                 <div class="dashboard-section">
-                    <h4><i class="fas fa-brain" style="color:var(--blue)"></i> Available Models</h4>
-                    <p class="dashboard-desc">All models are free. Use any of these in your API calls.</p>
-                    <div class="models-dashboard-grid">
-                        <div class="model-dash-card">
-                            <div class="model-dash-name">llama-3.3-70b</div>
-                            <div class="model-dash-meta">70B · General · Best quality</div>
+                    <h4><i class="fas fa-terminal" style="color:var(--blue)"></i> Use in Your CLI</h4>
+                    <p class="dashboard-desc">Copy these commands into your terminal. Replace <code>YOUR_KEY</code> with your API key above.</p>
+                    <div class="cli-commands">
+                        <div class="cli-cmd">
+                            <div class="cli-label">Install</div>
+                            <div class="cli-line"><code>pip install openai</code><button class="copy-btn" onclick="navigator.clipboard.writeText('pip install openai');showToast('Copied!','success')">Copy</button></div>
                         </div>
-                        <div class="model-dash-card">
-                            <div class="model-dash-name">mistral-7b</div>
-                            <div class="model-dash-meta">7B · Fast · Low latency</div>
+                        <div class="cli-cmd">
+                            <div class="cli-label">Quick ask (Python)</div>
+                            <div class="cli-line"><code id="cliPythonCmd">python -c "from openai import OpenAI; c=OpenAI(api_key='YOUR_KEY',base_url='https://api.gitblock.io/v1'); print(c.chat.completions.create(model='llama-3.3-70b',messages=[{'role':'user','content':'Hello'}]).choices[0].message.content)"</code><button class="copy-btn" onclick="copyCliCmd('cliPythonCmd')">Copy</button></div>
                         </div>
-                        <div class="model-dash-card">
-                            <div class="model-dash-name">deepseek-coder-33b</div>
-                            <div class="model-dash-meta">33B · Code · Programming</div>
+                        <div class="cli-cmd">
+                            <div class="cli-label">Quick ask (cURL)</div>
+                            <div class="cli-line"><code id="cliCurlCmd">curl -s https://api.gitblock.io/v1/chat/completions -H "Authorization: Bearer YOUR_KEY" -H "Content-Type: application/json" -d '{"model":"llama-3.3-70b","messages":[{"role":"user","content":"Hello"}]}'</code><button class="copy-btn" onclick="copyCliCmd('cliCurlCmd')">Copy</button></div>
                         </div>
-                        <div class="model-dash-card">
-                            <div class="model-dash-name">qwen-2.5-72b</div>
-                            <div class="model-dash-meta">72B · General · Multilingual</div>
-                        </div>
-                        <div class="model-dash-card">
-                            <div class="model-dash-name">gemma-4-9b</div>
-                            <div class="model-dash-meta">9B · Fast · Lightweight</div>
-                        </div>
-                        <div class="model-dash-card">
-                            <div class="model-dash-name">phi-3-14b</div>
-                            <div class="model-dash-meta">14B · Fast · Efficient</div>
-                        </div>
-                        <div class="model-dash-card">
-                            <div class="model-dash-name">codellama-34b</div>
-                            <div class="model-dash-meta">34B · Code · Code gen</div>
-                        </div>
-                        <div class="model-dash-card">
-                            <div class="model-dash-name">yi-1.5-34b</div>
-                            <div class="model-dash-meta">34B · General · Balanced</div>
+                        <div class="cli-cmd">
+                            <div class="cli-label">Set env var (Linux/Mac)</div>
+                            <div class="cli-line"><code id="cliEnvCmd">export GITBLOCK_API_KEY=YOUR_KEY</code><button class="copy-btn" onclick="copyCliCmd('cliEnvCmd')">Copy</button></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- AI Agent Integration -->
                 <div class="dashboard-section">
-                    <h4><i class="fas fa-robot" style="color:var(--blue)"></i> Use in AI Agents</h4>
-                    <p class="dashboard-desc">Drop GitBlock into any AI agent framework — same API format as OpenAI.</p>
+                    <h4><i class="fas fa-robot" style="color:var(--blue)"></i> Use in Any AI Agent</h4>
+                    <p class="dashboard-desc">Drop GitBlock into any AI agent framework — same API format as OpenAI. Works with Hermes, LangChain, AutoGPT, CrewAI, and more.</p>
 
                     <div class="agent-tabs">
-                        <button class="agent-tab active" onclick="showAgentTab('python-sdk')">Python SDK</button>
-                        <button class="agent-tab" onclick="showAgentTab('openai-sdk')">OpenAI SDK</button>
-                        <button class="agent-tab" onclick="showAgentTab('langchain')">LangChain</button>
-                        <button class="agent-tab" onclick="showAgentTab('curl')">cURL</button>
-                        <button class="agent-tab" onclick="showAgentTab('js')">JavaScript</button>
+                        <button class="agent-tab active" onclick="showAgentTab('python-sdk',this)">Python SDK</button>
+                        <button class="agent-tab" onclick="showAgentTab('openai-sdk',this)">OpenAI SDK</button>
+                        <button class="agent-tab" onclick="showAgentTab('langchain',this)">LangChain</button>
+                        <button class="agent-tab" onclick="showAgentTab('curl',this)">cURL</button>
+                        <button class="agent-tab" onclick="showAgentTab('js',this)">JavaScript</button>
+                        <button class="agent-tab" onclick="showAgentTab('hermes',this)">Hermes Agent</button>
                     </div>
 
                     <div class="agent-code-panel" id="panel-python-sdk">
-                        <div class="code-block"><span class="code-comment"># pip install gitblock</span>
-<span class="code-keyword">from</span> gitblock <span class="code-keyword">import</span> GitBlock
+                        <div class="code-block"><span class="code-comment"># pip install openai</span>
+<span class="code-keyword">from</span> openai <span class="code-keyword">import</span> OpenAI
 
-client = GitBlock(api_key=<span class="code-string">"<span class="api-key-placeholder">YOUR_KEY</span>"</span>)
+client = OpenAI(
+    api_key=<span class="code-string">"<span class="api-key-placeholder">YOUR_KEY</span>"</span>,
+    base_url=<span class="code-string">"https://api.gitblock.io/v1"</span>
+)
 
-response = client.chat(
+response = client.chat.completions.create(
     model=<span class="code-string">"llama-3.3-70b"</span>,
     messages=[
         {<span class="code-string">"role"</span>: <span class="code-string">"user"</span>,
@@ -544,6 +617,20 @@ response = llm.invoke(<span class="code-string">"Write a Python fibonacci functi
 });
 
 console.<span class="code-func">log</span>(response.choices[<span class="code-func">0</span>].message.content);</div>
+                    </div>
+
+                    <div class="agent-code-panel" id="panel-hermes" style="display:none">
+                        <div class="code-block"><span class="code-comment"># Use GitBlock as a provider in Hermes Agent</span>
+<span class="code-comment"># Add to your Hermes config:</span>
+
+<span class="code-keyword">providers</span>:
+  <span class="code-keyword">gitblock</span>:
+    <span class="code-keyword">type</span>: openai
+    <span class="code-keyword">base_url</span>: <span class="code-string">"https://api.gitblock.io/v1"</span>
+    <span class="code-keyword">api_key</span>: <span class="code-string">"<span class="api-key-placeholder">YOUR_KEY</span>"</span>
+    <span class="code-keyword">model</span>: <span class="code-string">"llama-3.3-70b"</span>
+
+<span class="code-comment"># Then use: hermes chat --provider gitblock</span></div>
                     </div>
                 </div>
 
@@ -731,7 +818,7 @@ response = client.chat(
             <div class="code-card-body">
                 <p>Call from any language using HTTP. Works with cURL, fetch, axios, requests, or any HTTP library.</p>
                 <div class="code-block">curl -X POST https://api.gitblock.io/v1/chat/completions \
-  -H <span class="code-string">"Authorization: Bearer gb_free_xxx"</span> \
+  -H <span class="code-string">"Authorization: Bearer <span class="api-key-placeholder">YOUR_KEY</span>"</span> \
   -H <span class="code-string">"Content-Type: application/json"</span> \
   -d <span class="code-string">'{
     "model": "llama-3.3-70b",
@@ -1063,7 +1150,70 @@ function onWalletConnected(address) {
         el.textContent = apiKey;
     });
 
-    showToast('Wallet connected! API key generated.', 'success');
+    // Update CLI commands with actual API key
+    updateCliCommands(apiKey);
+
+    // Auto-select recommended model
+    const recommended = document.querySelector('.llm-card');
+    if (recommended) {
+        recommended.classList.add('selected');
+        selectedModel = 'llama-3.3-70b';
+    }
+
+    showToast('Wallet connected! API key generated. Select a model below to get started.', 'success');
+
+    // Scroll to the API key display
+    setTimeout(() => {
+        document.getElementById('apiKeyDisplay').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 300);
+}
+
+function updateCliCommands(key) {
+    const pyCmd = document.getElementById('cliPythonCmd');
+    if (pyCmd) pyCmd.textContent = 'python -c "from openai import OpenAI; c=OpenAI(api_key=\'' + key + '\',base_url=\'https://api.gitblock.io/v1\'); print(c.chat.completions.create(model=\'llama-3.3-70b\',messages=[{\'role\':\'user\',\'content\':\'Hello\'}]).choices[0].message.content)"';
+
+    const curlCmd = document.getElementById('cliCurlCmd');
+    if (curlCmd) curlCmd.textContent = 'curl -s https://api.gitblock.io/v1/chat/completions -H "Authorization: Bearer ' + key + '" -H "Content-Type: application/json" -d \'{"model":"llama-3.3-70b","messages":[{"role":"user","content":"Hello"}]}\'';
+
+    const envCmd = document.getElementById('cliEnvCmd');
+    if (envCmd) envCmd.textContent = 'export GITBLOCK_API_KEY=' + key;
+}
+
+let selectedModel = 'llama-3.3-70b';
+
+function selectLLM(el, model) {
+    document.querySelectorAll('.llm-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedModel = model;
+    // Update all code examples with selected model
+    document.querySelectorAll('.code-block').forEach(block => {
+        block.innerHTML = block.innerHTML.replace(/model['"\s:=]+['"]?[^'"\s,)}]+/g, (m) => {
+            return m.replace(/['"]?[^'"\s,)}]+$/, '') + '"' + model + '"');
+        });
+    });
+    showToast('Selected model: ' + model + ' — Code examples updated!', 'success');
+}
+
+function regenerateApiKey() {
+    if (!connectedAddress) {
+        showToast('Connect a wallet first.', 'error');
+        return;
+    }
+    apiKey = generateApiKey(connectedAddress + Date.now());
+    document.getElementById('apiKeyText').textContent = apiKey;
+    document.querySelectorAll('.api-key-placeholder').forEach(el => {
+        el.textContent = apiKey;
+    });
+    updateCliCommands(apiKey);
+    showToast('New API key generated! Copy it before leaving.', 'success');
+}
+
+function copyCliCmd(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        navigator.clipboard.writeText(el.textContent);
+        showToast('Command copied!', 'success');
+    }
 }
 
 async function connectMetaMask() {
@@ -1115,14 +1265,68 @@ async function connectPhantom() {
     }
 }
 
-function connectWalletConnect() {
-    showToast('WalletConnect: scan QR with any wallet app', 'success');
-    // In production, initialize WalletConnect modal
-    // For demo, simulate with a random address
-    setTimeout(() => {
-        const demoAddr = '0x' + Array.from({length: 40}, () => '0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
-        onWalletConnected(demoAddr);
-    }, 2000);
+async function connectWalletConnect() {
+    try {
+        showToast('Loading WalletConnect...', 'success');
+
+        // Use pre-loaded UMD bundle from <head>
+        const WC = window.WalletConnectEthereumProvider || window.EthereumProvider;
+        if (!WC) {
+            showToast('WalletConnect SDK not loaded. Retrying...', 'error');
+            // Fallback: try loading dynamically
+            await new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = 'https://unpkg.com/@walletconnect/ethereum-provider@2.17.3/dist/index.umd.js';
+                s.onload = resolve;
+                s.onerror = () => reject(new Error('Failed to load WalletConnect SDK'));
+                document.head.appendChild(s);
+                setTimeout(() => reject(new Error('WalletConnect SDK load timeout')), 20000);
+            });
+        }
+
+        const EthProvider = window.WalletConnectEthereumProvider || window.EthereumProvider;
+        if (!EthProvider) throw new Error('WalletConnect SDK unavailable');
+
+        const provider = await EthProvider.init({
+            projectId: '2f05a0e4a2b62b3f1e42c75e82a9a7d1',
+            chains: [1],
+            showQrModal: true,
+            metadata: {
+                name: 'GitBlock',
+                description: 'Decentralized AI Inference Network',
+                url: window.location.origin,
+                icons: ['https://raw.githubusercontent.com/Gitblock17/gitblock-website/main/assets/gitblock.jpg']
+            }
+        });
+
+        await provider.connect();
+
+        // Get accounts from session (more reliable than eth_accounts after connect)
+        let address;
+        if (provider.accounts && provider.accounts.length > 0) {
+            address = provider.accounts[0];
+        } else {
+            const accounts = await provider.request({ method: 'eth_requestAccounts' });
+            address = accounts[0];
+        }
+
+        if (!address) throw new Error('No accounts returned from wallet');
+
+        // Sign verification message (free, no gas)
+        const message = 'GitBlock API Key Verification\nAddress: ' + address + '\nTimestamp: ' + Date.now() + '\n\nThis signature proves you own this address. No funds will be moved.';
+        await provider.request({ method: 'personal_sign', params: [message, address] });
+
+        onWalletConnected(address);
+
+        try { await provider.disconnect(); } catch(e) {}
+    } catch (err) {
+        if (err.message && (err.message.includes('User rejected') || err.message.includes('rejected'))) {
+            showToast('Connection rejected by user.', 'error');
+        } else {
+            console.error('WalletConnect error:', err);
+            showToast('WalletConnect failed: ' + (err.message || 'Unknown error') + '. Try MetaMask or Phantom.', 'error');
+        }
+    }
 }
 
 function copyAddress() {
@@ -1135,7 +1339,7 @@ function copyApiKey() {
     showToast('API key copied!', 'success');
 }
 
-function showAgentTab(tabId) {
+function showAgentTab(tabId, el) {
     // Hide all panels
     document.querySelectorAll('.agent-code-panel').forEach(p => p.style.display = 'none');
     // Deactivate all tabs
@@ -1143,7 +1347,8 @@ function showAgentTab(tabId) {
     // Show selected panel
     document.getElementById('panel-' + tabId).style.display = 'block';
     // Activate clicked tab
-    event.currentTarget.classList.add('active');
+    if (el) el.classList.add('active');
+    else event.currentTarget.classList.add('active');
 }
 </script>
 </body>
