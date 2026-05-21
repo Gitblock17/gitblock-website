@@ -643,7 +643,7 @@
             </div>
             <div class="env-card">
                 <div class="env-key">GITBLOCK_BASE_URL</div>
-                <div class="env-val">https://api.gitblock.io/v1</div>
+                <div class="env-val">https://gitblock-api.onrender.com/v1</div>
             </div>
         </div>
 
@@ -653,7 +653,7 @@
                 <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
             </div>
 <pre>export GITBLOCK_API_KEY=your_api_key_here
-export GITBLOCK_BASE_URL=https://api.gitblock.io/v1</pre>
+export GITBLOCK_BASE_URL=https://gitblock-api.onrender.com/v1</pre>
         </div>
     </section>
 
@@ -693,7 +693,7 @@ export GITBLOCK_BASE_URL=https://api.gitblock.io/v1</pre>
 
         <div class="note-box">
             <div class="note-label">Base URL</div>
-            <p>All endpoints are relative to <code class="inline">https://api.gitblock.io/v1</code></p>
+            <p>All endpoints are relative to <code class="inline">https://gitblock-api.onrender.com/v1</code></p>
         </div>
     </section>
 
@@ -713,7 +713,7 @@ export GITBLOCK_BASE_URL=https://api.gitblock.io/v1</pre>
 <pre><span class="kw">import</span> requests
 
 response = requests.post(
-    <span class="str">"https://api.gitblock.io/v1/chat/completions"</span>,
+    <span class="str">"https://gitblock-api.onrender.com/v1/chat/completions"</span>,
     headers={
         <span class="str">"Authorization"</span>: <span class="str">"Bearer YOUR_API_KEY"</span>,
         <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>
@@ -772,7 +772,7 @@ code = resp.choices[<span class="num">0</span>].message.content
                 <span>chat.js</span>
                 <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
             </div>
-<pre><span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">"https://api.gitblock.io/v1/chat/completions"</span>, {
+<pre><span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">"https://gitblock-api.onrender.com/v1/chat/completions"</span>, {
   method: <span class="str">"POST"</span>,
   headers: {
     <span class="str">"Authorization"</span>: <span class="str">"Bearer YOUR_API_KEY"</span>,
@@ -801,7 +801,7 @@ console.<span class="fn">log</span>(data.choices[<span class="num">0</span>].mes
                 <span>bash</span>
                 <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
             </div>
-<pre>curl -X POST https://api.gitblock.io/v1/chat/completions \
+<pre>curl -X POST https://gitblock-api.onrender.com/v1/chat/completions \
   -H <span class="str">"Authorization: Bearer YOUR_API_KEY"</span> \
   -H <span class="str">"Content-Type: application/json"</span> \
   -d <span class="str">'{
@@ -842,7 +842,7 @@ console.<span class="fn">log</span>(data.choices[<span class="num">0</span>].mes
 
 client = <span class="fn">OpenAI</span>(
     api_key=<span class="str">"YOUR_API_KEY"</span>,
-    base_url=<span class="str">"https://api.gitblock.io/v1"</span>
+    base_url=<span class="str">"https://gitblock-api.onrender.com/v1"</span>
 )
 
 response = client.chat.completions.<span class="fn">create</span>(
@@ -870,7 +870,7 @@ response = client.chat.completions.<span class="fn">create</span>(
 
 llm = <span class="fn">ChatOpenAI</span>(
     api_key=<span class="str">"YOUR_API_KEY"</span>,
-    base_url=<span class="str">"https://api.gitblock.io/v1"</span>,
+    base_url=<span class="str">"https://gitblock-api.onrender.com/v1"</span>,
     model=<span class="str">"llama-3.3-70b"</span>
 )
 
@@ -897,7 +897,7 @@ providers:
   gitblock:
     type: openai
     api_key: <span class="str">YOUR_API_KEY</span>
-    base_url: <span class="str">https://api.gitblock.io/v1</span>
+    base_url: <span class="str">https://gitblock-api.onrender.com/v1</span>
     model: <span class="str">llama-3.3-70b</span></pre>
         </div>
 
@@ -909,7 +909,7 @@ providers:
 <pre><span class="cmt"># Or via environment variables:</span>
 export HERMES_PROVIDER=openai
 export OPENAI_API_KEY=YOUR_API_KEY
-export OPENAI_BASE_URL=https://api.gitblock.io/v1</pre>
+export OPENAI_BASE_URL=https://gitblock-api.onrender.com/v1</pre>
         </div>
     </section>
 

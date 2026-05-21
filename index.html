@@ -1121,7 +1121,7 @@
             <div class="cli-section reveal">
                 <h4><i class="fas fa-terminal" style="margin-right:8px;"></i>Quick Commands</h4>
                 <div class="cli-cmd">
-                    <code id="cli-curl">curl -X POST https://api.gitblock.io/v1/chat/completions ...</code>
+                    <code id="cli-curl">curl -X POST https://gitblock-api.onrender.com/v1/chat/completions ...</code>
                     <button onclick="copyCliCmd('cli-curl')">Copy</button>
                 </div>
                 <div class="cli-cmd">
@@ -1129,7 +1129,7 @@
                     <button onclick="copyCliCmd('cli-export')">Copy</button>
                 </div>
                 <div class="cli-cmd">
-                    <code id="cli-base">export GITBLOCK_BASE_URL=https://api.gitblock.io/v1</code>
+                    <code id="cli-base">export GITBLOCK_BASE_URL=https://gitblock-api.onrender.com/v1</code>
                     <button onclick="copyCliCmd('cli-base')">Copy</button>
                 </div>
             </div>
@@ -1150,7 +1150,7 @@
 <pre>import requests
 
 response = requests.post(
-    "https://api.gitblock.io/v1/chat/completions",
+    "https://gitblock-api.onrender.com/v1/chat/completions",
     headers={
         "Authorization": "Bearer YOUR_API_KEY",
         "Content-Type": "application/json"
@@ -1167,7 +1167,7 @@ print(response.json()["choices"][0]["message"]["content"])</pre>
 
 client = OpenAI(
     api_key="YOUR_API_KEY",
-    base_url="https://api.gitblock.io/v1"
+    base_url="https://gitblock-api.onrender.com/v1"
 )
 
 response = client.chat.completions.create(
@@ -1181,7 +1181,7 @@ print(response.choices[0].message.content)</pre>
 
 llm = ChatOpenAI(
     api_key="YOUR_API_KEY",
-    base_url="https://api.gitblock.io/v1",
+    base_url="https://gitblock-api.onrender.com/v1",
     model="llama-3.3-70b"
 )
 
@@ -1189,7 +1189,7 @@ result = llm.invoke("Hello!")
 print(result.content)</pre>
                     </div>
                     <div class="agent-code-panel" id="tab-curl">
-<pre>curl -X POST https://api.gitblock.io/v1/chat/completions \
+<pre>curl -X POST https://gitblock-api.onrender.com/v1/chat/completions \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -1198,7 +1198,7 @@ print(result.content)</pre>
   }'</pre>
                     </div>
                     <div class="agent-code-panel" id="tab-js">
-<pre>const response = await fetch("https://api.gitblock.io/v1/chat/completions", {
+<pre>const response = await fetch("https://gitblock-api.onrender.com/v1/chat/completions", {
     method: "POST",
     headers: {
         "Authorization": "Bearer YOUR_API_KEY",
@@ -1218,13 +1218,13 @@ providers:
   gitblock:
     type: openai
     api_key: YOUR_API_KEY
-    base_url: https://api.gitblock.io/v1
+    base_url: https://gitblock-api.onrender.com/v1
     model: llama-3.3-70b
 
 # Or via environment variables:
 export HERMES_PROVIDER=openai
 export OPENAI_API_KEY=YOUR_API_KEY
-export OPENAI_BASE_URL=https://api.gitblock.io/v1</pre>
+export OPENAI_BASE_URL=https://gitblock-api.onrender.com/v1</pre>
                     </div>
                 </div>
             </div>
@@ -1266,7 +1266,7 @@ export OPENAI_BASE_URL=https://api.gitblock.io/v1</pre>
             <div class="api-step">
                 <div class="api-step-letter">C</div>
                 <h4>Point to GitBlock</h4>
-                <p>Set the base URL to https://api.gitblock.io/v1 — that's the only change from OpenAI.</p>
+                <p>Set the base URL to https://gitblock-api.onrender.com/v1 — that's the only change from OpenAI.</p>
             </div>
             <div class="api-step">
                 <div class="api-step-letter">D</div>
@@ -1435,7 +1435,7 @@ export OPENAI_BASE_URL=https://api.gitblock.io/v1</pre>
                     <i class="fas fa-chevron-down"></i>
                 </button>
                 <div class="faq-answer">
-                    <div class="faq-answer-inner">GitBlock uses the exact same API format as OpenAI. The only difference is the base URL — just point your client to api.gitblock.io. The key difference: it's completely free.</div>
+                    <div class="faq-answer-inner">GitBlock uses the exact same API format as OpenAI. The only difference is the base URL — just point your client to gitblock-api.onrender.com. The key difference: it's completely free.</div>
                 </div>
             </div>
             <div class="faq-item reveal">
@@ -1557,13 +1557,13 @@ export OPENAI_BASE_URL=https://api.gitblock.io/v1</pre>
     // --- CLI Commands ---
     function updateCliCommands(key) {
         document.getElementById('cli-curl').textContent =
-            `curl -X POST https://api.gitblock.io/v1/chat/completions -H "Authorization: Bearer ${key}" -H "Content-Type: application/json" -d '{"model":"${selectedModel}","messages":[{"role":"user","content":"Hello!"}]}'`;
+            `curl -X POST https://gitblock-api.onrender.com/v1/chat/completions -H "Authorization: Bearer ${key}" -H "Content-Type: application/json" -d '{"model":"${selectedModel}","messages":[{"role":"user","content":"Hello!"}]}'`;
 
         document.getElementById('cli-export').textContent =
             `export GITBLOCK_API_KEY=${key}`;
 
         document.getElementById('cli-base').textContent =
-            `export GITBLOCK_BASE_URL=https://api.gitblock.io/v1`;
+            `export GITBLOCK_BASE_URL=https://gitblock-api.onrender.com/v1`;
     }
 
     // --- Model Selection ---
