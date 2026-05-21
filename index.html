@@ -115,7 +115,32 @@ img{max-width:100%;height:auto}
 .wallet-btn.walletconnect:hover{background:#2b89ec;transform:translateY(-2px)}
 .api-key-display{margin-top:20px;padding:20px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:12px;text-align:center;display:none}
 .api-key-display.show{display:block}
-.api-key-display h4{color:var(--success);font-size:.9rem;margin-bottom:8px}
+.dashboard-section{padding:24px;border-bottom:1px solid var(--border)}
+.dashboard-section:last-child{border:none}
+.dashboard-section h4{font-size:1.05rem;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.dashboard-desc{color:var(--text-secondary);font-size:.85rem;margin-bottom:14px}
+.api-meta{display:flex;flex-wrap:wrap;gap:16px;margin-top:12px}
+.api-meta span{font-size:.78rem;color:var(--text-secondary);display:flex;align-items:center;gap:4px}
+.api-meta code{background:#f1f5f9;padding:2px 8px;border-radius:6px;font-size:.75rem;color:var(--blue);font-family:'SF Mono','Fira Code',monospace}
+.models-dashboard-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.model-dash-card{padding:10px 12px;background:rgba(37,99,235,0.04);border:1px solid var(--border);border-radius:10px;transition:all .2s;cursor:default}
+.model-dash-card:hover{border-color:rgba(37,99,235,0.25);background:rgba(37,99,235,0.08)}
+.model-dash-name{font-size:.82rem;font-weight:700;color:var(--text);font-family:'SF Mono','Fira Code',monospace}
+.model-dash-meta{font-size:.7rem;color:var(--text-secondary);margin-top:2px}
+.agent-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.agent-tab{padding:8px 16px;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;border:1px solid var(--border);background:transparent;color:var(--text-secondary);font-family:inherit}
+.agent-tab:hover{border-color:var(--blue);color:var(--blue)}
+.agent-tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.agent-code-panel .code-block{font-size:.78rem;line-height:1.8}
+.api-key-placeholder{color:var(--blue);font-weight:600}
+.quick-steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.quick-step{display:flex;gap:12px;align-items:flex-start;padding:14px;background:rgba(37,99,235,0.04);border:1px solid var(--border);border-radius:12px}
+.quick-step-num{width:32px;height:32px;min-width:32px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem}
+.quick-step-text{display:flex;flex-direction:column;gap:2px}
+.quick-step-text strong{font-size:.85rem;color:var(--text)}
+.quick-step-text span{font-size:.75rem;color:var(--text-secondary)}
+@media(max-width:768px){.models-dashboard-grid{grid-template-columns:repeat(2,1fr)}.quick-steps-grid{grid-template-columns:1fr}}
+.api-key-display h4{color:var(--text);font-size:1rem;margin-bottom:8px}
 .api-key-value{display:flex;align-items:center;gap:8px;padding:12px 16px;background:#f1f5f9;border:1px solid var(--border);border-radius:10px;font-family:'SF Mono','Fira Code',monospace;font-size:.85rem;color:var(--text);margin:8px 0}
 .copy-btn{padding:6px 14px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
 .copy-btn:hover{background:var(--blue-dark)}
@@ -370,31 +395,184 @@ img{max-width:100%;height:auto}
             </div>
 
             <div class="api-key-display" id="apiKeyDisplay">
-                <h4><i class="fas fa-check-circle"></i> Your Free API Key</h4>
-                <div class="api-key-value">
-                    <span style="flex:1" id="apiKeyText"></span>
-                    <button class="copy-btn" onclick="copyApiKey()">Copy</button>
+                <!-- API Key Section -->
+                <div class="dashboard-section">
+                    <h4><i class="fas fa-key" style="color:var(--blue)"></i> Your API Key</h4>
+                    <div class="api-key-value">
+                        <span style="flex:1" id="apiKeyText"></span>
+                        <button class="copy-btn" onclick="copyApiKey()">Copy</button>
+                    </div>
+                    <div class="api-meta">
+                        <span><i class="fas fa-link"></i> Base URL: <code>https://api.gitblock.io/v1</code></span>
+                        <span><i class="fas fa-bolt"></i> Rate Limit: 100 req/min</span>
+                        <span><i class="fas fa-infinity"></i> No Expiration</span>
+                    </div>
                 </div>
-                <p style="font-size:.8rem;color:var(--text-secondary);margin-top:8px">This key is permanent and tied to your wallet. Save it somewhere safe.</p>
-            </div>
 
-            <div class="wallet-steps">
-                <h4>How It Works</h4>
-                <div class="wallet-step">
-                    <div class="wallet-step-num">1</div>
-                    <p><strong>Connect your wallet</strong> — Click MetaMask, Phantom, or WalletConnect above. No funds will be moved. No transaction needed.</p>
+                <!-- Available Models -->
+                <div class="dashboard-section">
+                    <h4><i class="fas fa-brain" style="color:var(--blue)"></i> Available Models</h4>
+                    <p class="dashboard-desc">All models are free. Use any of these in your API calls.</p>
+                    <div class="models-dashboard-grid">
+                        <div class="model-dash-card">
+                            <div class="model-dash-name">llama-3.3-70b</div>
+                            <div class="model-dash-meta">70B · General · Best quality</div>
+                        </div>
+                        <div class="model-dash-card">
+                            <div class="model-dash-name">mistral-7b</div>
+                            <div class="model-dash-meta">7B · Fast · Low latency</div>
+                        </div>
+                        <div class="model-dash-card">
+                            <div class="model-dash-name">deepseek-coder-33b</div>
+                            <div class="model-dash-meta">33B · Code · Programming</div>
+                        </div>
+                        <div class="model-dash-card">
+                            <div class="model-dash-name">qwen-2.5-72b</div>
+                            <div class="model-dash-meta">72B · General · Multilingual</div>
+                        </div>
+                        <div class="model-dash-card">
+                            <div class="model-dash-name">gemma-4-9b</div>
+                            <div class="model-dash-meta">9B · Fast · Lightweight</div>
+                        </div>
+                        <div class="model-dash-card">
+                            <div class="model-dash-name">phi-3-14b</div>
+                            <div class="model-dash-meta">14B · Fast · Efficient</div>
+                        </div>
+                        <div class="model-dash-card">
+                            <div class="model-dash-name">codellama-34b</div>
+                            <div class="model-dash-meta">34B · Code · Code gen</div>
+                        </div>
+                        <div class="model-dash-card">
+                            <div class="model-dash-name">yi-1.5-34b</div>
+                            <div class="model-dash-meta">34B · General · Balanced</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="wallet-step">
-                    <div class="wallet-step-num">2</div>
-                    <p><strong>Sign a verification message</strong> — Your wallet will ask you to sign a free message. This proves you own the address. Zero gas cost.</p>
+
+                <!-- AI Agent Integration -->
+                <div class="dashboard-section">
+                    <h4><i class="fas fa-robot" style="color:var(--blue)"></i> Use in AI Agents</h4>
+                    <p class="dashboard-desc">Drop GitBlock into any AI agent framework — same API format as OpenAI.</p>
+
+                    <div class="agent-tabs">
+                        <button class="agent-tab active" onclick="showAgentTab('python-sdk')">Python SDK</button>
+                        <button class="agent-tab" onclick="showAgentTab('openai-sdk')">OpenAI SDK</button>
+                        <button class="agent-tab" onclick="showAgentTab('langchain')">LangChain</button>
+                        <button class="agent-tab" onclick="showAgentTab('curl')">cURL</button>
+                        <button class="agent-tab" onclick="showAgentTab('js')">JavaScript</button>
+                    </div>
+
+                    <div class="agent-code-panel" id="panel-python-sdk">
+                        <div class="code-block"><span class="code-comment"># pip install gitblock</span>
+<span class="code-keyword">from</span> gitblock <span class="code-keyword">import</span> GitBlock
+
+client = GitBlock(api_key=<span class="code-string">"<span class="api-key-placeholder">YOUR_KEY</span>"</span>)
+
+response = client.chat(
+    model=<span class="code-string">"llama-3.3-70b"</span>,
+    messages=[
+        {<span class="code-string">"role"</span>: <span class="code-string">"user"</span>,
+         <span class="code-string">"content"</span>: <span class="code-string">"What is blockchain?"</span>}
+    ]
+)
+<span class="code-keyword">print</span>(response.choices[<span class="code-func">0</span>].message.content)</div>
+                    </div>
+
+                    <div class="agent-code-panel" id="panel-openai-sdk" style="display:none">
+                        <div class="code-block"><span class="code-comment"># pip install openai</span>
+<span class="code-comment"># Works with existing OpenAI code — just swap the base URL</span>
+<span class="code-keyword">from</span> openai <span class="code-keyword">import</span> OpenAI
+
+client = OpenAI(
+    api_key=<span class="code-string">"<span class="api-key-placeholder">YOUR_KEY</span>"</span>,
+    base_url=<span class="code-string">"https://api.gitblock.io/v1"</span>
+)
+
+response = client.chat.completions.create(
+    model=<span class="code-string">"llama-3.3-70b"</span>,
+    messages=[
+        {<span class="code-string">"role"</span>: <span class="code-string">"user"</span>,
+         <span class="code-string">"content"</span>: <span class="code-string">"Explain quantum computing"</span>}
+    ]
+)
+<span class="code-keyword">print</span>(response.choices[<span class="code-func">0</span>].message.content)</div>
+                    </div>
+
+                    <div class="agent-code-panel" id="panel-langchain" style="display:none">
+                        <div class="code-block"><span class="code-comment"># pip install langchain-openai</span>
+<span class="code-keyword">from</span> langchain_openai <span class="code-keyword">import</span> ChatOpenAI
+
+llm = ChatOpenAI(
+    api_key=<span class="code-string">"<span class="api-key-placeholder">YOUR_KEY</span>"</span>,
+    base_url=<span class="code-string">"https://api.gitblock.io/v1"</span>,
+    model=<span class="code-string">"llama-3.3-70b"</span>,
+    temperature=<span class="code-func">0.7</span>
+)
+
+<span class="code-comment"># Use in any LangChain agent or chain</span>
+response = llm.invoke(<span class="code-string">"Write a Python fibonacci function"</span>)
+<span class="code-keyword">print</span>(response.content)</div>
+                    </div>
+
+                    <div class="agent-code-panel" id="panel-curl" style="display:none">
+                        <div class="code-block">curl -X POST https://api.gitblock.io/v1/chat/completions \
+  -H <span class="code-string">"Authorization: Bearer <span class="api-key-placeholder">YOUR_KEY</span>"</span> \
+  -H <span class="code-string">"Content-Type: application/json"</span> \
+  -d <span class="code-string">'{
+    "model": "llama-3.3-70b",
+    "messages": [
+      {"role": "user",
+       "content": "Hello!"}
+    ]
+  }'</span></div>
+                    </div>
+
+                    <div class="agent-code-panel" id="panel-js" style="display:none">
+                        <div class="code-block"><span class="code-comment">// npm install openai</span>
+<span class="code-keyword">import</span> OpenAI <span class="code-keyword">from</span> <span class="code-string">"openai"</span>;
+
+<span class="code-keyword">const</span> client = <span class="code-keyword">new</span> <span class="code-func">OpenAI</span>({
+  apiKey: <span class="code-string">"<span class="api-key-placeholder">YOUR_KEY</span>"</span>,
+  baseURL: <span class="code-string">"https://api.gitblock.io/v1"</span>,
+});
+
+<span class="code-keyword">const</span> response = <span class="code-keyword">await</span> client.chat.completions.create({
+  model: <span class="code-string">"llama-3.3-70b"</span>,
+  messages: [
+    { role: <span class="code-string">"user"</span>, content: <span class="code-string">"Explain AI agents"</span> }
+  ],
+});
+
+console.<span class="code-func">log</span>(response.choices[<span class="code-func">0</span>].message.content);</div>
+                    </div>
                 </div>
-                <div class="wallet-step">
-                    <div class="wallet-step-num">3</div>
-                    <p><strong>Receive your API key</strong> — A unique key is generated and tied to your wallet address. Use it in any SDK, CLI, or REST call.</p>
-                </div>
-                <div class="wallet-step">
-                    <div class="wallet-step-num">4</div>
-                    <p><strong>Start making requests</strong> — 100 free requests per minute. No expiration. No credit card. Upgrade anytime by running a node.</p>
+
+                <!-- Quick Steps -->
+                <div class="dashboard-section">
+                    <h4><i class="fas fa-list-ol" style="color:var(--blue)"></i> Quick Start</h4>
+                    <div class="quick-steps-grid">
+                        <div class="quick-step">
+                            <div class="quick-step-num">1</div>
+                            <div class="quick-step-text">
+                                <strong>Copy your API key</strong>
+                                <span>Click the copy button above</span>
+                            </div>
+                        </div>
+                        <div class="quick-step">
+                            <div class="quick-step-num">2</div>
+                            <div class="quick-step-text">
+                                <strong>Choose a model</strong>
+                                <span>Pick from 8+ free models above</span>
+                            </div>
+                        </div>
+                        <div class="quick-step">
+                            <div class="quick-step-num">3</div>
+                            <div class="quick-step-text">
+                                <strong>Integrate in your agent</strong>
+                                <span>Copy code snippet, paste, run</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -880,6 +1058,11 @@ function onWalletConnected(address) {
     document.getElementById('apiKeyDisplay').classList.add('show');
     document.getElementById('apiKeyText').textContent = apiKey;
 
+    // Inject API key into all code examples
+    document.querySelectorAll('.api-key-placeholder').forEach(el => {
+        el.textContent = apiKey;
+    });
+
     showToast('Wallet connected! API key generated.', 'success');
 }
 
@@ -950,6 +1133,17 @@ function copyAddress() {
 function copyApiKey() {
     navigator.clipboard.writeText(apiKey);
     showToast('API key copied!', 'success');
+}
+
+function showAgentTab(tabId) {
+    // Hide all panels
+    document.querySelectorAll('.agent-code-panel').forEach(p => p.style.display = 'none');
+    // Deactivate all tabs
+    document.querySelectorAll('.agent-tab').forEach(t => t.classList.remove('active'));
+    // Show selected panel
+    document.getElementById('panel-' + tabId).style.display = 'block';
+    // Activate clicked tab
+    event.currentTarget.classList.add('active');
 }
 </script>
 </body>
