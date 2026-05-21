@@ -346,6 +346,9 @@
             background: rgba(37,99,235,0.04);
         }
         .wallet-btn i { color: #2563eb; font-size: 1.1rem; }
+        .wallet-btn:active {
+            transform: scale(0.97);
+        }
 
         .connected-section { display: none; }
         .connected-section.active { display: block; }
@@ -891,8 +894,8 @@
 <header id="main-header">
     <div class="header-inner">
         <a href="#home" class="logo">
-            <i class="fas fa-cube"></i>
-            GitBlock
+            <img src="assets/gitblock.jpg" alt="GitBlock" style="width:36px;height:36px;border-radius:8px;object-fit:cover;">
+            <span>GitBlock</span>
         </a>
         <nav>
             <a href="#features">Features</a>
@@ -1036,14 +1039,11 @@
             <h3><i class="fas fa-wallet" style="color:#2563eb;margin-right:8px;"></i>Connect Your Wallet</h3>
             <p>Choose a wallet to generate your unique API key.</p>
             <div class="wallet-buttons">
-                <button class="wallet-btn" disabled style="opacity:0.5;cursor:not-allowed;">
-                    <i class="fab fa-ethereum"></i> MetaMask — Coming Soon!
+                <button class="wallet-btn" onclick="connectMetaMask()">
+                    <i class="fab fa-ethereum"></i> MetaMask
                 </button>
-                <button class="wallet-btn" disabled style="opacity:0.5;cursor:not-allowed;">
-                    <i class="fas fa-ghost"></i> Phantom — Coming Soon!
-                </button>
-                <button class="wallet-btn" disabled style="opacity:0.5;cursor:not-allowed;">
-                    <i class="fas fa-qrcode"></i> WalletConnect — Coming Soon!
+                <button class="wallet-btn" onclick="connectPhantom()">
+                    <i class="fas fa-ghost"></i> Phantom
                 </button>
             </div>
         </div>
@@ -1053,6 +1053,7 @@
             <!-- Address -->
             <div class="address-display reveal">
                 <span>Connected: <code id="wallet-address">—</code></span>
+                <span id="wallet-type-badge" style="display:inline-flex;align-items:center;padding:4px 12px;background:rgba(37,99,235,0.15);color:#2563eb;font-size:0.78rem;font-weight:600;border-radius:6px;"></span>
                 <button onclick="copyAddress()"><i class="fas fa-copy"></i> Copy</button>
             </div>
 
@@ -1063,6 +1064,19 @@
                 <div style="display:flex;gap:8px;">
                     <button onclick="copyApiKey()"><i class="fas fa-copy"></i> Copy</button>
                     <button onclick="regenerateApiKey()" style="background:#7c3aed;"><i class="fas fa-rotate"></i> Regenerate</button>
+                </div>
+            </div>
+
+            <!-- Active Model Display -->
+            <div class="active-model-display reveal" id="active-model-display" style="background:linear-gradient(135deg,rgba(37,99,235,0.08),rgba(124,58,237,0.08));border:1px solid rgba(37,99,235,0.2);border-radius:12px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                <div>
+                    <div style="font-size:0.75rem;font-weight:600;color:#2563eb;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;">Active Model</div>
+                    <div style="font-size:1.1rem;font-weight:700;color:#0f172a;font-family:'SF Mono','Fira Code',monospace;" id="active-model-name">llama-3.3-70b</div>
+                    <div style="font-size:0.82rem;color:#64748b;margin-top:2px;" id="active-model-meta">70B params · General Purpose · Meta</div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <span style="display:inline-block;padding:4px 12px;background:#059669;color:#fff;font-size:0.75rem;font-weight:700;border-radius:6px;">READY</span>
+                    <button onclick="copyModelName()" style="padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;"><i class="fas fa-copy"></i> Copy Model</button>
                 </div>
             </div>
 
@@ -1547,8 +1561,8 @@ curl http://localhost:8080/health</pre>
 <!-- Footer -->
 <footer>
     <div class="footer-grid">
-        <div class="footer-col">
-            <h4><i class="fas fa-cube" style="margin-right:8px;color:#2563eb;"></i>GitBlock</h4>
+            <div class="footer-col">
+                <h4><img src="assets/gitblock.jpg" alt="GitBlock" style="width:24px;height:24px;border-radius:6px;vertical-align:middle;margin-right:8px;object-fit:cover;">GitBlock</h4>
             <p>Decentralized AI inference for everyone. Free, open, and unstoppable.</p>
             <div class="footer-socials">
                 <a href="https://github.com/Gitblock17/Gitblock" target="_blank"><i class="fab fa-github"></i></a>
@@ -1592,6 +1606,18 @@ curl http://localhost:8080/health</pre>
     let currentWalletAddress = null;
     let selectedModel = 'llama-3.3-70b';
 
+    // --- Model Metadata ---
+    const modelInfo = {
+        'llama-3.3-70b':      { params: '70B',  type: 'General Purpose', provider: 'Meta' },
+        'deepseek-coder-33b': { params: '33B',  type: 'Code Generation', provider: 'DeepSeek' },
+        'qwen-2.5-72b':       { params: '72B',  type: 'General Purpose', provider: 'Alibaba' },
+        'mistral-7b':         { params: '7B',   type: 'Fast Inference',  provider: 'Mistral AI' },
+        'codellama-34b':      { params: '34B',  type: 'Code Generation', provider: 'Meta' },
+        'phi-3-14b':          { params: '14B',  type: 'Compact/Efficient', provider: 'Microsoft' },
+        'gemma-4-9b':         { params: '9B',   type: 'General Purpose', provider: 'Google' },
+        'yi-1.5-34b':         { params: '34B',  type: 'General Purpose', provider: '01.AI' }
+    };
+
     // --- Toast ---
     function showToast(msg, type = 'info') {
         const container = document.getElementById('toast-container');
@@ -1603,32 +1629,32 @@ curl http://localhost:8080/health</pre>
     }
 
     // --- API Key Generation ---
-    function generateApiKey(addr) {
-        let hash = 0;
-        const seed = 'gitblock-' + addr.toLowerCase();
-        for (let i = 0; i < seed.length; i++) {
-            const chr = seed.charCodeAt(i);
-            hash = ((hash << 5) - hash) + chr;
-            hash |= 0;
-        }
-        let hex = '';
-        for (let i = 0; i < 32; i++) {
-            hash = ((hash << 5) - hash) + i * 7 + 0x9e3779b9;
-            hash |= 0;
-            const byte = (hash >>> 0) & 0xff;
-            hex += byte.toString(16).padStart(2, '0');
-        }
+    async function generateApiKey(addr) {
+        const seed = 'gitblock-v2-' + addr.toLowerCase();
+        const encoder = new TextEncoder();
+        const data = encoder.encode(seed);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         return 'gb_' + hex;
     }
 
     // --- Wallet Connected ---
-    function onWalletConnected(address) {
+    async function onWalletConnected(address, walletType) {
         currentWalletAddress = address;
         document.getElementById('wallet-connect-box').style.display = 'none';
         document.getElementById('connected-section').classList.add('active');
         document.getElementById('wallet-address').textContent = address.slice(0, 6) + '...' + address.slice(-4);
 
-        currentApiKey = generateApiKey(address);
+        // Show wallet type badge
+        const walletBadge = document.getElementById('wallet-type-badge');
+        if (walletBadge) {
+            const icon = walletType === 'metamask' ? 'fab fa-ethereum' : 'fas fa-ghost';
+            const name = walletType === 'metamask' ? 'MetaMask' : 'Phantom';
+            walletBadge.innerHTML = '<i class="' + icon + '" style="margin-right:6px;"></i>' + name;
+        }
+
+        currentApiKey = await generateApiKey(address);
         document.getElementById('api-key-display').textContent = currentApiKey;
         updateCliCommands(currentApiKey);
         selectLLM(document.querySelector('.llm-card.selected'), selectedModel);
@@ -1653,17 +1679,28 @@ curl http://localhost:8080/health</pre>
         document.querySelectorAll('.llm-card').forEach(c => c.classList.remove('selected'));
         if (el) el.classList.add('selected');
         if (currentApiKey) updateCliCommands(currentApiKey);
+
+        // Update active model display
+        const info = modelInfo[model] || { params: '?', type: 'Unknown', provider: 'Unknown' };
+        const nameEl = document.getElementById('active-model-name');
+        const metaEl = document.getElementById('active-model-meta');
+        if (nameEl) nameEl.textContent = model;
+        if (metaEl) metaEl.textContent = info.params + ' params · ' + info.type + ' · ' + info.provider;
+    }
+
+    // --- Copy Model Name ---
+    function copyModelName() {
+        navigator.clipboard.writeText(selectedModel).then(() => showToast('Model name copied: ' + selectedModel, 'success'));
     }
 
     // --- Regenerate Key ---
     function regenerateApiKey() {
-        const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-        let hex = '';
-        for (let i = 0; i < 64; i++) hex += chars[Math.floor(Math.random() * chars.length)];
-        currentApiKey = 'gb_' + hex;
-        document.getElementById('api-key-display').textContent = currentApiKey;
-        updateCliCommands(currentApiKey);
-        showToast('API key regenerated', 'info');
+        generateApiKey(currentWalletAddress + Date.now()).then(key => {
+            currentApiKey = key;
+            document.getElementById('api-key-display').textContent = currentApiKey;
+            updateCliCommands(currentApiKey);
+            showToast('API key regenerated', 'info');
+        });
     }
 
     // --- Copy Functions ---
@@ -1692,7 +1729,7 @@ curl http://localhost:8080/health</pre>
         }
         try {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            if (accounts && accounts[0]) onWalletConnected(accounts[0]);
+            if (accounts && accounts[0]) onWalletConnected(accounts[0], 'metamask');
         } catch (err) {
             showToast('MetaMask connection rejected.', 'error');
         }
@@ -1705,46 +1742,13 @@ curl http://localhost:8080/health</pre>
         }
         try {
             const resp = await window.solana.connect();
-            if (resp.publicKey) onWalletConnected(resp.publicKey.toString());
+            if (resp.publicKey) onWalletConnected(resp.publicKey.toString(), 'phantom');
         } catch (err) {
             showToast('Phantom connection rejected.', 'error');
         }
     }
 
-    function connectWalletConnect() {
-        showToast('Loading WalletConnect...', 'info');
-        const script = document.createElement('script');
-        script.type = 'module';
-        script.textContent = `
-            import { EthereumProvider } from 'https://esm.sh/@walletconnect/ethereum-provider@2.17.3';
-            try {
-                const provider = await EthereumProvider.init({
-                    projectId: '2f05a0e4a2b62b3f1e42c75e82a9a7d1',
-                    chains: [1],
-                    showQrModal: true
-                });
-                await provider.connect();
-                const accounts = await provider.request({ method: 'eth_accounts' });
-                if (accounts && accounts[0]) {
-                    window.__wcAddress = accounts[0];
-                    window.dispatchEvent(new Event('walletconnect-connected'));
-                }
-            } catch (e) {
-                console.error('WalletConnect error:', e);
-                window.dispatchEvent(new Event('walletconnect-error'));
-            }
-        `;
-        document.body.appendChild(script);
 
-        window.addEventListener('walletconnect-connected', function handler() {
-            window.removeEventListener('walletconnect-connected', handler);
-            if (window.__wcAddress) onWalletConnected(window.__wcAddress);
-        });
-        window.addEventListener('walletconnect-error', function handler() {
-            window.removeEventListener('walletconnect-error', handler);
-            showToast('WalletConnect connection failed.', 'error');
-        });
-    }
 
     // --- Agent Tabs ---
     function showAgentTab(tabId, el) {
