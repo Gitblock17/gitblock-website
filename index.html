@@ -7,7 +7,11 @@
 <link rel="icon" href="assets/gitblock.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<script src="https://unpkg.com/@walletconnect/ethereum-provider@2.17.3/dist/index.umd.js" defer></script>
+<script type="module">
+  import { EthereumProvider } from 'https://esm.sh/@walletconnect/ethereum-provider@2.17.3';
+  window.WalletConnectProvider = EthereumProvider;
+  window.dispatchEvent(new Event('wc-ready'));
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#ffffff;--blue:#2563eb;--blue-light:#3b82f6;--blue-dark:#1d4ed8;--blue-glow:rgba(37,99,235,0.08);--card:rgba(37,99,235,0.04);--border:rgba(37,99,235,0.12);--text:#1e293b;--text-secondary:#64748b;--radius:16px;--max:1200px;--success:#22c55e;--warning:#eab308}
@@ -1270,21 +1274,18 @@ async function connectWalletConnect() {
         showToast('Loading WalletConnect...', 'success');
 
         // Use pre-loaded UMD bundle from <head>
-        const WC = window.WalletConnectEthereumProvider || window.EthereumProvider;
-        if (!WC) {
-            showToast('WalletConnect SDK not loaded. Retrying...', 'error');
-            // Fallback: try loading dynamically
+        // Wait for the ESM module to load if not ready yet
+        if (!window.WalletConnectProvider) {
+            showToast('Loading WalletConnect...', 'info');
             await new Promise((resolve, reject) => {
-                const s = document.createElement('script');
-                s.src = 'https://unpkg.com/@walletconnect/ethereum-provider@2.17.3/dist/index.umd.js';
-                s.onload = resolve;
-                s.onerror = () => reject(new Error('Failed to load WalletConnect SDK'));
-                document.head.appendChild(s);
-                setTimeout(() => reject(new Error('WalletConnect SDK load timeout')), 20000);
+                const timeout = setTimeout(() => reject(new Error('WalletConnect SDK load timeout')), 20000);
+                window.addEventListener('wc-ready', () => { clearTimeout(timeout); resolve(); }, { once: true });
+                // If event already fired while we were waiting
+                if (window.WalletConnectProvider) { clearTimeout(timeout); resolve(); }
             });
         }
 
-        const EthProvider = window.WalletConnectEthereumProvider || window.EthereumProvider;
+        const EthProvider = window.WalletConnectProvider;
         if (!EthProvider) throw new Error('WalletConnect SDK unavailable');
 
         const provider = await EthProvider.init({
