@@ -735,6 +735,9 @@
             overflow: hidden;
             transition: max-height 0.3s ease;
         }
+        .faq-item.open .faq-answer {
+            max-height: 300px;
+        }
         .faq-answer-inner {
             padding: 0 24px 20px;
             font-size: 0.92rem;
@@ -1033,14 +1036,14 @@
             <h3><i class="fas fa-wallet" style="color:#2563eb;margin-right:8px;"></i>Connect Your Wallet</h3>
             <p>Choose a wallet to generate your unique API key.</p>
             <div class="wallet-buttons">
-                <button class="wallet-btn" onclick="connectMetaMask()">
-                    <i class="fab fa-ethereum"></i> MetaMask
+                <button class="wallet-btn" disabled style="opacity:0.5;cursor:not-allowed;">
+                    <i class="fab fa-ethereum"></i> MetaMask — Coming Soon!
                 </button>
-                <button class="wallet-btn" onclick="connectPhantom()">
-                    <i class="fas fa-ghost"></i> Phantom
+                <button class="wallet-btn" disabled style="opacity:0.5;cursor:not-allowed;">
+                    <i class="fas fa-ghost"></i> Phantom — Coming Soon!
                 </button>
-                <button class="wallet-btn" onclick="connectWalletConnect()">
-                    <i class="fas fa-qrcode"></i> WalletConnect
+                <button class="wallet-btn" disabled style="opacity:0.5;cursor:not-allowed;">
+                    <i class="fas fa-qrcode"></i> WalletConnect — Coming Soon!
                 </button>
             </div>
         </div>
