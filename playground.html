@@ -482,19 +482,19 @@
         <div class="onboarding-steps">
             <div class="onboarding-step">
                 <div class="onboarding-step-num">1</div>
-                <div class="onboarding-step-text"><strong>Get your free MiMo API key</strong> — Sign up at <a href="https://platform.xiaomimimo.com" target="_blank" style="color:#2563eb;">platform.xiaomimimo.com</a> → Console → API Keys. Free credits included!</div>
+                <div class="onboarding-step-text"><strong>Start building instantly</strong> — Just type what you want in the AI chat on the right. No sign-up, no API key needed. It works right away!</div>
             </div>
             <div class="onboarding-step">
                 <div class="onboarding-step-num">2</div>
-                <div class="onboarding-step-text"><strong>Paste your key</strong> — Click the <i class="fas fa-cog"></i> Settings icon above, select <strong>"MiMo API (Recommended)"</strong>, and paste your key.</div>
+                <div class="onboarding-step-text"><strong>Apply &amp; Preview</strong> — Click <strong>"Apply to Editor"</strong> to see your AI-generated code live in the preview pane below.</div>
             </div>
             <div class="onboarding-step">
                 <div class="onboarding-step-num">3</div>
-                <div class="onboarding-step-text"><strong>Start building</strong> — Type what you want in the AI chat on the right. Click <strong>"Apply to Editor"</strong> to see it live in the preview pane.</div>
+                <div class="onboarding-step-text"><strong>Want even more power?</strong> — Optionally add your own <a href="https://platform.xiaomimimo.com" target="_blank" style="color:#2563eb;">MiMo API key</a> in <i class="fas fa-cog"></i> Settings for faster responses and higher limits.</div>
             </div>
         </div>
-        <div style="background:rgba(37,99,235,0.06); border:1px solid rgba(37,99,235,0.15); border-radius:10px; padding:12px 16px; font-size:0.8rem; color:#475569; margin-bottom:16px; text-align:center;">
-            <i class="fas fa-bolt" style="color:#2563eb;"></i> <strong>Plug &amp; Play:</strong> No credit card needed. Free tier includes generous daily limits. <a href="usage.html#tutorials" target="_blank" style="color:#2563eb;">View setup tutorial →</a>
+        <div style="background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.2); border-radius:10px; padding:12px 16px; font-size:0.8rem; color:#475569; margin-bottom:16px; text-align:center;">
+            <i class="fas fa-bolt" style="color:#22c55e;"></i> <strong>No sign-up required.</strong> Start building immediately — it's free and instant.
         </div>
         <button class="btn-new-project" onclick="closeOnboarding()" style="font-size:0.95rem; padding:12px;">
             <i class="fas fa-rocket"></i> Get Started
@@ -705,11 +705,8 @@
             <div class="ai-msg assistant">
                 <div class="ai-msg-text">
                     <strong>👋 I'm your AI coding agent</strong> powered by <strong>Xiaomi MiMo</strong>.<br><br>
-                    <strong>Quick Setup:</strong><br>
-                    1. Get a free API key at <a href="https://platform.xiaomimimo.com/console" target="_blank" style="color:#2563eb;">platform.xiaomimimo.com</a><br>
-                    2. Click <i class="fas fa-cog"></i> Settings above → paste your key<br>
-                    3. Start building!<br><br>
-                    Or just describe what you want and I'll generate the code. Try:<br><br>
+                    Just describe what you want and I'll generate the code — no sign-up needed!<br><br>
+                    Try:<br>
                     • "Build a landing page for a SaaS product"<br>
                     • "Create a todo app with drag and drop"<br>
                     • "Make a weather dashboard"<br>
@@ -846,7 +843,7 @@ function updateApiStatus() {
         text.textContent = getModel();
     } else {
         dot.className = 'api-status-dot connected';
-        text.textContent = 'MiMo (Setup key for full access)';
+        text.textContent = 'Free — Ready to build!';
     }
 }
 
