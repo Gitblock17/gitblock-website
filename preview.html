@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview — GitBlock Playground</title>
+    <link rel="icon" href="assets/gitblock.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(37,99,235,0.1);
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header-left {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .logo {
+            display: flex; align-items: center; gap: 8px;
+            text-decoration: none; color: #2563eb; font-weight: 700; font-size: 0.95rem;
+        }
+        .logo img { width: 28px; height: 28px; border-radius: 6px; }
+        .project-title {
+            font-size: 0.85rem; font-weight: 600; color: #475569;
+            padding-left: 12px; border-left: 1px solid rgba(37,99,235,0.15);
+        }
+        .header-actions { display: flex; gap: 8px; }
+        .header-btn {
+            padding: 6px 14px; border: 1px solid rgba(37,99,235,0.15);
+            border-radius: 8px; background: #fff; color: #475569;
+            font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 500;
+            cursor: pointer; display: flex; align-items: center; gap: 6px;
+            transition: all 0.15s; text-decoration: none;
+        }
+        .header-btn:hover { border-color: #2563eb; color: #2563eb; }
+        .header-btn.primary { background: #2563eb; color: #fff; border-color: #2563eb; }
+        .header-btn.primary:hover { background: #1d4ed8; }
+
+        /* Device Preview Bar */
+        .device-bar {
+            display: flex; align-items: center; justify-content: center;
+            gap: 8px; padding: 8px; background: #fff;
+            border-bottom: 1px solid rgba(37,99,235,0.06);
+        }
+        .device-btn {
+            padding: 6px 12px; border: 1px solid rgba(37,99,235,0.1);
+            border-radius: 6px; background: transparent; color: #64748b;
+            font-size: 0.75rem; cursor: pointer; transition: all 0.15s;
+            font-family: 'Inter', sans-serif;
+        }
+        .device-btn:hover { border-color: #2563eb; color: #2563eb; }
+        .device-btn.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+        .device-btn i { margin-right: 4px; }
+
+        /* Preview Frame */
+        .preview-container {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            padding: 16px; overflow: auto;
+        }
+        .preview-frame-wrapper {
+            background: #fff; border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            overflow: hidden; transition: all 0.3s;
+            width: 100%; height: 100%;
+        }
+        .preview-frame-wrapper.mobile {
+            width: 375px; height: 667px;
+            border: 2px solid #e2e8f0;
+        }
+        .preview-frame-wrapper.tablet {
+            width: 768px; height: 100%;
+            border: 2px solid #e2e8f0;
+        }
+        .preview-frame {
+            width: 100%; height: 100%; border: none;
+        }
+
+        /* Console */
+        .console-bar {
+            background: #1e1e2e; border-top: 1px solid rgba(255,255,255,0.05);
+            max-height: 150px; overflow-y: auto; padding: 8px 16px;
+            font-family: 'JetBrains Mono', monospace; font-size: 12px;
+            color: #cdd6f4; display: none;
+        }
+        .console-bar.open { display: block; }
+        .console-line { padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .console-line.error { color: #f38ba8; }
+        .console-line.warn { color: #f9e2af; }
+        .console-line.info { color: #89b4fa; }
+
+        /* Empty State */
+        .empty-state {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; height: 100%; color: #94a3b8;
+        }
+        .empty-state i { font-size: 3rem; margin-bottom: 16px; opacity: 0.3; }
+        .empty-state h3 { font-size: 1.1rem; margin-bottom: 8px; color: #64748b; }
+        .empty-state p { font-size: 0.85rem; margin-bottom: 20px; }
+        .empty-state a {
+            padding: 10px 20px; background: #2563eb; color: #fff;
+            border-radius: 10px; text-decoration: none; font-weight: 600;
+            font-size: 0.9rem; transition: background 0.2s;
+        }
+        .empty-state a:hover { background: #1d4ed8; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <a href="index.html" class="logo">
+            <img src="assets/gitblock.jpg" alt="GitBlock">
+            <span>GitBlock</span>
+        </a>
+        <span class="project-title" id="project-title">Preview</span>
+    </div>
+    <div class="header-actions">
+        <button class="header-btn" onclick="toggleConsole()"><i class="fas fa-terminal"></i> Console</button>
+        <button class="header-btn" onclick="copyLink()"><i class="fas fa-link"></i> Share</button>
+        <a class="header-btn primary" href="playground.html"><i class="fas fa-code"></i> Open Playground</a>
+    </div>
+</header>
+
+<div class="device-bar">
+    <button class="device-btn active" onclick="setDevice('desktop', this)"><i class="fas fa-desktop"></i> Desktop</button>
+    <button class="device-btn" onclick="setDevice('tablet', this)"><i class="fas fa-tablet-alt"></i> Tablet</button>
+    <button class="device-btn" onclick="setDevice('mobile', this)"><i class="fas fa-mobile-alt"></i> Mobile</button>
+</div>
+
+<div class="preview-container" id="preview-container">
+    <div class="preview-frame-wrapper" id="frame-wrapper">
+        <iframe class="preview-frame" id="preview-frame" sandbox="allow-scripts allow-modals allow-forms allow-same-origin"></iframe>
+    </div>
+</div>
+
+<div class="console-bar" id="console-bar"></div>
+
+<script>
+// Load preview data from URL or localStorage
+(function() {
+    const params = new URLSearchParams(window.location.search);
+    const dataParam = params.get('data');
+    const projectParam = params.get('project');
+    const userParam = params.get('user');
+
+    if (dataParam) {
+        // Data passed via URL (from playground pop-out)
+        try {
+            const data = JSON.parse(decodeURIComponent(atob(dataParam)));
+            renderPreview(data);
+            document.getElementById('project-title').textContent = data.name || 'Preview';
+        } catch (e) {
+            showEmpty();
+        }
+    } else if (projectParam && userParam) {
+        // Load from localStorage by project ID and user
+        try {
+            const key = 'gb_playground_projects_' + userParam;
+            const projects = JSON.parse(localStorage.getItem(key) || '{}');
+            if (projects[projectParam]) {
+                const proj = projects[projectParam];
+                renderPreview(proj);
+                document.getElementById('project-title').textContent = proj.name || 'Preview';
+            } else {
+                showEmpty();
+            }
+        } catch (e) {
+            showEmpty();
+        }
+    } else {
+        showEmpty();
+    }
+})();
+
+function renderPreview(data) {
+    const html = data.html || '';
+    const css = data.css || '';
+    const js = data.js || '';
+
+    let fullHtml = html;
+
+    // Inject CSS
+    if (css.trim()) {
+        if (fullHtml.includes('</head>')) {
+            fullHtml = fullHtml.replace('</head>', '<style>' + css + '</style></head>');
+        } else {
+            fullHtml = '<style>' + css + '</style>' + fullHtml;
+        }
+    }
+
+    // Inject JS with console capture
+    const consoleCapture = `<script>
+(function(){
+    function send(type, args) {
+        try {
+            window.parent.postMessage({type:'console', level:type, args: Array.from(args).map(a => {
+                try { return typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a); }
+                catch(e) { return String(a); }
+            })}, '*');
+        } catch(e) {}
+    }
+    console.log = function() { send('log', arguments); };
+    console.error = function() { send('error', arguments); };
+    console.warn = function() { send('warn', arguments); };
+    console.info = function() { send('info', arguments); };
+    window.onerror = function(msg, url, line) {
+        send('error', ['Error: ' + msg + ' (line ' + line + ')']);
+    };
+})();
+<\/script>`;
+
+    if (js.trim()) {
+        if (fullHtml.includes('</body>')) {
+            fullHtml = fullHtml.replace('</body>', consoleCapture + '<script>' + js + '<\/script></body>');
+        } else {
+            fullHtml += consoleCapture + '<script>' + js + '<\/script>';
+        }
+    } else {
+        if (fullHtml.includes('</body>')) {
+            fullHtml = fullHtml.replace('</body>', consoleCapture + '</body>');
+        } else {
+            fullHtml += consoleCapture;
+        }
+    }
+
+    const frame = document.getElementById('preview-frame');
+    const blob = new Blob([fullHtml], { type: 'text/html' });
+    frame.src = URL.createObjectURL(blob);
+}
+
+function showEmpty() {
+    const container = document.getElementById('preview-container');
+    container.innerHTML = `
+        <div class="empty-state">
+            <i class="fas fa-code"></i>
+            <h3>No Project to Preview</h3>
+            <p>Open a project in the Playground to see it here.</p>
+            <a href="playground.html">Open Playground</a>
+        </div>
+    `;
+}
+
+function setDevice(device, btn) {
+    document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const wrapper = document.getElementById('frame-wrapper');
+    wrapper.className = 'preview-frame-wrapper';
+    if (device !== 'desktop') {
+        wrapper.classList.add(device);
+    }
+}
+
+function toggleConsole() {
+    const bar = document.getElementById('console-bar');
+    bar.classList.toggle('open');
+}
+
+// Console message handler
+window.addEventListener('message', function(e) {
+    if (e.data && e.data.type === 'console') {
+        const bar = document.getElementById('console-bar');
+        bar.classList.add('open');
+        const line = document.createElement('div');
+        line.className = 'console-line ' + e.data.level;
+        line.textContent = e.data.args.join(' ');
+        bar.appendChild(line);
+        bar.scrollTop = bar.scrollHeight;
+    }
+});
+
+function copyLink() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+        const btn = event.target.closest('.header-btn');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        setTimeout(() => btn.innerHTML = orig, 1500);
+    });
+}
+</script>
+
+</body>
+</html>

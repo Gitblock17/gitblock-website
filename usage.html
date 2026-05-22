@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Usage — GitBlock API Documentation</title>
+    <title>Docs — GitBlock API (Powered by MiMo)</title>
     <link rel="icon" href="assets/gitblock.jpg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -533,8 +533,10 @@
         <nav>
             <a href="index.html">Home</a>
             <a href="index.html#features">Features</a>
-            <a href="index.html#api">API</a>
-            <a href="usage.html" class="active">Usage</a>
+            <a href="usage.html" class="active">Docs</a>
+            <a href="playground.html">Playground</a>
+            <a href="editor.html">Editor</a>
+            <a href="preview.html">Preview</a>
             <a href="index.html#models">Models</a>
             <a href="index.html#faq">FAQ</a>
         </nav>
@@ -548,6 +550,9 @@
     <a href="index.html#features">Features</a>
     <a href="index.html#api">API</a>
     <a href="usage.html">Usage</a>
+    <a href="playground.html">Playground</a>
+    <a href="editor.html">Editor</a>
+    <a href="preview.html">Preview</a>
     <a href="index.html#models">Models</a>
     <a href="index.html#faq">FAQ</a>
 </div>
@@ -557,8 +562,14 @@
 <!-- Sidebar -->
 <aside class="sidebar">
     <div class="sidebar-section">
+        <div class="sidebar-label">Tutorials</div>
+        <a href="#tutorials" class="sidebar-link active">
+            <i class="fas fa-play-circle"></i> Plug &amp; Play Setup
+        </a>
+    </div>
+    <div class="sidebar-section">
         <div class="sidebar-label">Getting Started</div>
-        <a href="#quickstart" class="sidebar-link active">
+        <a href="#quickstart" class="sidebar-link">
             <i class="fas fa-rocket"></i> Quick Start
         </a>
         <a href="#authentication" class="sidebar-link">
@@ -566,6 +577,9 @@
         </a>
         <a href="#endpoints" class="sidebar-link">
             <i class="fas fa-plug"></i> Endpoints
+        </a>
+        <a href="#models" class="sidebar-link">
+            <i class="fas fa-brain"></i> Models
         </a>
     </div>
     <div class="sidebar-section">
@@ -602,10 +616,100 @@
 
     <!-- Page Header -->
     <div class="page-header">
-        <div class="breadcrumb"><a href="index.html">Home</a> / Usage</div>
-        <h1>API Usage Guide</h1>
-        <p>Everything you need to integrate GitBlock into your application. Drop-in compatible with the OpenAI SDK.</p>
+        <div class="breadcrumb"><a href="index.html">Home</a> / Docs</div>
+        <h1>GitBlock API Documentation</h1>
+        <p>Free AI inference powered by <strong>Xiaomi MiMo</strong>. OpenAI-compatible API — drop in and start building.</p>
     </div>
+
+    <!-- Tutorials: Plug & Play Setup -->
+    <section class="content-section" id="tutorials">
+        <h2><i class="fas fa-play-circle" style="color:#2563eb;"></i> Plug &amp; Play Setup</h2>
+        <p>Get from zero to AI-powered in under 3 minutes. No credit card needed.</p>
+
+        <div class="steps-list">
+            <div class="step-item">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <h4>Create a free MiMo account</h4>
+                    <p>Go to <a href="https://platform.xiaomimimo.com" target="_blank" style="color:#2563eb;">platform.xiaomimimo.com</a> and sign up. You'll get free credits instantly — no credit card required.</p>
+                </div>
+            </div>
+            <div class="step-item">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <h4>Generate an API key</h4>
+                    <p>In the MiMo Console, navigate to <strong>API Keys</strong> and create a new key. Copy it — you'll need it in the next step.</p>
+                    <div class="code-block" style="margin-top:8px;">
+                        <div class="code-block-header">
+                            <span>Your key looks like this</span>
+                        </div>
+<pre><span class="cmt"># It will be a long string like:</span>
+sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</pre>
+                    </div>
+                </div>
+            </div>
+            <div class="step-item">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                    <h4>Start building</h4>
+                    <p>Use the <a href="playground.html" style="color:#2563eb;">Playground</a> (paste your key in Settings) or make API calls directly. That's it — you're live!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="note-box">
+            <div class="note-label">Tip</div>
+            <p>The API is fully OpenAI-compatible. If you've used OpenAI, Anthropic, or any OpenAI-compatible provider before, you already know how to use GitBlock — just change the base URL and API key.</p>
+        </div>
+
+        <h3 style="margin-top:28px; margin-bottom:16px; font-size:1rem;">Your first API call (copy &amp; paste)</h3>
+
+        <div class="code-block">
+            <div class="code-block-header">
+                <span>bash — try it right now</span>
+                <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
+            </div>
+<pre>curl -X POST https://api.xiaomimimo.com/v1/chat/completions \
+  -H "Authorization: Bearer YOUR_MIMO_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "mimo-v2.5-pro",
+    "messages": [{"role": "user", "content": "Hello! What can you do?"}]
+  }'</pre>
+        </div>
+
+        <div class="code-block">
+            <div class="code-block-header">
+                <span>python — 5 lines to get started</span>
+                <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
+            </div>
+<pre><span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+
+client = <span class="fn">OpenAI</span>(api_key=<span class="str">"YOUR_MIMO_API_KEY"</span>, base_url=<span class="str">"https://api.xiaomimimo.com/v1"</span>)
+response = client.chat.completions.<span class="fn">create</span>(model=<span class="str">"mimo-v2.5-pro"</span>, messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Hello!"</span>}])
+<span class="fn">print</span>(response.choices[<span class="num">0</span>].message.content)</pre>
+        </div>
+
+        <div class="code-block">
+            <div class="code-block-header">
+                <span>javascript — fetch example</span>
+                <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
+            </div>
+<pre><span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">"https://api.xiaomimimo.com/v1/chat/completions"</span>, {
+  method: <span class="str">"POST"</span>,
+  headers: {
+    <span class="str">"Authorization"</span>: <span class="str">"Bearer YOUR_MIMO_API_KEY"</span>,
+    <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>
+  },
+  body: JSON.<span class="fn">stringify</span>({
+    model: <span class="str">"mimo-v2.5-pro"</span>,
+    messages: [{ role: <span class="str">"user"</span>, content: <span class="str">"Hello!"</span> }]
+  })
+});
+<span class="kw">const</span> data = <span class="kw">await</span> res.<span class="fn">json</span>();
+console.<span class="fn">log</span>(data.choices[<span class="num">0</span>].message.content);</pre>
+        </div>
+    </section>
 
     <!-- Quick Start -->
     <section class="content-section" id="quickstart">
@@ -617,7 +721,7 @@
                 <div class="step-num">1</div>
                 <div class="step-content">
                     <h4>Get your API key</h4>
-                    <p>Connect your wallet on the <a href="index.html#api" style="color:#2563eb;">home page</a> to generate a free API key.</p>
+                    <p>Sign up at <a href="https://platform.xiaomimimo.com/console" target="_blank" style="color:#2563eb;">platform.xiaomimimo.com</a> → Console → API Keys. Free credits included.</p>
                 </div>
             </div>
             <div class="step-item">
@@ -638,12 +742,12 @@
 
         <div class="env-grid">
             <div class="env-card">
-                <div class="env-key">GITBLOCK_API_KEY</div>
-                <div class="env-val">gb_a1b2c3d4e5f6...</div>
+                <div class="env-key">MIMO_API_KEY</div>
+                <div class="env-val">sk-xxxxxxxxxxxx...</div>
             </div>
             <div class="env-card">
-                <div class="env-key">GITBLOCK_BASE_URL</div>
-                <div class="env-val">https://gitblock-api.onrender.com/v1</div>
+                <div class="env-key">MIMO_BASE_URL</div>
+                <div class="env-val">https://api.xiaomimimo.com/v1</div>
             </div>
         </div>
 
@@ -652,31 +756,38 @@
                 <span>bash</span>
                 <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
             </div>
-<pre>export GITBLOCK_API_KEY=your_api_key_here
-export GITBLOCK_BASE_URL=https://gitblock-api.onrender.com/v1</pre>
+<pre>export MIMO_API_KEY=your_api_key_here
+export MIMO_BASE_URL=https://api.xiaomimimo.com/v1</pre>
         </div>
     </section>
 
     <!-- Authentication -->
     <section class="content-section" id="authentication">
         <h2><i class="fas fa-key" style="color:#2563eb;"></i> Authentication</h2>
-        <p>All requests require a Bearer token in the Authorization header.</p>
+        <p>Two ways to authenticate. Use whichever fits your setup.</p>
 
+        <h3 style="margin-top:20px; margin-bottom:12px; font-size:0.95rem;">Option A: Authorization header (recommended)</h3>
         <div class="endpoint-box">
             <span class="endpoint-method">HEADER</span>
-            <span class="endpoint-url">Authorization: Bearer YOUR_API_KEY</span>
+            <span class="endpoint-url">Authorization: Bearer YOUR_MIMO_API_KEY</span>
+        </div>
+
+        <h3 style="margin-top:20px; margin-bottom:12px; font-size:0.95rem;">Option B: api-key header</h3>
+        <div class="endpoint-box">
+            <span class="endpoint-method">HEADER</span>
+            <span class="endpoint-url">api-key: YOUR_MIMO_API_KEY</span>
         </div>
 
         <div class="note-box">
             <div class="note-label">Note</div>
-            <p>Your API key is deterministically generated from your wallet address. You can regenerate it anytime from the <a href="index.html#api" style="color:#2563eb;">dashboard</a>.</p>
+            <p>Your API key is stored locally in the <a href="playground.html" style="color:#2563eb;">Playground</a> and never sent to our servers. Get your key from the <a href="https://platform.xiaomimimo.com/console" target="_blank" style="color:#2563eb;">MiMo Console</a>.</p>
         </div>
     </section>
 
     <!-- Endpoints -->
     <section class="content-section" id="endpoints">
         <h2><i class="fas fa-plug" style="color:#2563eb;"></i> Endpoints</h2>
-        <p>GitBlock exposes OpenAI-compatible endpoints.</p>
+        <p>GitBlock exposes MiMo's OpenAI-compatible endpoints.</p>
 
         <div class="endpoint-box">
             <span class="endpoint-method">POST</span>
@@ -693,7 +804,33 @@ export GITBLOCK_BASE_URL=https://gitblock-api.onrender.com/v1</pre>
 
         <div class="note-box">
             <div class="note-label">Base URL</div>
-            <p>All endpoints are relative to <code class="inline">https://gitblock-api.onrender.com/v1</code></p>
+            <p>All endpoints are relative to <code class="inline">https://api.xiaomimimo.com/v1</code></p>
+        </div>
+    </section>
+
+    <!-- Models -->
+    <section class="content-section" id="models">
+        <h2><i class="fas fa-brain" style="color:#2563eb;"></i> Models</h2>
+        <p>Choose the right model for your use case.</p>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px;">
+            <div style="padding:16px; background:#f8fafc; border:1px solid rgba(37,99,235,0.1); border-radius:10px;">
+                <div style="font-weight:700; color:#1e293b; font-size:0.9rem; margin-bottom:4px;">mimo-v2.5-pro</div>
+                <div style="font-size:0.78rem; color:#64748b;">Best quality. Deep reasoning, 1M context window. Best for complex code generation and analysis.</div>
+                <div style="margin-top:8px; font-size:0.72rem; color:#2563eb; font-weight:600;">⭐ Recommended</div>
+            </div>
+            <div style="padding:16px; background:#f8fafc; border:1px solid rgba(37,99,235,0.1); border-radius:10px;">
+                <div style="font-weight:700; color:#1e293b; font-size:0.9rem; margin-bottom:4px;">mimo-v2.5</div>
+                <div style="font-size:0.78rem; color:#64748b;">Fast and capable. Great balance of speed and quality for most tasks.</div>
+            </div>
+            <div style="padding:16px; background:#f8fafc; border:1px solid rgba(37,99,235,0.1); border-radius:10px;">
+                <div style="font-weight:700; color:#1e293b; font-size:0.9rem; margin-bottom:4px;">mimo-v2-flash</div>
+                <div style="font-size:0.78rem; color:#64748b;">Fastest responses. 262K context. Ideal for quick iterations and real-time chat.</div>
+            </div>
+            <div style="padding:16px; background:#f8fafc; border:1px solid rgba(37,99,235,0.1); border-radius:10px;">
+                <div style="font-weight:700; color:#1e293b; font-size:0.9rem; margin-bottom:4px;">mimo-v2-omni</div>
+                <div style="font-size:0.78rem; color:#64748b;">Multimodal — text + image input. Use for vision tasks, image analysis, and document understanding.</div>
+            </div>
         </div>
     </section>
 
@@ -713,13 +850,13 @@ export GITBLOCK_BASE_URL=https://gitblock-api.onrender.com/v1</pre>
 <pre><span class="kw">import</span> requests
 
 response = requests.post(
-    <span class="str">"https://gitblock-api.onrender.com/v1/chat/completions"</span>,
+    <span class="str">"https://api.xiaomimimo.com/v1/chat/completions"</span>,
     headers={
-        <span class="str">"Authorization"</span>: <span class="str">"Bearer YOUR_API_KEY"</span>,
+        <span class="str">"Authorization"</span>: <span class="str">"Bearer YOUR_MIMO_API_KEY"</span>,
         <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>
     },
     json={
-        <span class="str">"model"</span>: <span class="str">"llama-3.3-70b"</span>,
+        <span class="str">"model"</span>: <span class="str">"mimo-v2.5-pro"</span>,
         <span class="str">"messages"</span>: [{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Hello!"</span>}]
     }
 )
@@ -732,7 +869,7 @@ response = requests.post(
                 <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
             </div>
 <pre>stream = client.chat.completions.create(
-    model=<span class="str">"llama-3.3-70b"</span>,
+    model=<span class="str">"mimo-v2.5-pro"</span>,
     messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Write a haiku."</span>}],
     stream=<span class="kw">True</span>
 )
@@ -748,7 +885,7 @@ response = requests.post(
                 <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
             </div>
 <pre>resp = client.chat.completions.create(
-    model=<span class="str">"deepseek-coder-33b"</span>,
+    model=<span class="str">"mimo-v2.5-pro"</span>,
     messages=[{
         <span class="str">"role"</span>: <span class="str">"user"</span>,
         <span class="str">"content"</span>: <span class="str">"Write a Python function to find prime numbers."</span>
@@ -772,14 +909,14 @@ code = resp.choices[<span class="num">0</span>].message.content
                 <span>chat.js</span>
                 <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
             </div>
-<pre><span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">"https://gitblock-api.onrender.com/v1/chat/completions"</span>, {
+<pre><span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">"https://api.xiaomimimo.com/v1/chat/completions"</span>, {
   method: <span class="str">"POST"</span>,
   headers: {
-    <span class="str">"Authorization"</span>: <span class="str">"Bearer YOUR_API_KEY"</span>,
+    <span class="str">"Authorization"</span>: <span class="str">"Bearer YOUR_MIMO_API_KEY"</span>,
     <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>
   },
   body: JSON.<span class="fn">stringify</span>({
-    model: <span class="str">"llama-3.3-70b"</span>,
+    model: <span class="str">"mimo-v2.5-pro"</span>,
     messages: [{ role: <span class="str">"user"</span>, content: <span class="str">"Hello!"</span> }]
   })
 });
@@ -801,13 +938,13 @@ console.<span class="fn">log</span>(data.choices[<span class="num">0</span>].mes
                 <span>bash</span>
                 <button class="copy-btn" onclick="copyBlock(this)"><i class="fas fa-copy"></i> Copy</button>
             </div>
-<pre>curl -X POST https://gitblock-api.onrender.com/v1/chat/completions \
-  -H <span class="str">"Authorization: Bearer YOUR_API_KEY"</span> \
-  -H <span class="str">"Content-Type: application/json"</span> \
-  -d <span class="str">'{
-    "model": "llama-3.3-70b",
+<pre>curl -X POST https://api.xiaomimimo.com/v1/chat/completions \
+  -H "Authorization: Bearer YOUR_MIMO_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "mimo-v2.5-pro",
     "messages": [{"role": "user", "content": "Hello!"}]
-  }'</span></pre>
+  }'</pre>
         </div>
     </section>
 
@@ -841,12 +978,12 @@ console.<span class="fn">log</span>(data.choices[<span class="num">0</span>].mes
 <pre><span class="kw">from</span> openai <span class="kw">import</span> OpenAI
 
 client = <span class="fn">OpenAI</span>(
-    api_key=<span class="str">"YOUR_API_KEY"</span>,
-    base_url=<span class="str">"https://gitblock-api.onrender.com/v1"</span>
+    api_key=<span class="str">"YOUR_MIMO_API_KEY"</span>,
+    base_url=<span class="str">"https://api.xiaomimimo.com/v1"</span>
 )
 
 response = client.chat.completions.<span class="fn">create</span>(
-    model=<span class="str">"llama-3.3-70b"</span>,
+    model=<span class="str">"mimo-v2.5-pro"</span>,
     messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Explain quantum computing."</span>}]
 )
 <span class="fn">print</span>(response.choices[<span class="num">0</span>].message.content)</pre>
@@ -859,7 +996,7 @@ response = client.chat.completions.<span class="fn">create</span>(
             <span class="lang-icon agent"><i class="fas fa-link"></i></span>
             LangChain
         </h2>
-        <p>Use GitBlock as the LLM backend for LangChain chains and agents.</p>
+        <p>Use MiMo as the LLM backend for LangChain chains and agents.</p>
 
         <div class="code-block">
             <div class="code-block-header">
@@ -869,9 +1006,9 @@ response = client.chat.completions.<span class="fn">create</span>(
 <pre><span class="kw">from</span> langchain_openai <span class="kw">import</span> ChatOpenAI
 
 llm = <span class="fn">ChatOpenAI</span>(
-    api_key=<span class="str">"YOUR_API_KEY"</span>,
-    base_url=<span class="str">"https://gitblock-api.onrender.com/v1"</span>,
-    model=<span class="str">"llama-3.3-70b"</span>
+    api_key=<span class="str">"YOUR_MIMO_API_KEY"</span>,
+    base_url=<span class="str">"https://api.xiaomimimo.com/v1"</span>,
+    model=<span class="str">"mimo-v2.5-pro"</span>
 )
 
 result = llm.<span class="fn">invoke</span>(<span class="str">"What is decentralized AI?"</span>)
@@ -885,7 +1022,7 @@ result = llm.<span class="fn">invoke</span>(<span class="str">"What is decentral
             <span class="lang-icon agent"><i class="fas fa-robot"></i></span>
             Hermes Agent
         </h2>
-        <p>Configure GitBlock as a provider in Hermes Agent.</p>
+        <p>Configure MiMo as a provider in Hermes Agent.</p>
 
         <div class="code-block">
             <div class="code-block-header">
@@ -894,11 +1031,11 @@ result = llm.<span class="fn">invoke</span>(<span class="str">"What is decentral
             </div>
 <pre><span class="cmt"># In your hermes-agent config (config.yaml):</span>
 providers:
-  gitblock:
+  mimo:
     type: openai
-    api_key: <span class="str">YOUR_API_KEY</span>
-    base_url: <span class="str">https://gitblock-api.onrender.com/v1</span>
-    model: <span class="str">llama-3.3-70b</span></pre>
+    api_key: <span class="str">YOUR_MIMO_API_KEY</span>
+    base_url: <span class="str">https://api.xiaomimimo.com/v1</span>
+    model: <span class="str">mimo-v2.5-pro</span></pre>
         </div>
 
         <div class="code-block">
@@ -908,8 +1045,8 @@ providers:
             </div>
 <pre><span class="cmt"># Or via environment variables:</span>
 export HERMES_PROVIDER=openai
-export OPENAI_API_KEY=YOUR_API_KEY
-export OPENAI_BASE_URL=https://gitblock-api.onrender.com/v1</pre>
+export OPENAI_API_KEY=YOUR_MIMO_API_KEY
+export OPENAI_BASE_URL=https://api.xiaomimimo.com/v1</pre>
         </div>
     </section>
 
@@ -933,10 +1070,13 @@ export OPENAI_BASE_URL=https://gitblock-api.onrender.com/v1</pre>
             <a href="index.html#api">API Access</a>
             <a href="index.html#models">Models</a>
             <a href="usage.html">Code Examples</a>
+            <a href="playground.html">Playground</a>
+            <a href="editor.html">Editor</a>
         </div>
         <div class="footer-col">
             <h4>Developers</h4>
             <a href="https://github.com/Gitblock17/Gitblock" target="_blank">GitHub</a>
+            <a href="usage.html#tutorials">Tutorials</a>
             <a href="usage.html">Documentation</a>
             <a href="index.html#faq">FAQ</a>
             <a href="https://github.com/Gitblock17/Gitblock/issues" target="_blank">Report Issue</a>

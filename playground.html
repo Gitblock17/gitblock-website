@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playground — GitBlock</title>
+    <link rel="icon" href="assets/gitblock.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #ffffff;
+            color: #1e293b;
+            line-height: 1.6;
+            overflow: hidden;
+            height: 100vh;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                linear-gradient(rgba(37, 99, 235, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Header */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(37,99,235,0.1);
+            z-index: 1000;
+        }
+        .header-inner {
+            max-width: 1400px; margin: 0 auto; padding: 0 24px;
+            display: flex; align-items: center; justify-content: space-between; height: 56px;
+        }
+        .logo {
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none; color: #2563eb; font-weight: 800; font-size: 1.15rem;
+        }
+        .logo img { width: 32px; height: 32px; border-radius: 8px; object-fit: cover; }
+        nav { display: flex; align-items: center; gap: 24px; }
+        nav a {
+            text-decoration: none; color: #475569; font-size: 0.85rem; font-weight: 500;
+            transition: color 0.2s;
+        }
+        nav a:hover, nav a.active { color: #2563eb; }
+        nav a.active { font-weight: 600; }
+        .hamburger {
+            display: none; background: none; border: none;
+            font-size: 1.3rem; color: #2563eb; cursor: pointer;
+        }
+        .mobile-menu {
+            display: none; position: fixed; top: 56px; left: 0; width: 100%;
+            background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(37,99,235,0.1); padding: 16px 24px;
+            flex-direction: column; gap: 12px; z-index: 999;
+        }
+        .mobile-menu.open { display: flex; }
+        .mobile-menu a {
+            text-decoration: none; color: #475569; font-size: 0.95rem; font-weight: 500; padding: 6px 0;
+        }
+        .mobile-menu a:hover { color: #2563eb; }
+        .user-badge {
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 12px; background: rgba(37,99,235,0.08);
+            border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: #2563eb;
+        }
+        .user-badge i { font-size: 0.75rem; }
+        .logout-btn {
+            background: none; border: none; color: #ef4444; cursor: pointer;
+            font-size: 0.75rem; padding: 2px 6px; border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .logout-btn:hover { background: rgba(239,68,68,0.1); }
+        .settings-btn {
+            background: none; border: none; color: #475569; cursor: pointer;
+            font-size: 1rem; padding: 6px 8px; border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .settings-btn:hover { color: #2563eb; background: rgba(37,99,235,0.08); }
+
+        /* Main Layout */
+        .app-wrapper {
+            margin-top: 56px; display: flex; height: calc(100vh - 56px);
+            position: relative; z-index: 1;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px; min-width: 260px; background: #f8fafc;
+            border-right: 1px solid rgba(37,99,235,0.08);
+            display: flex; flex-direction: column; overflow-y: auto;
+        }
+        .sidebar-section { padding: 16px; border-bottom: 1px solid rgba(37,99,235,0.06); }
+        .sidebar-section-title {
+            font-size: 0.7rem; font-weight: 700; color: #94a3b8;
+            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px;
+        }
+        .btn-new-project {
+            width: 100%; padding: 10px; background: #2563eb; color: #fff;
+            border: none; border-radius: 10px; font-family: 'Inter', sans-serif;
+            font-size: 0.85rem; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: background 0.2s;
+        }
+        .btn-new-project:hover { background: #1d4ed8; }
+        .btn-secondary {
+            width: 100%; padding: 8px 12px; background: rgba(37,99,235,0.06);
+            color: #475569; border: 1px solid rgba(37,99,235,0.1);
+            border-radius: 8px; font-family: 'Inter', sans-serif;
+            font-size: 0.8rem; font-weight: 500; cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
+            transition: all 0.2s; margin-top: 6px;
+        }
+        .btn-secondary:hover { background: rgba(37,99,235,0.12); color: #2563eb; }
+        .project-list { display: flex; flex-direction: column; gap: 4px; }
+        .project-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 10px; border-radius: 8px; cursor: pointer;
+            transition: background 0.15s; font-size: 0.82rem;
+        }
+        .project-item:hover { background: rgba(37,99,235,0.06); }
+        .project-item.active { background: rgba(37,99,235,0.1); color: #2563eb; font-weight: 600; }
+        .project-item-name {
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;
+        }
+        .project-item-date { font-size: 0.7rem; color: #94a3b8; margin-left: 8px; white-space: nowrap; }
+        .project-item-actions {
+            display: flex; gap: 2px; margin-left: 4px;
+        }
+        .project-item-actions button {
+            background: none; border: none; color: #94a3b8; cursor: pointer;
+            font-size: 0.7rem; padding: 2px 4px; border-radius: 4px;
+            transition: all 0.15s;
+        }
+        .project-item-actions button:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
+        .sidebar-actions {
+            display: flex; flex-direction: column; gap: 6px; margin-top: auto; padding: 16px;
+            border-top: 1px solid rgba(37,99,235,0.06);
+        }
+        .storage-info {
+            font-size: 0.7rem; color: #94a3b8; text-align: center;
+            padding: 8px 16px; border-top: 1px solid rgba(37,99,235,0.06);
+        }
+        .storage-bar {
+            width: 100%; height: 4px; background: rgba(37,99,235,0.1);
+            border-radius: 2px; margin-top: 4px; overflow: hidden;
+        }
+        .storage-bar-fill { height: 100%; background: #2563eb; border-radius: 2px; transition: width 0.3s; }
+
+        /* Editor Area */
+        .editor-area {
+            flex: 1; display: flex; flex-direction: column; min-width: 0;
+        }
+        .editor-toolbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 16px; background: #f8fafc;
+            border-bottom: 1px solid rgba(37,99,235,0.08);
+        }
+        .project-name-input {
+            border: none; background: transparent; font-family: 'Inter', sans-serif;
+            font-size: 0.95rem; font-weight: 600; color: #1e293b; outline: none;
+            padding: 4px 8px; border-radius: 6px; transition: background 0.2s;
+            max-width: 250px;
+        }
+        .project-name-input:hover { background: rgba(37,99,235,0.04); }
+        .project-name-input:focus { background: rgba(37,99,235,0.08); }
+        .toolbar-actions { display: flex; gap: 6px; }
+        .toolbar-btn {
+            padding: 6px 12px; border: 1px solid rgba(37,99,235,0.15);
+            border-radius: 8px; background: #fff; color: #475569;
+            font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 500;
+            cursor: pointer; display: flex; align-items: center; gap: 6px;
+            transition: all 0.15s;
+        }
+        .toolbar-btn:hover { border-color: #2563eb; color: #2563eb; }
+        .toolbar-btn.primary { background: #2563eb; color: #fff; border-color: #2563eb; }
+        .toolbar-btn.primary:hover { background: #1d4ed8; }
+
+        /* Tab Bar */
+        .tab-bar {
+            display: flex; background: #f1f5f9; border-bottom: 1px solid rgba(37,99,235,0.08);
+        }
+        .tab-btn {
+            padding: 10px 20px; border: none; background: transparent;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 500;
+            color: #64748b; cursor: pointer; border-bottom: 2px solid transparent;
+            transition: all 0.15s; display: flex; align-items: center; gap: 6px;
+        }
+        .tab-btn:hover { color: #2563eb; background: rgba(37,99,235,0.04); }
+        .tab-btn.active { color: #2563eb; border-bottom-color: #2563eb; background: #fff; }
+        .tab-btn i { font-size: 0.7rem; }
+        .tab-btn .dot {
+            width: 6px; height: 6px; border-radius: 50%; background: #f59e0b;
+            display: none;
+        }
+        .tab-btn .dot.modified { display: block; }
+
+        /* Code Editor */
+        .code-panel { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+        .code-editor {
+            flex: 1; overflow: auto; background: #1e1e2e;
+        }
+        .code-editor textarea {
+            width: 100%; height: 100%; border: none; outline: none; resize: none;
+            font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.6;
+            padding: 16px; background: #1e1e2e; color: #cdd6f4;
+            tab-size: 2;
+        }
+        .code-editor textarea::placeholder { color: #585b70; }
+
+        /* Preview Panel */
+        .preview-panel {
+            border-top: 1px solid rgba(37,99,235,0.08);
+            background: #fff; display: flex; flex-direction: column;
+            height: 40%; min-height: 120px; position: relative;
+        }
+        .preview-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 6px 16px; background: #f8fafc;
+            border-bottom: 1px solid rgba(37,99,235,0.08);
+            cursor: ns-resize;
+        }
+        .preview-header-title {
+            font-size: 0.75rem; font-weight: 600; color: #64748b;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .preview-header-title i { color: #22c55e; }
+        .preview-actions { display: flex; gap: 4px; }
+        .preview-actions button {
+            background: none; border: 1px solid rgba(37,99,235,0.1);
+            border-radius: 6px; padding: 3px 8px; font-size: 0.7rem;
+            color: #64748b; cursor: pointer; transition: all 0.15s;
+            font-family: 'Inter', sans-serif;
+        }
+        .preview-actions button:hover { border-color: #2563eb; color: #2563eb; }
+        .preview-frame {
+            flex: 1; border: none; width: 100%; background: #fff;
+        }
+        .resize-handle {
+            width: 100%; height: 4px; cursor: ns-resize; position: absolute; top: -2px;
+            z-index: 10;
+        }
+        .resize-handle:hover { background: rgba(37,99,235,0.2); }
+
+        /* Console Output */
+        .console-panel {
+            display: none; border-top: 1px solid rgba(37,99,235,0.08);
+            background: #1e1e2e; max-height: 200px; overflow-y: auto;
+            padding: 8px 16px; font-family: 'JetBrains Mono', monospace;
+            font-size: 12px; color: #cdd6f4;
+        }
+        .console-panel.open { display: block; }
+        .console-line { padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .console-line.error { color: #f38ba8; }
+        .console-line.warn { color: #f9e2af; }
+        .console-line.info { color: #89b4fa; }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 24px; right: 24px;
+            padding: 12px 20px; background: #1e293b; color: #fff;
+            border-radius: 10px; font-size: 0.85rem; font-weight: 500;
+            z-index: 3000; transform: translateY(100px); opacity: 0;
+            transition: all 0.3s;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: #059669; }
+        .toast.error { background: #dc2626; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.3); z-index: 2500;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-overlay.hidden { display: none; }
+        .modal-box {
+            background: #fff; border-radius: 16px; padding: 28px;
+            width: 420px; max-width: 90vw; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        .modal-box h3 { font-size: 1.1rem; margin-bottom: 16px; }
+        .modal-box input, .modal-box select {
+            width: 100%; padding: 10px 14px; border: 2px solid rgba(37,99,235,0.15);
+            border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.9rem;
+            outline: none; margin-bottom: 12px;
+        }
+        .modal-box input:focus, .modal-box select:focus { border-color: #2563eb; }
+        .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+        .modal-actions button {
+            padding: 8px 16px; border-radius: 8px; font-family: 'Inter', sans-serif;
+            font-size: 0.85rem; font-weight: 500; cursor: pointer;
+        }
+        .modal-cancel { background: #f1f5f9; border: 1px solid #e2e8f0; color: #475569; }
+        .modal-confirm { background: #2563eb; border: none; color: #fff; }
+        .modal-label {
+            font-size: 0.8rem; font-weight: 600; color: #475569; margin-bottom: 6px;
+            display: block;
+        }
+        .modal-note {
+            font-size: 0.75rem; color: #94a3b8; margin-top: 8px; line-height: 1.5;
+        }
+        .modal-note a { color: #2563eb; }
+
+        /* AI Panel */
+        .ai-panel {
+            width: 380px; min-width: 380px; border-left: 1px solid rgba(37,99,235,0.08);
+            display: flex; flex-direction: column; background: #fafbfc;
+        }
+        .ai-panel.hidden { display: none; }
+        .ai-header {
+            padding: 12px 16px; border-bottom: 1px solid rgba(37,99,235,0.08);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .ai-header-title {
+            font-size: 0.85rem; font-weight: 600; color: #1e293b;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .ai-header-title i { color: #2563eb; }
+        .ai-messages {
+            flex: 1; overflow-y: auto; padding: 16px; display: flex;
+            flex-direction: column; gap: 12px;
+        }
+        .ai-msg {
+            padding: 10px 14px; border-radius: 12px; font-size: 0.82rem;
+            line-height: 1.5; max-width: 95%;
+        }
+        .ai-msg.user {
+            background: #2563eb; color: #fff; align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .ai-msg.assistant {
+            background: #fff; color: #1e293b; align-self: flex-start;
+            border: 1px solid rgba(37,99,235,0.1); border-bottom-left-radius: 4px;
+            width: 100%; max-width: 100%;
+        }
+        .ai-msg pre {
+            background: #1e1e2e; color: #cdd6f4; padding: 10px 12px;
+            border-radius: 6px; overflow-x: auto; font-size: 0.75rem;
+            margin: 8px 0; font-family: 'JetBrains Mono', monospace;
+            position: relative;
+        }
+        .ai-msg code {
+            background: rgba(37,99,235,0.08); padding: 1px 4px; border-radius: 3px;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+        }
+        .ai-msg pre code { background: none; padding: 0; }
+        .ai-input-area {
+            padding: 12px 16px; border-top: 1px solid rgba(37,99,235,0.08);
+        }
+        .ai-input-wrapper { display: flex; gap: 8px; }
+        .ai-input {
+            flex: 1; padding: 10px 12px; border: 2px solid rgba(37,99,235,0.12);
+            border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.82rem;
+            outline: none; resize: none; min-height: 38px; max-height: 100px;
+        }
+        .ai-input:focus { border-color: #2563eb; }
+        .ai-send-btn {
+            width: 38px; height: 38px; background: #2563eb; color: #fff;
+            border: none; border-radius: 10px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s; align-self: flex-end;
+        }
+        .ai-send-btn:hover { background: #1d4ed8; }
+        .ai-send-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+        .ai-apply-btn {
+            margin-top: 8px; padding: 6px 14px; background: #2563eb;
+            border: none; border-radius: 8px;
+            color: #fff; font-size: 0.78rem; font-weight: 600;
+            cursor: pointer; font-family: 'Inter', sans-serif;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: background 0.2s;
+        }
+        .ai-apply-btn:hover { background: #1d4ed8; }
+        .typing-dots { display: inline-flex; gap: 4px; padding: 4px 0; }
+        .typing-dots span {
+            width: 6px; height: 6px; background: #94a3b8; border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-4px); opacity: 1; }
+        }
+
+        /* Templates Grid */
+        .templates-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+            padding: 4px 0;
+        }
+        .template-card {
+            padding: 10px; border: 1px solid rgba(37,99,235,0.12);
+            border-radius: 8px; cursor: pointer; transition: all 0.2s;
+            background: #fff;
+        }
+        .template-card:hover {
+            border-color: #2563eb; background: rgba(37,99,235,0.04);
+            transform: translateY(-1px);
+        }
+        .template-card-icon { font-size: 1.2rem; margin-bottom: 4px; }
+        .template-card-name { font-size: 0.75rem; font-weight: 600; color: #1e293b; }
+        .template-card-desc { font-size: 0.65rem; color: #94a3b8; margin-top: 2px; }
+
+        /* Onboarding Overlay */
+        .onboarding-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 3000;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .onboarding-overlay.hidden { display: none; }
+        .onboarding-box {
+            background: #fff; border-radius: 20px; padding: 40px;
+            width: 520px; max-width: 90vw; max-height: 85vh; overflow-y: auto;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.2);
+        }
+        .onboarding-box img { width: 56px; height: 56px; border-radius: 14px; margin-bottom: 16px; }
+        .onboarding-box h2 { font-size: 1.4rem; margin-bottom: 8px; }
+        .onboarding-box p { color: #64748b; font-size: 0.9rem; margin-bottom: 20px; }
+        .onboarding-steps { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+        .onboarding-step {
+            display: flex; gap: 12px; padding: 12px; background: #f8fafc;
+            border-radius: 10px; border: 1px solid rgba(37,99,235,0.08);
+        }
+        .onboarding-step-num {
+            width: 28px; height: 28px; background: #2563eb; color: #fff;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; font-weight: 700; flex-shrink: 0;
+        }
+        .onboarding-step-text { font-size: 0.85rem; color: #475569; }
+        .onboarding-step-text strong { color: #1e293b; }
+        .onboarding-skip {
+            display: block; text-align: center; color: #94a3b8; font-size: 0.8rem;
+            cursor: pointer; margin-top: 8px; text-decoration: none;
+        }
+        .onboarding-skip:hover { color: #2563eb; }
+
+        /* Status indicator */
+        .api-status {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.7rem; color: #94a3b8; padding: 4px 0;
+        }
+        .api-status-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+        }
+        .api-status-dot.connected { background: #22c55e; }
+        .api-status-dot.disconnected { background: #ef4444; }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            nav { display: none; }
+            .hamburger { display: block; }
+            .user-badge { display: none; }
+            .sidebar { display: none; }
+            .ai-panel { display: none !important; }
+            .editor-area { width: 100%; }
+            .toolbar-actions { gap: 4px; }
+            .toolbar-btn span { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Onboarding -->
+<div class="onboarding-overlay" id="onboarding-overlay">
+    <div class="onboarding-box">
+        <img src="assets/gitblock.jpg" alt="GitBlock">
+        <h2>Welcome to GitBlock Playground</h2>
+        <p>Build web projects with AI powered by <strong>Xiaomi MiMo</strong>. Code, preview, and ship — all in your browser.</p>
+        <div class="onboarding-steps">
+            <div class="onboarding-step">
+                <div class="onboarding-step-num">1</div>
+                <div class="onboarding-step-text"><strong>Get your free MiMo API key</strong> — Sign up at <a href="https://platform.xiaomimimo.com" target="_blank" style="color:#2563eb;">platform.xiaomimimo.com</a> → Console → API Keys. Free credits included!</div>
+            </div>
+            <div class="onboarding-step">
+                <div class="onboarding-step-num">2</div>
+                <div class="onboarding-step-text"><strong>Paste your key</strong> — Click the <i class="fas fa-cog"></i> Settings icon above, select <strong>"MiMo API (Recommended)"</strong>, and paste your key.</div>
+            </div>
+            <div class="onboarding-step">
+                <div class="onboarding-step-num">3</div>
+                <div class="onboarding-step-text"><strong>Start building</strong> — Type what you want in the AI chat on the right. Click <strong>"Apply to Editor"</strong> to see it live in the preview pane.</div>
+            </div>
+        </div>
+        <div style="background:rgba(37,99,235,0.06); border:1px solid rgba(37,99,235,0.15); border-radius:10px; padding:12px 16px; font-size:0.8rem; color:#475569; margin-bottom:16px; text-align:center;">
+            <i class="fas fa-bolt" style="color:#2563eb;"></i> <strong>Plug &amp; Play:</strong> No credit card needed. Free tier includes generous daily limits. <a href="usage.html#tutorials" target="_blank" style="color:#2563eb;">View setup tutorial →</a>
+        </div>
+        <button class="btn-new-project" onclick="closeOnboarding()" style="font-size:0.95rem; padding:12px;">
+            <i class="fas fa-rocket"></i> Get Started
+        </button>
+        <a class="onboarding-skip" onclick="closeOnboarding()">I'll explore on my own</a>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay hidden" id="settings-modal">
+    <div class="modal-box">
+        <h3><i class="fas fa-cog"></i> Settings</h3>
+        <label class="modal-label">AI Provider</label>
+        <select id="settings-api-mode" onchange="toggleSettingsMode()">
+            <option value="custom">MiMo API — Recommended ✓</option>
+            <option value="free">GitBlock Free API (Legacy)</option>
+        </select>
+
+        <div id="settings-custom-section">
+            <label class="modal-label" style="margin-top:12px;">MiMo API Key</label>
+            <div style="display:flex; gap:8px;">
+                <input type="password" id="settings-api-key" placeholder="Enter your MiMo API key" style="flex:1;">
+                <a href="https://platform.xiaomimimo.com/console" target="_blank" style="display:flex; align-items:center; padding:8px 12px; background:rgba(37,99,235,0.08); border-radius:8px; color:#2563eb; font-size:0.78rem; font-weight:600; text-decoration:none; white-space:nowrap;"><i class="fas fa-external-link-alt" style="margin-right:6px;"></i> Get Key</a>
+            </div>
+            <div class="modal-note">
+                <strong>Plug &amp; Play Setup:</strong> Sign up free at <a href="https://platform.xiaomimimo.com" target="_blank">platform.xiaomimimo.com</a> → Console → API Keys. No credit card needed. Your key is stored locally and never sent to our servers.
+            </div>
+            <label class="modal-label" style="margin-top:12px;">AI Model</label>
+            <select id="settings-model">
+                <option value="mimo-v2.5-pro">MiMo V2.5 Pro — Best quality, reasoning (Recommended)</option>
+                <option value="mimo-v2.5">MiMo V2.5 — Fast &amp; capable</option>
+                <option value="mimo-v2-flash">MiMo V2 Flash — Fastest responses</option>
+                <option value="mimo-v2-omni">MiMo V2 Omni — Multimodal (text + image)</option>
+            </select>
+        </div>
+
+        <div id="settings-free-section" style="display:none;">
+            <div class="modal-note" style="margin-top:12px;">
+                <i class="fas fa-info-circle" style="color:#94a3b8;"></i> The free GitBlock proxy uses a shared key with rate limits. For the best experience, we recommend using your own MiMo API key above.
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="modal-cancel" onclick="closeSettings()">Cancel</button>
+            <button class="modal-confirm" onclick="saveSettings()">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- Header -->
+<header>
+    <div class="header-inner">
+        <a href="index.html" class="logo">
+            <img src="assets/gitblock.jpg" alt="GitBlock">
+            <span>GitBlock</span>
+        </a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="usage.html">Docs</a>
+            <a href="editor.html">Editor</a>
+            <a href="playground.html" class="active">Playground</a>
+            <a href="preview.html" target="_blank">Preview</a>
+        </nav>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <button class="settings-btn" onclick="openSettings()" title="Settings">
+                <i class="fas fa-cog"></i>
+            </button>
+            <div class="user-badge" id="user-badge" style="display:none;">
+                <i class="fas fa-user"></i>
+                <span id="user-badge-name"></span>
+                <button class="logout-btn" onclick="handleLogout()" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </div>
+        <button class="hamburger" onclick="document.getElementById('mobile-menu').classList.toggle('open')">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+</header>
+<div class="mobile-menu" id="mobile-menu">
+    <a href="index.html">Home</a>
+    <a href="usage.html">Docs</a>
+    <a href="editor.html">Editor</a>
+    <a href="playground.html" class="active">Playground</a>
+    <a href="preview.html" target="_blank">Preview</a>
+</div>
+
+<!-- Main App -->
+<div class="app-wrapper" id="app-wrapper">
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-section">
+            <button class="btn-new-project" onclick="createNewProject()">
+                <i class="fas fa-plus"></i> New Project
+            </button>
+        </div>
+
+        <div class="sidebar-section" style="flex:1; overflow-y:auto;">
+            <div class="sidebar-section-title">My Projects</div>
+            <div class="project-list" id="project-list"></div>
+        </div>
+
+        <div class="sidebar-actions">
+            <button class="btn-secondary" onclick="exportProjects()">
+                <i class="fas fa-download"></i> Export All
+            </button>
+            <button class="btn-secondary" onclick="document.getElementById('import-file').click()">
+                <i class="fas fa-upload"></i> Import
+            </button>
+            <input type="file" id="import-file" accept=".json" style="display:none" onchange="importProjects(event)">
+            <button class="btn-secondary" onclick="toggleAI()">
+                <i class="fas fa-robot"></i> <span id="ai-toggle-text">Show AI</span>
+            </button>
+        </div>
+
+        <div class="storage-info">
+            <span id="storage-text">0 projects</span>
+            <div class="storage-bar"><div class="storage-bar-fill" id="storage-bar" style="width:0%"></div></div>
+        </div>
+    </div>
+
+    <!-- Editor Area -->
+    <div class="editor-area" id="editor-area">
+        <!-- Toolbar -->
+        <div class="editor-toolbar">
+            <input type="text" class="project-name-input" id="project-name" value="Untitled Project" onchange="renameCurrentProject()">
+            <div class="toolbar-actions">
+                <button class="toolbar-btn" onclick="saveProject()" title="Save (Ctrl+S)">
+                    <i class="fas fa-save"></i> <span>Save</span>
+                </button>
+                <button class="toolbar-btn primary" onclick="runCode()" title="Run (Ctrl+Enter)">
+                    <i class="fas fa-play"></i> <span>Run</span>
+                </button>
+                <button class="toolbar-btn" onclick="openPreviewWindow()" title="Open in new window">
+                    <i class="fas fa-external-link-alt"></i>
+                </button>
+                <button class="toolbar-btn" onclick="toggleConsole()" title="Console">
+                    <i class="fas fa-terminal"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tab-bar">
+            <button class="tab-btn active" data-lang="html" onclick="switchTab('html', this)">
+                <i class="fab fa-html5"></i> index.html
+                <span class="dot" id="dot-html"></span>
+            </button>
+            <button class="tab-btn" data-lang="css" onclick="switchTab('css', this)">
+                <i class="fab fa-css3-alt"></i> style.css
+                <span class="dot" id="dot-css"></span>
+            </button>
+            <button class="tab-btn" data-lang="js" onclick="switchTab('js', this)">
+                <i class="fab fa-js"></i> script.js
+                <span class="dot" id="dot-js"></span>
+            </button>
+        </div>
+
+        <!-- Code Editors -->
+        <div class="code-panel" id="code-panel-html">
+            <div class="code-editor">
+                <textarea id="editor-html" placeholder="<!-- Write your HTML here -->" spellcheck="false" oninput="onCodeChange('html')"></textarea>
+            </div>
+        </div>
+        <div class="code-panel" id="code-panel-css" style="display:none;">
+            <div class="code-editor">
+                <textarea id="editor-css" placeholder="/* Write your CSS here */" spellcheck="false" oninput="onCodeChange('css')"></textarea>
+            </div>
+        </div>
+        <div class="code-panel" id="code-panel-js" style="display:none;">
+            <div class="code-editor">
+                <textarea id="editor-js" placeholder="// Write your JavaScript here" spellcheck="false" oninput="onCodeChange('js')"></textarea>
+            </div>
+        </div>
+
+        <!-- Console -->
+        <div class="console-panel" id="console-panel"></div>
+
+        <!-- Preview -->
+        <div class="preview-panel" id="preview-panel">
+            <div class="resize-handle" id="resize-handle"></div>
+            <div class="preview-header">
+                <div class="preview-header-title">
+                    <i class="fas fa-circle" style="font-size:6px;"></i> Live Preview
+                </div>
+                <div class="preview-actions">
+                    <button onclick="openPreviewWindow()"><i class="fas fa-external-link-alt"></i> Pop Out</button>
+                    <button onclick="runCode()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
+            </div>
+            <iframe class="preview-frame" id="preview-frame" sandbox="allow-scripts allow-modals allow-forms allow-same-origin"></iframe>
+        </div>
+    </div>
+
+    <!-- AI Assistant Panel -->
+    <div class="ai-panel hidden" id="ai-panel">
+        <div class="ai-header">
+            <div class="ai-header-title">
+                <i class="fas fa-robot"></i> AI Agent
+                <div class="api-status" id="api-status">
+                    <div class="api-status-dot disconnected" id="api-status-dot"></div>
+                    <span id="api-status-text">MiMo (Setup key for full access)</span>
+                </div>
+            </div>
+            <button class="toolbar-btn" onclick="toggleAI()" style="padding:4px 8px;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="ai-messages" id="ai-messages">
+            <div class="ai-msg assistant">
+                <div class="ai-msg-text">
+                    <strong>👋 I'm your AI coding agent</strong> powered by <strong>Xiaomi MiMo</strong>.<br><br>
+                    <strong>Quick Setup:</strong><br>
+                    1. Get a free API key at <a href="https://platform.xiaomimimo.com/console" target="_blank" style="color:#2563eb;">platform.xiaomimimo.com</a><br>
+                    2. Click <i class="fas fa-cog"></i> Settings above → paste your key<br>
+                    3. Start building!<br><br>
+                    Or just describe what you want and I'll generate the code. Try:<br><br>
+                    • "Build a landing page for a SaaS product"<br>
+                    • "Create a todo app with drag and drop"<br>
+                    • "Make a weather dashboard"<br>
+                    • "Build a snake game"<br><br>
+                    <div class="templates-grid">
+                        <div class="template-card" onclick="useTemplate('landing')">
+                            <div class="template-card-icon">🚀</div>
+                            <div class="template-card-name">Landing Page</div>
+                            <div class="template-card-desc">SaaS product page</div>
+                        </div>
+                        <div class="template-card" onclick="useTemplate('dashboard')">
+                            <div class="template-card-icon">📊</div>
+                            <div class="template-card-name">Dashboard</div>
+                            <div class="template-card-desc">Data visualization</div>
+                        </div>
+                        <div class="template-card" onclick="useTemplate('portfolio')">
+                            <div class="template-card-icon">🎨</div>
+                            <div class="template-card-name">Portfolio</div>
+                            <div class="template-card-desc">Personal website</div>
+                        </div>
+                        <div class="template-card" onclick="useTemplate('game')">
+                            <div class="template-card-icon">🎮</div>
+                            <div class="template-card-name">Game</div>
+                            <div class="template-card-desc">Browser game</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ai-input-area">
+            <div class="ai-input-wrapper">
+                <textarea class="ai-input" id="ai-input" placeholder="Describe what you want to build..." rows="1" onkeydown="handleAIKey(event)" oninput="autoResizeAI(this)"></textarea>
+                <button class="ai-send-btn" id="ai-send-btn" onclick="sendAIMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rename Modal -->
+<div class="modal-overlay hidden" id="rename-modal">
+    <div class="modal-box">
+        <h3>Rename Project</h3>
+        <input type="text" id="rename-input" maxlength="50" onkeydown="if(event.key==='Enter')confirmRename()">
+        <div class="modal-actions">
+            <button class="modal-cancel" onclick="closeRenameModal()">Cancel</button>
+            <button class="modal-confirm" onclick="confirmRename()">Rename</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== STATE ==========
+let currentUser = null;
+let currentProjectId = null;
+let projects = {};
+let activeTab = 'html';
+let aiHistory = [];
+let isAIStreaming = false;
+let modifiedTabs = { html: false, css: false, js: false };
+let autoSaveTimer = null;
+
+const GITBLOCK_API_URL = 'https://gitblock-api.onrender.com/v1/chat/completions';
+const GITBLOCK_AUTH_TOKEN = 'Bearer playground-anonymous';
+const GITBLOCK_MODEL = 'llama-3.3-70b';
+const MIMO_API_URL = 'https://api.xiaomimimo.com/v1/chat/completions';
+
+const DEFAULT_HTML = '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>My Project</title>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n  <h1>Hello World!</h1>\n  <p>Start building something amazing.</p>\n  <script src="script.js"><\/script>\n</body>\n</html>';
+const DEFAULT_CSS = 'body {\n  font-family: "Inter", sans-serif;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  min-height: 100vh;\n  margin: 0;\n  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n  color: white;\n}\n\nh1 {\n  font-size: 3rem;\n  margin-bottom: 0.5rem;\n}\n\np {\n  font-size: 1.2rem;\n  opacity: 0.9;\n}';
+const DEFAULT_JS = 'console.log("Project loaded!");';
+
+// ========== SETTINGS ==========
+function getApiKey() {
+    return localStorage.getItem('gb_mimo_api_key') || '';
+}
+
+function getModel() {
+    const hasCustomKey = !!getApiKey();
+    if (hasCustomKey) {
+        return localStorage.getItem('gb_mimo_model') || 'mimo-v2.5-pro';
+    }
+    return GITBLOCK_MODEL; // fallback for free proxy
+}
+
+function openSettings() {
+    const key = getApiKey();
+    document.getElementById('settings-api-key').value = key;
+    document.getElementById('settings-model').value = localStorage.getItem('gb_mimo_model') || 'mimo-v2.5-pro';
+    document.getElementById('settings-api-mode').value = key ? 'custom' : 'custom'; // Default to MiMo
+    toggleSettingsMode();
+    document.getElementById('settings-modal').classList.remove('hidden');
+}
+
+function closeSettings() {
+    document.getElementById('settings-modal').classList.add('hidden');
+}
+
+function toggleSettingsMode() {
+    const mode = document.getElementById('settings-api-mode').value;
+    document.getElementById('settings-custom-section').style.display = mode === 'custom' ? 'block' : 'none';
+    const freeSection = document.getElementById('settings-free-section');
+    if (freeSection) freeSection.style.display = mode === 'free' ? 'block' : 'none';
+}
+
+function saveSettings() {
+    const mode = document.getElementById('settings-api-mode').value;
+    if (mode === 'custom') {
+        const key = document.getElementById('settings-api-key').value.trim();
+        const model = document.getElementById('settings-model').value;
+        if (key) {
+            localStorage.setItem('gb_mimo_api_key', key);
+        } else {
+            localStorage.removeItem('gb_mimo_api_key');
+        }
+        localStorage.setItem('gb_mimo_model', model);
+    } else {
+        localStorage.removeItem('gb_mimo_api_key');
+    }
+
+    closeSettings();
+    updateApiStatus();
+    showToast('Settings saved!', 'success');
+}
+
+function updateApiStatus() {
+    const dot = document.getElementById('api-status-dot');
+    const text = document.getElementById('api-status-text');
+    const key = getApiKey();
+
+    if (key) {
+        dot.className = 'api-status-dot connected';
+        text.textContent = getModel();
+    } else {
+        dot.className = 'api-status-dot connected';
+        text.textContent = 'MiMo (Setup key for full access)';
+    }
+}
+
+// ========== ONBOARDING ==========
+function closeOnboarding() {
+    document.getElementById('onboarding-overlay').classList.add('hidden');
+    localStorage.setItem('gb_onboarding_done', 'true');
+}
+
+// ========== LOGIN ==========
+function handleLogin() {
+    const username = document.getElementById('login-username').value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+    if (!username) {
+        showToast('Please enter a username', 'error');
+        return;
+    }
+    if (username.length < 2) {
+        showToast('Username must be at least 2 characters', 'error');
+        return;
+    }
+
+    currentUser = username;
+    localStorage.setItem('gb_playground_user', username);
+
+    loadUserProjects();
+
+    document.getElementById('login-overlay').classList.add('hidden');
+    document.getElementById('user-badge').style.display = 'flex';
+    document.getElementById('user-badge-name').textContent = username;
+
+    const lastId = localStorage.getItem('gb_playground_last_' + username);
+    if (lastId && projects[lastId]) {
+        loadProject(lastId);
+    } else if (Object.keys(projects).length > 0) {
+        loadProject(Object.keys(projects)[0]);
+    } else {
+        createNewProject();
+    }
+
+    renderProjectList();
+    updateStorageInfo();
+}
+
+function handleLogout() {
+    saveProject();
+    currentUser = null;
+    currentProjectId = null;
+    projects = {};
+    localStorage.removeItem('gb_playground_user');
+    document.getElementById('login-overlay').classList.remove('hidden');
+    document.getElementById('user-badge').style.display = 'none';
+    document.getElementById('login-username').value = '';
+}
+
+// ========== PROJECTS ==========
+function loadUserProjects() {
+    const key = 'gb_playground_projects_' + currentUser;
+    try {
+        const data = localStorage.getItem(key);
+        projects = data ? JSON.parse(data) : {};
+    } catch (e) {
+        projects = {};
+    }
+}
+
+function saveAllProjects() {
+    const key = 'gb_playground_projects_' + currentUser;
+    try {
+        localStorage.setItem(key, JSON.stringify(projects));
+    } catch (e) {
+        showToast('Storage full! Export some projects.', 'error');
+    }
+    updateStorageInfo();
+}
+
+function createNewProject() {
+    saveProject();
+
+    const id = 'proj_' + Date.now();
+    projects[id] = {
+        id: id,
+        name: 'Untitled Project',
+        html: DEFAULT_HTML,
+        css: DEFAULT_CSS,
+        js: DEFAULT_JS,
+        created: Date.now(),
+        updated: Date.now()
+    };
+    saveAllProjects();
+    loadProject(id);
+    renderProjectList();
+    showToast('New project created', 'success');
+}
+
+function loadProject(id) {
+    if (!projects[id]) return;
+    currentProjectId = id;
+    const proj = projects[id];
+
+    document.getElementById('editor-html').value = proj.html || '';
+    document.getElementById('editor-css').value = proj.css || '';
+    document.getElementById('editor-js').value = proj.js || '';
+    document.getElementById('project-name').value = proj.name || 'Untitled Project';
+
+    modifiedTabs = { html: false, css: false, js: false };
+    updateModifiedDots();
+
+    localStorage.setItem('gb_playground_last_' + currentUser, id);
+
+    renderProjectList();
+    runCode();
+}
+
+function saveProject() {
+    if (!currentProjectId || !projects[currentProjectId]) return;
+
+    projects[currentProjectId].html = document.getElementById('editor-html').value;
+    projects[currentProjectId].css = document.getElementById('editor-css').value;
+    projects[currentProjectId].js = document.getElementById('editor-js').value;
+    projects[currentProjectId].name = document.getElementById('project-name').value || 'Untitled Project';
+    projects[currentProjectId].updated = Date.now();
+
+    modifiedTabs = { html: false, css: false, js: false };
+    updateModifiedDots();
+
+    saveAllProjects();
+    renderProjectList();
+}
+
+function deleteProject(id, e) {
+    e.stopPropagation();
+    if (!confirm('Delete "' + projects[id]?.name + '"?')) return;
+
+    delete projects[id];
+    saveAllProjects();
+
+    if (currentProjectId === id) {
+        const remaining = Object.keys(projects);
+        if (remaining.length > 0) {
+            loadProject(remaining[0]);
+        } else {
+            createNewProject();
+        }
+    }
+    renderProjectList();
+    showToast('Project deleted', 'success');
+}
+
+function renameCurrentProject() {
+    if (!currentProjectId) return;
+    projects[currentProjectId].name = document.getElementById('project-name').value || 'Untitled Project';
+    projects[currentProjectId].updated = Date.now();
+    saveAllProjects();
+    renderProjectList();
+}
+
+function openRenameModal(id, e) {
+    e.stopPropagation();
+    const modal = document.getElementById('rename-modal');
+    const input = document.getElementById('rename-input');
+    input.value = projects[id]?.name || '';
+    modal.classList.remove('hidden');
+    modal.dataset.projectId = id;
+    input.focus();
+    input.select();
+}
+
+function closeRenameModal() {
+    document.getElementById('rename-modal').classList.add('hidden');
+}
+
+function confirmRename() {
+    const modal = document.getElementById('rename-modal');
+    const id = modal.dataset.projectId;
+    const name = document.getElementById('rename-input').value.trim();
+    if (id && projects[id] && name) {
+        projects[id].name = name;
+        projects[id].updated = Date.now();
+        saveAllProjects();
+        if (currentProjectId === id) {
+            document.getElementById('project-name').value = name;
+        }
+        renderProjectList();
+    }
+    closeRenameModal();
+}
+
+function renderProjectList() {
+    const container = document.getElementById('project-list');
+    const sorted = Object.values(projects).sort((a, b) => b.updated - a.updated);
+
+    if (sorted.length === 0) {
+        container.innerHTML = '<div style="font-size:0.8rem;color:#94a3b8;text-align:center;padding:16px;">No projects yet</div>';
+        return;
+    }
+
+    container.innerHTML = sorted.map(p => {
+        const isActive = p.id === currentProjectId;
+        const date = new Date(p.updated);
+        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        return `
+            <div class="project-item ${isActive ? 'active' : ''}" onclick="loadProject('${p.id}')">
+                <div class="project-item-name">${escapeHtml(p.name)}</div>
+                <div class="project-item-date">${dateStr}</div>
+                <div class="project-item-actions">
+                    <button onclick="openRenameModal('${p.id}', event)" title="Rename"><i class="fas fa-pen"></i></button>
+                    <button onclick="deleteProject('${p.id}', event)" title="Delete"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ========== EDITOR ==========
+function switchTab(tab, btn) {
+    activeTab = tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    document.querySelectorAll('.code-panel').forEach(p => p.style.display = 'none');
+    document.getElementById('code-panel-' + tab).style.display = 'flex';
+
+    document.getElementById('editor-' + tab).focus();
+}
+
+function onCodeChange(tab) {
+    modifiedTabs[tab] = true;
+    updateModifiedDots();
+
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(() => {
+        saveProject();
+        showToast('Auto-saved', 'success');
+    }, 2000);
+
+    clearTimeout(window._autoRunTimer);
+    window._autoRunTimer = setTimeout(runCode, 500);
+}
+
+function updateModifiedDots() {
+    for (const tab of ['html', 'css', 'js']) {
+        const dot = document.getElementById('dot-' + tab);
+        if (dot) {
+            dot.classList.toggle('modified', modifiedTabs[tab]);
+        }
+    }
+}
+
+function runCode() {
+    const html = document.getElementById('editor-html').value;
+    const css = document.getElementById('editor-css').value;
+    const js = document.getElementById('editor-js').value;
+
+    let fullHtml = html;
+
+    if (css.trim()) {
+        if (fullHtml.includes('</head>')) {
+            fullHtml = fullHtml.replace('</head>', `<style>${css}</style></head>`);
+        } else {
+            fullHtml = `<style>${css}</style>` + fullHtml;
+        }
+    }
+
+    const consoleCapture = `
+<script>
+(function(){
+    const _origConsole = {log: console.log, error: console.error, warn: console.warn, info: console.info};
+    function send(type, args) {
+        try {
+            window.parent.postMessage({type:'console', level:type, args: Array.from(args).map(a => {
+                try { return typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a); }
+                catch(e) { return String(a); }
+            })}, '*');
+        } catch(e) {}
+    }
+    console.log = function() { send('log', arguments); _origConsole.log.apply(console, arguments); };
+    console.error = function() { send('error', arguments); _origConsole.error.apply(console, arguments); };
+    console.warn = function() { send('warn', arguments); _origConsole.warn.apply(console, arguments); };
+    console.info = function() { send('info', arguments); _origConsole.info.apply(console, arguments); };
+    window.onerror = function(msg, url, line, col, err) {
+        send('error', ['Error: ' + msg + ' (line ' + line + ')']);
+    };
+})();
+<\/script>`;
+
+    if (js.trim()) {
+        if (fullHtml.includes('</body>')) {
+            fullHtml = fullHtml.replace('</body>', consoleCapture + `<script>${js}<\/script></body>`);
+        } else {
+            fullHtml += consoleCapture + `<script>${js}<\/script>`;
+        }
+    } else {
+        if (fullHtml.includes('</body>')) {
+            fullHtml = fullHtml.replace('</body>', consoleCapture + '</body>');
+        } else {
+            fullHtml += consoleCapture;
+        }
+    }
+
+    const frame = document.getElementById('preview-frame');
+    const blob = new Blob([fullHtml], { type: 'text/html' });
+    frame.src = URL.createObjectURL(blob);
+}
+
+// Console message handler
+window.addEventListener('message', function(e) {
+    if (e.data && e.data.type === 'console') {
+        const panel = document.getElementById('console-panel');
+        const line = document.createElement('div');
+        line.className = 'console-line ' + e.data.level;
+        line.textContent = e.data.args.join(' ');
+        panel.appendChild(line);
+        panel.scrollTop = panel.scrollHeight;
+    }
+});
+
+function toggleConsole() {
+    const panel = document.getElementById('console-panel');
+    panel.classList.toggle('open');
+}
+
+function openPreviewWindow() {
+    saveProject();
+    const proj = projects[currentProjectId];
+    if (!proj) return;
+
+    const data = btoa(encodeURIComponent(JSON.stringify({
+        html: proj.html,
+        css: proj.css,
+        js: proj.js,
+        name: proj.name
+    })));
+    window.open('preview.html?data=' + data, '_blank');
+}
+
+// ========== AI ASSISTANT ==========
+function toggleAI() {
+    const panel = document.getElementById('ai-panel');
+    panel.classList.toggle('hidden');
+    document.getElementById('ai-toggle-text').textContent = panel.classList.contains('hidden') ? 'Show AI' : 'Hide AI';
+    if (!panel.classList.contains('hidden')) {
+        updateApiStatus();
+    }
+}
+
+function autoResizeAI(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+}
+
+function handleAIKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendAIMessage();
+    }
+}
+
+// ========== TEMPLATES ==========
+const TEMPLATES = {
+    landing: "Build a modern SaaS landing page with: hero section with gradient background, feature cards with icons, pricing table with 3 tiers, testimonials section, and a CTA footer. Use smooth animations and a professional blue/purple color scheme.",
+    dashboard: "Build an analytics dashboard with: sidebar navigation, stat cards (revenue, users, orders), a line chart using canvas, a bar chart, a recent activity table, and a responsive grid layout. Use a dark theme with blue accents.",
+    portfolio: "Build a creative portfolio website with: animated hero with typing effect, about section with skills bars, project gallery with filter tabs, contact form, and smooth scroll navigation. Use a minimal black/white design with one accent color.",
+    game: "Build a snake game with: canvas-based rendering, arrow key controls, score tracking, speed increase on each food, game over screen with restart, and a high score saved in localStorage. Use neon green on dark background."
+};
+
+function useTemplate(type) {
+    const prompt = TEMPLATES[type];
+    document.getElementById('ai-input').value = prompt;
+    sendAIMessage();
+}
+
+// ========== AI CORE ==========
+async function sendAIMessage() {
+    const input = document.getElementById('ai-input');
+    const text = input.value.trim();
+    if (!text || isAIStreaming) return;
+
+    const apiKey = getApiKey();
+
+    input.value = '';
+    input.style.height = 'auto';
+
+    addAIMessage('user', text);
+
+    const currentCode = {
+        html: document.getElementById('editor-html').value,
+        css: document.getElementById('editor-css').value,
+        js: document.getElementById('editor-js').value
+    };
+
+    const systemPrompt = `You are GitBlock AI — a powerful web development agent. You build complete, production-ready HTML/CSS/JS projects.
+
+CURRENT CODE:
+HTML: ${currentCode.html.slice(0, 1500)}
+CSS: ${currentCode.css.slice(0, 800)}
+JS: ${currentCode.js.slice(0, 800)}
+
+RULES:
+1. ALWAYS provide COMPLETE working code — never partial snippets
+2. When building a new project, provide ALL THREE: html, css, and js blocks
+3. Use modern CSS (flexbox, grid, variables, transitions, animations)
+4. Make designs responsive and visually polished
+5. Use CDN links for Font Awesome icons and Google Fonts when needed
+6. Keep code clean with comments
+7. Be concise in explanations — let the code speak
+
+OUTPUT FORMAT — Use fenced code blocks with language tags:
+\`\`\`html
+<!DOCTYPE html>
+...
+\`\`\`
+
+\`\`\`css
+/* styles */
+...
+\`\`\`
+
+\`\`\`js
+// JavaScript
+...
+\`\`\`
+
+If the user asks for changes to existing code, provide the COMPLETE updated files, not just the diff.`;
+
+    aiHistory.push({ role: 'user', content: text });
+
+    const assistantDiv = addAIMessage('assistant', '');
+    const textEl = assistantDiv.querySelector('.ai-msg-text');
+    textEl.innerHTML = '<span class="typing-dots"><span></span><span></span><span></span></span>';
+
+    isAIStreaming = true;
+    document.getElementById('ai-send-btn').disabled = true;
+    let fullResponse = '';
+
+    try {
+        const useCustom = !!apiKey;
+        const apiUrl = useCustom ? MIMO_API_URL : GITBLOCK_API_URL;
+        const authHeader = useCustom ? ('Bearer ' + apiKey) : GITBLOCK_AUTH_TOKEN;
+        const model = getModel();
+
+        const fetchBody = {
+            model: model,
+            messages: [
+                { role: 'system', content: systemPrompt },
+                ...aiHistory.slice(-10)
+            ],
+            temperature: useCustom ? 0.7 : 0.3,
+            max_tokens: useCustom ? 4096 : 1024,
+        };
+
+        // Try streaming first for custom keys; non-streaming for GitBlock proxy
+        if (useCustom) {
+            fetchBody.stream = true;
+        }
+
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authHeader
+            },
+            body: JSON.stringify(fetchBody)
+        });
+
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.error?.message || errData.error || 'API error: ' + response.status);
+        }
+
+        if (useCustom && response.headers.get('content-type')?.includes('text/event-stream')) {
+            // Streaming mode (custom API key)
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop();
+
+                for (const line of lines) {
+                    const trimmed = line.trim();
+                    if (!trimmed || !trimmed.startsWith('data:')) continue;
+                    const data = trimmed.slice(5).trim();
+                    if (data === '[DONE]') break;
+
+                    try {
+                        const parsed = JSON.parse(data);
+                        const delta = parsed.choices?.[0]?.delta?.content;
+                        if (delta) {
+                            fullResponse += delta;
+                            textEl.innerHTML = renderAIContent(fullResponse);
+                            const messagesEl = document.getElementById('ai-messages');
+                            messagesEl.scrollTop = messagesEl.scrollHeight;
+                        }
+                    } catch (e) {}
+                }
+            }
+        } else {
+            // Non-streaming mode (GitBlock free proxy or fallback)
+            const data = await response.json();
+            fullResponse = data.choices?.[0]?.message?.content || 'No response received.';
+            textEl.innerHTML = renderAIContent(fullResponse);
+        }
+
+        aiHistory.push({ role: 'assistant', content: fullResponse });
+
+        if (fullResponse.includes('```')) {
+            const applyBtn = document.createElement('button');
+            applyBtn.className = 'ai-apply-btn';
+            applyBtn.innerHTML = '<i class="fas fa-magic"></i> Apply to Editor';
+            applyBtn.onclick = () => applyAICode(fullResponse);
+            assistantDiv.appendChild(applyBtn);
+        }
+
+    } catch (err) {
+        textEl.innerHTML = '<span style="color:#ef4444;">Error: ' + escapeHtml(err.message) + '</span>';
+    } finally {
+        isAIStreaming = false;
+        document.getElementById('ai-send-btn').disabled = false;
+    }
+}
+
+function addAIMessage(role, content) {
+    const container = document.getElementById('ai-messages');
+    const div = document.createElement('div');
+    div.className = 'ai-msg ' + role;
+    if (role === 'assistant') {
+        div.innerHTML = '<div class="ai-msg-text">' + renderAIContent(content) + '</div>';
+    } else {
+        div.textContent = content;
+    }
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+    return div;
+}
+
+function renderAIContent(text) {
+    let html = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+    // Code blocks with language
+    html = html.replace(/```(html|css|javascript|js)?\n?([\s\S]*?)```/g, function(match, lang, code) {
+        const label = lang || 'code';
+        return '<pre><code>' + code.trim() + '</code></pre>';
+    });
+
+    // Inline code
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    // Bold
+    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+    // Line breaks
+    html = html.replace(/\n/g, '<br>');
+
+    return html;
+}
+
+function applyAICode(response) {
+    const htmlMatch = response.match(/```html\n?([\s\S]*?)```/);
+    const cssMatch = response.match(/```css\n?([\s\S]*?)```/);
+    const jsMatch = response.match(/```(?:javascript|js)\n?([\s\S]*?)```/);
+
+    let applied = false;
+
+    if (htmlMatch) {
+        let htmlCode = htmlMatch[1].trim();
+        if (htmlCode.includes('<!DOCTYPE') || htmlCode.includes('<html')) {
+            document.getElementById('editor-html').value = htmlCode;
+        } else {
+            const existingHtml = document.getElementById('editor-html').value;
+            if (existingHtml.includes('<body>')) {
+                document.getElementById('editor-html').value = existingHtml.replace(
+                    /<body[^>]*>[\s\S]*?<\/body>/i,
+                    `<body>\n${htmlCode}\n</body>`
+                );
+            } else {
+                document.getElementById('editor-html').value = `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>My Project</title>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n${htmlCode}\n  <script src="script.js"><\/script>\n</body>\n</html>`;
+            }
+        }
+        modifiedTabs.html = true;
+        applied = true;
+    }
+    if (cssMatch) {
+        document.getElementById('editor-css').value = cssMatch[1].trim();
+        modifiedTabs.css = true;
+        applied = true;
+    }
+    if (jsMatch) {
+        document.getElementById('editor-js').value = jsMatch[1].trim();
+        modifiedTabs.js = true;
+        applied = true;
+    }
+
+    if (applied) {
+        updateModifiedDots();
+        runCode();
+        saveProject();
+        showToast('Code applied! Check the preview.', 'success');
+    } else {
+        showToast('No code blocks found to apply', 'error');
+    }
+}
+
+// ========== EXPORT / IMPORT ==========
+function exportProjects() {
+    saveProject();
+    const data = {
+        user: currentUser,
+        projects: projects,
+        exported: Date.now()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'gitblock-projects-' + currentUser + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Projects exported!', 'success');
+}
+
+function importProjects(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (data.projects) {
+                let imported = 0;
+                for (const [id, proj] of Object.entries(data.projects)) {
+                    if (!projects[id]) {
+                        projects[id] = proj;
+                        imported++;
+                    }
+                }
+                saveAllProjects();
+                renderProjectList();
+                showToast(`Imported ${imported} projects!`, 'success');
+            }
+        } catch (err) {
+            showToast('Invalid file format', 'error');
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+}
+
+// ========== RESIZE HANDLE ==========
+(function() {
+    const handle = document.getElementById('resize-handle');
+    const preview = document.getElementById('preview-panel');
+    let startY, startHeight;
+
+    handle.addEventListener('mousedown', function(e) {
+        startY = e.clientY;
+        startHeight = preview.offsetHeight;
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    });
+
+    function onMouseMove(e) {
+        const diff = startY - e.clientY;
+        const newHeight = Math.max(120, Math.min(window.innerHeight * 0.7, startHeight + diff));
+        preview.style.height = newHeight + 'px';
+    }
+
+    function onMouseUp() {
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+    }
+})();
+
+// ========== SHORTCUTS ==========
+document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        saveProject();
+        showToast('Saved!', 'success');
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        runCode();
+    }
+});
+
+// ========== TAB KEY IN EDITORS ==========
+document.querySelectorAll('.code-editor textarea').forEach(textarea => {
+    textarea.addEventListener('keydown', function(e) {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+            this.value = this.value.substring(0, start) + '  ' + this.value.substring(end);
+            this.selectionStart = this.selectionEnd = start + 2;
+        }
+    });
+});
+
+// ========== UTILITIES ==========
+function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function showToast(msg, type) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.className = 'toast ' + (type || '');
+    toast.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+function updateStorageInfo() {
+    const count = Object.keys(projects).length;
+    document.getElementById('storage-text').textContent = count + ' project' + (count !== 1 ? 's' : '');
+
+    const key = 'gb_playground_projects_' + currentUser;
+    const data = localStorage.getItem(key) || '';
+    const bytes = new Blob([data]).size;
+    const maxBytes = 5 * 1024 * 1024;
+    const pct = Math.min(100, (bytes / maxBytes) * 100);
+    document.getElementById('storage-bar').style.width = pct + '%';
+}
+
+// ========== INIT ==========
+(function init() {
+    // Onboarding
+    if (!localStorage.getItem('gb_onboarding_done')) {
+        document.getElementById('onboarding-overlay').classList.remove('hidden');
+    }
+
+    // Update API status
+    updateApiStatus();
+
+    // Check if user already logged in
+    const savedUser = localStorage.getItem('gb_playground_user');
+    if (savedUser) {
+        currentUser = savedUser;
+        loadUserProjects();
+        document.getElementById('login-overlay').classList.add('hidden');
+        document.getElementById('user-badge').style.display = 'flex';
+        document.getElementById('user-badge-name').textContent = savedUser;
+
+        const lastId = localStorage.getItem('gb_playground_last_' + savedUser);
+        if (lastId && projects[lastId]) {
+            loadProject(lastId);
+        } else if (Object.keys(projects).length > 0) {
+            loadProject(Object.keys(projects)[0]);
+        } else {
+            createNewProject();
+        }
+        renderProjectList();
+        updateStorageInfo();
+    }
+})();
+</script>
+
+</body>
+</html>
