@@ -235,7 +235,7 @@ currentProject = projects[0];
 // ═══════════════ INIT ═══════════════
 function init(){
 const sel = document.getElementById('provider-select');
-sel.innerHTML = Object.entries(PROVIDERS).map(([k,v])=>`<option value="${k}">${v.name}</option>`).join('');
+sel.innerHTML = Object.entries(PROVIDERS).map(function(e){return '<option value="'+e[0]+'">'+e[1].name+'</option>';}).join('');
 const savedProv = localStorage.getItem('gb_provider')||'mimo';
 sel.value = savedProv; currentProvider = savedProv;
 switchProvider();
@@ -266,7 +266,7 @@ updateModelList();
 function updateModelList(){
 const prov = PROVIDERS[document.getElementById('settings-provider').value];
 const sel = document.getElementById('settings-model');
-sel.innerHTML = prov.models.map(m=>`<option>${m}</option>`).join('');
+sel.innerHTML = prov.models.map(function(m){return '<option>'+m+'</option>';}).join('');
 document.getElementById('settings-key-hint').textContent = prov.hint;
 const savedKey = localStorage.getItem('gb_key_'+currentProvider);
 if(savedKey) document.getElementById('settings-key').value = savedKey;
@@ -342,7 +342,7 @@ showToast('Project exported!','success');
 
 function renderProjects(){
 const el = document.getElementById('sidebar-projects');
-el.innerHTML = projects.map((p,i)=>`<div style="padding:8px 10px;border-radius:6px;cursor:pointer;font-size:.78rem;margin-bottom:3px;${p===currentProject?'background:rgba(37,99,235,0.06);color:#2563eb;font-weight:600':'color:#475569'}" onclick="loadProject(${i})">📄 ${p.name||'untitled'}</div>`).join('');
+el.innerHTML = projects.map((p,i)=>'<div style="padding:8px 10px;border-radius:6px;cursor:pointer;font-size:.78rem;margin-bottom:3px;'+(p===currentProject?'background:rgba(37,99,235,0.06);color:#2563eb;font-weight:600':'color:#475569')+'" onclick="loadProject('+i+')">📄 '+(p.name||'untitled')+'</div>').join('');
 document.getElementById('project-name').value = currentProject.name||'untitled';
 }
 
@@ -365,11 +365,7 @@ const TUTORIALS_DATA = [
 
 function renderTutorials(){
 const TUTORIALS = TUTORIALS_DATA;
-document.getElementById('sidebar-tutorials').innerHTML = TUTORIALS.map(t=>`
-<div style="padding:10px;margin-bottom:6px;background:var(--surface);border:1px solid var(--border);border-radius:8px;cursor:pointer" onclick="this.querySelector('.tut-body').style.display=this.querySelector('.tut-body').style.display==='none'?'block':'none'">
-<div style="display:flex;align-items:center;gap:8px;font-size:.8rem;font-weight:600"><span>${t.icon}</span> ${t.title}</div>
-<div class="tut-body" style="display:none;margin-top:8px;font-size:.76rem;color:var(--muted);line-height:1.6;white-space:pre-line">${t.content}</div>
-</div>`).join('');
+document.getElementById('sidebar-tutorials').innerHTML = TUTORIALS.map(function(t){return '<div style="padding:10px;margin-bottom:6px;background:var(--surface);border:1px solid var(--border);border-radius:8px;cursor:pointer" onclick="this.querySelector(\'.tut-body\').style.display=this.querySelector(\'.tut-body\').style.display===\'none\'?\'block\':\'none\'"><div style="display:flex;align-items:center;gap:8px;font-size:.8rem;font-weight:600"><span>'+t.icon+'</span> '+t.title+'</div><div class="tut-body" style="display:none;margin-top:8px;font-size:.76rem;color:var(--muted);line-height:1.6;white-space:pre-line">'+t.content+'</div></div>';}).join('');
 }
 
 function switchTab(tab){
