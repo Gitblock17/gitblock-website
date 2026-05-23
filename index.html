@@ -1080,8 +1080,8 @@
             <div class="active-model-display reveal" id="active-model-display" style="background:linear-gradient(135deg,rgba(37,99,235,0.08),rgba(124,58,237,0.08));border:1px solid rgba(37,99,235,0.2);border-radius:12px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
                 <div>
                     <div style="font-size:0.75rem;font-weight:600;color:#2563eb;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;">Active Model</div>
-                    <div style="font-size:1.1rem;font-weight:700;color:#0f172a;font-family:'SF Mono','Fira Code',monospace;" id="active-model-name">mimo-v2.5-pro</div>
-                    <div style="font-size:0.82rem;color:#64748b;margin-top:2px;" id="active-model-meta">70B params · General Purpose · Meta</div>
+                    <div style="font-size:1.1rem;font-weight:700;color:#0f172a;font-family:'SF Mono','Fira Code',monospace;" id="active-model-name">30+ models available</div>
+                    <div style="font-size:0.82rem;color:#64748b;margin-top:2px;" id="active-model-meta">8 providers · OpenAI, Anthropic, Google, Meta, xAI, DeepSeek, MiMo, Mistral</div>
                 </div>
                 <div style="display:flex;gap:8px;align-items:center;">
                     <span style="display:inline-block;padding:4px 12px;background:#059669;color:#fff;font-size:0.75rem;font-weight:700;border-radius:6px;">READY</span>
@@ -1089,25 +1089,10 @@
                 </div>
             </div>
 
-            <!-- Model Selection -->
-            <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:16px;color:#0f172a;" class="reveal">Select a Model</h3>
-            <div class="llm-models-grid reveal">
-                <div class="llm-card selected" onclick="selectLLM(this,'mimo-v2.5-pro')">
-                    <div class="model-name">mimo-v2.5-pro</div>
-                    <div class="model-size">Flagship</div>
-                </div>
-                <div class="llm-card" onclick="selectLLM(this,'mimo-v2.5')">
-                    <div class="model-name">mimo-v2.5</div>
-                    <div class="model-size">General</div>
-                </div>
-                <div class="llm-card" onclick="selectLLM(this,'mimo-v2-flash')">
-                    <div class="model-name">mimo-v2-flash</div>
-                    <div class="model-size">Fast</div>
-                </div>
-                <div class="llm-card" onclick="selectLLM(this,'mimo-v2-omni')">
-                    <div class="model-name">mimo-v2-omni</div>
-                    <div class="model-size">Multimodal</div>
-                </div>
+            <!-- Model Selection — now in Console -->
+            <div style="text-align:center;padding:20px;margin:16px 0;background:rgba(37,99,235,0.03);border-radius:12px;border:1px solid rgba(37,99,235,0.08)">
+                <p style="font-size:.9rem;color:#64748b;margin-bottom:10px">Choose from 30+ models across 8 providers including OpenAI, Anthropic, Google, Meta, DeepSeek, xAI, and more.</p>
+                <a href="console.html" class="btn btn-primary" style="display:inline-flex"><i class="fas fa-terminal"></i> Open Console → Pick Your Model</a>
             </div>
 
             <!-- CLI Commands -->
@@ -1275,31 +1260,55 @@ export OPENAI_BASE_URL=https://api.xiaomimimo.com/v1</pre>
     <div class="container">
         <div class="section-label reveal">Models</div>
         <h2 class="section-title reveal">Available Models</h2>
-        <p class="section-desc reveal">Curated models optimized for different tasks. All accessible through a single API endpoint.</p>
+        <p class="section-desc reveal">8 providers · 30+ models · One API. Bring your own key from any provider.</p>
         <div class="models-grid">
             <div class="model-card reveal">
-                <div class="model-badge">Flagship</div>
-                <h3>mimo-v2.5-pro</h3>
-                <div class="model-params">Xiaomi MiMo</div>
-                <p class="model-desc">Xiaomi's most capable reasoning model. Top-tier performance on math, code, and complex logic tasks.</p>
+                <div class="model-badge">OpenAI</div>
+                <h3>GPT-4o</h3>
+                <div class="model-params">128K context · Multimodal</div>
+                <p class="model-desc">Flagship OpenAI model. Top reasoning, vision, and coding. The gold standard for complex tasks.</p>
             </div>
             <div class="model-card reveal">
-                <div class="model-badge">General</div>
-                <h3>mimo-v2.5</h3>
-                <div class="model-params">Xiaomi MiMo</div>
-                <p class="model-desc">General-purpose MiMo model. Strong balance of speed and reasoning for everyday AI tasks.</p>
+                <div class="model-badge">Anthropic</div>
+                <h3>Claude Sonnet 4</h3>
+                <div class="model-params">200K context · Reasoning</div>
+                <p class="model-desc">Best balance of speed and intelligence. Excellent at coding, analysis, and long-form content.</p>
             </div>
             <div class="model-card reveal">
-                <div class="model-badge">Fast</div>
-                <h3>mimo-v2-flash</h3>
-                <div class="model-params">Xiaomi MiMo</div>
-                <p class="model-desc">Optimized for speed and efficiency. Ideal for latency-sensitive applications and high-throughput workloads.</p>
+                <div class="model-badge">Google</div>
+                <h3>Gemini 2.5 Pro</h3>
+                <div class="model-params">1M context · Multimodal</div>
+                <p class="model-desc">Google's most capable model. Massive context window. Strong reasoning and multimodal abilities.</p>
             </div>
             <div class="model-card reveal">
-                <div class="model-badge">Multimodal</div>
-                <h3>mimo-v2-omni</h3>
-                <div class="model-params">Xiaomi MiMo</div>
-                <p class="model-desc">Multimodal model supporting text and vision. Send images alongside text for visual understanding tasks.</p>
+                <div class="model-badge">Meta</div>
+                <h3>Llama 3.3 70B</h3>
+                <div class="model-params">Groq · Together · OpenRouter</div>
+                <p class="model-desc">Best open-source model. Available via Groq (free tier), Together AI, and OpenRouter.</p>
+            </div>
+            <div class="model-card reveal">
+                <div class="model-badge">xAI</div>
+                <h3>Grok 3</h3>
+                <div class="model-params">Real-time · Reasoning</div>
+                <p class="model-desc">Real-time knowledge with strong reasoning. Built by xAI. Great for current events analysis.</p>
+            </div>
+            <div class="model-card reveal">
+                <div class="model-badge">DeepSeek</div>
+                <h3>DeepSeek-V3</h3>
+                <div class="model-params">671B MoE · Coding</div>
+                <p class="model-desc">Massive open model with exceptional coding and math. Available via DeepSeek and Together AI.</p>
+            </div>
+            <div class="model-card reveal">
+                <div class="model-badge">MiMo</div>
+                <h3>MiMo V2.5 Pro</h3>
+                <div class="model-params">Free tier · No credit card</div>
+                <p class="model-desc">Free tier available. Strong all-around model. Great for getting started with zero cost.</p>
+            </div>
+            <div class="model-card reveal">
+                <div class="model-badge">Mistral</div>
+                <h3>Mixtral 8x22B</h3>
+                <div class="model-params">Groq · Together · OpenRouter</div>
+                <p class="model-desc">Mistral's powerful MoE model. Fast inference on Groq. Strong multilingual performance.</p>
             </div>
         </div>
     </div>
