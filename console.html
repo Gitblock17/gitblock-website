@@ -302,7 +302,7 @@ function runCode(){
 const html = editorInstances.html.getValue();
 const css = editorInstances.css.getValue();
 const js = editorInstances.js.getValue();
-const full = `<!DOCTYPE html>\n<html><head><style>${css}</style></head><body>${html}\n<script>${js}<\/script></body></html>`;
+const full = '<!DOCTYPE html>\n<html><head><style>'+css+'</style></head><body>'+html+'\n<script>'+js+'<\/script></body></html>';
 const frame = document.getElementById('preview-frame');
 frame.srcdoc = full;
 document.getElementById('console-log').innerHTML = '<div style="color:var(--muted);font-size:.8rem">Code executed. Check Preview tab.</div>';
@@ -332,7 +332,7 @@ function exportProject(){
 const html = editorInstances.html.getValue();
 const css = editorInstances.css.getValue();
 const js = editorInstances.js.getValue();
-const full = `<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width,initial-scale=1.0">\n<title>${currentProject.name}</title>\n<style>\n${css}\n</style>\n</head>\n<body>\n${html}\n<script>\n${js}\n</script>\n</body>\n</html>`;
+const full = '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width,initial-scale=1.0">\n<title>'+currentProject.name+'</title>\n<style>\n'+css+'\n</style>\n</head>\n<body>\n'+html+'\n<script>\n'+js+'\n<\/script>\n</body>\n</html>';
 const blob = new Blob([full],{type:'text/html'});
 const url = URL.createObjectURL(blob);
 const a = document.createElement('a');a.href=url;a.download=(currentProject.name||'project')+'.html';a.click();
@@ -355,7 +355,7 @@ runCode();
 }
 
 // ═══════════════ TUTORIALS ═══════════════
-const TUTORIALS = [
+const TUTORIALS_DATA = [
 {title:'Quick Start',icon:'🚀',content:'1. Select an AI provider above (MiMo is free, no credit card)\n2. Click Settings → enter your API key\n3. Ask AI to write code in the chat panel\n4. Click Run to see your code live'},
 {title:'Build a Landing Page',icon:'🎨',content:'Ask AI: "Create a modern landing page with a hero section, features grid, and contact form." Click Run to preview. Edit any part yourself.'},
 {title:'API Integration',icon:'🔌',content:'Ask AI to write fetch() calls to any API. The JS editor has full browser API access. Try: "Fetch and display Bitcoin price from CoinGecko API."'},
@@ -364,6 +364,7 @@ const TUTORIALS = [
 ];
 
 function renderTutorials(){
+const TUTORIALS = TUTORIALS_DATA;
 document.getElementById('sidebar-tutorials').innerHTML = TUTORIALS.map(t=>`
 <div style="padding:10px;margin-bottom:6px;background:var(--surface);border:1px solid var(--border);border-radius:8px;cursor:pointer" onclick="this.querySelector('.tut-body').style.display=this.querySelector('.tut-body').style.display==='none'?'block':'none'">
 <div style="display:flex;align-items:center;gap:8px;font-size:.8rem;font-weight:600"><span>${t.icon}</span> ${t.title}</div>
