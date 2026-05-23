@@ -279,11 +279,14 @@
 // ═══════════════════════════════════════════
 // CONFIGURATION
 // ═══════════════════════════════════════════
-const MIMO_API_URL = 'https://api.xiaomimimo.com/v1/chat/completions';
+const PROXY_URL = 'https://gitblock-api.onrender.com/v1/chat/completions';
 let selectedSkill = '';
 let agentRunning = false;
 let agentTimer = null;
 let nextRunTime = null;
+function getApiKey() {
+    return document.getElementById('api-key').value || localStorage.getItem('gb_api_key') || localStorage.getItem('gb_mimo_api_key') || '';
+}
 
 // ═══════════════════════════════════════════
 // SKILL PROMPTS
@@ -535,7 +538,7 @@ async function runAgentCycle(skillId, varTarget, maxTurns) {
 
         let resp;
         try {
-            resp = await fetch(MIMO_API_URL, {
+            resp = await fetch(PROXY_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -634,9 +637,7 @@ function setStatus(running, text) {
 // ═══════════════════════════════════════════
 // ACTIONS
 // ═══════════════════════════════════════════
-function getApiKey() {
-    return document.getElementById('api-key').value || localStorage.getItem('gb_mimo_api_key') || '';
-}
+// getApiKey defined above in CONFIGURATION section
 
 function saveSettings() {
     const key = document.getElementById('api-key').value;
@@ -650,7 +651,7 @@ async function testConnection() {
     const key = getApiKey();
     if (!key) { alert('Enter your MiMo API key first.'); return; }
 
-    const resp = await fetch(MIMO_API_URL, {
+    const resp = await fetch(PROXY_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
         body: JSON.stringify({ model: document.getElementById('model-select').value, messages: [{ role: 'user', content: 'Say "OK" if you can read this.' }], max_tokens: 10 })

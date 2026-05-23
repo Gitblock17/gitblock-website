@@ -1510,6 +1510,7 @@ export OPENAI_BASE_URL=https://api.xiaomimimo.com/v1</pre>
         }
 
         currentApiKey = await generateApiKey(address);
+        localStorage.setItem('gb_api_key', currentApiKey);  // share with agents + playground
         document.getElementById('api-key-display').textContent = currentApiKey;
         updateCliCommands(currentApiKey);
         selectLLM(document.querySelector('.llm-card.selected'), selectedModel);
