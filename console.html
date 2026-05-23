@@ -393,19 +393,16 @@ input.value = '';
 addAIMessage('user',text);
 
 const currentCode = {html:editorInstances.html.getValue(),css:editorInstances.css.getValue(),js:editorInstances.js.getValue()};
-const systemPrompt = `You are a web development AI assistant. Help the user write HTML/CSS/JS code.
-
-CURRENT CODE:
-HTML: ${currentCode.html.slice(0,1500)}
-CSS: ${currentCode.css.slice(0,800)}
-JS: ${currentCode.js.slice(0,800)}
-
-RULES:
-1. Provide COMPLETE code — never partial snippets
-2. When building new projects, provide ALL THREE: html, css, js blocks
-3. Use modern CSS (flexbox, grid, variables)
-4. Use fenced code blocks with language tags: \`\`\`html ... \`\`\` \`\`\`css ... \`\`\` \`\`\`js ... \`\`\`
-5. Be concise — let the code speak`;
+const systemPrompt = 'You are a web development AI assistant. Help the user write HTML/CSS/JS code.\n\n'+
+    'CURRENT CODE:\nHTML: '+currentCode.html.slice(0,1500)+'\n'+
+    'CSS: '+currentCode.css.slice(0,800)+'\n'+
+    'JS: '+currentCode.js.slice(0,800)+'\n\n'+
+    'RULES:\n'+
+    '1. Provide COMPLETE code — never partial snippets\n'+
+    '2. When building new projects, provide ALL THREE: html, css, js blocks\n'+
+    '3. Use modern CSS (flexbox, grid, variables)\n'+
+    '4. Use fenced code blocks with language tags: ```html ... ``` ```css ... ``` ```js ... ```\n'+
+    '5. Be concise — let the code speak';
 
 aiHistory.push({role:'user',content:text});
 const assistantDiv = addAIMessage('assistant','');
