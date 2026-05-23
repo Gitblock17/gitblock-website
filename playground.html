@@ -508,11 +508,6 @@
     <div class="modal-box">
         <h3><i class="fas fa-cog"></i> Settings</h3>
         <label class="modal-label">AI Provider</label>
-        <select id="settings-api-mode" onchange="toggleSettingsMode()">
-            <option value="custom">MiMo API — Recommended ✓</option>
-            <option value="free">GitBlock Free API (Legacy)</option>
-        </select>
-
         <div id="settings-custom-section">
             <label class="modal-label" style="margin-top:12px;">MiMo API Key</label>
             <div style="display:flex; gap:8px;">
@@ -531,11 +526,6 @@
             </select>
         </div>
 
-        <div id="settings-free-section" style="display:none;">
-            <div class="modal-note" style="margin-top:12px;">
-                <i class="fas fa-info-circle" style="color:#94a3b8;"></i> The free GitBlock proxy uses a shared key with rate limits. For the best experience, we recommend using your own MiMo API key above.
-            </div>
-        </div>
 
         <div class="modal-actions">
             <button class="modal-cancel" onclick="closeSettings()">Cancel</button>
@@ -556,6 +546,7 @@
             <a href="usage.html">Docs</a>
             <a href="editor.html">Editor</a>
             <a href="playground.html" class="active">Playground</a>
+            <a href="agents.html">Agents</a>
             <a href="preview.html" target="_blank">Preview</a>
         </nav>
         <div style="display:flex; align-items:center; gap:8px;">
@@ -578,6 +569,7 @@
     <a href="usage.html">Docs</a>
     <a href="editor.html">Editor</a>
     <a href="playground.html" class="active">Playground</a>
+    <a href="agents.html">Agents</a>
     <a href="preview.html" target="_blank">Preview</a>
 </div>
 
@@ -771,9 +763,6 @@ let isAIStreaming = false;
 let modifiedTabs = { html: false, css: false, js: false };
 let autoSaveTimer = null;
 
-const GITBLOCK_API_URL = 'https://gitblock-api.onrender.com/v1/chat/completions';
-const GITBLOCK_AUTH_TOKEN = 'Bearer playground-anonymous';
-const GITBLOCK_MODEL = 'llama-3.3-70b';
 const MIMO_API_URL = 'https://api.xiaomimimo.com/v1/chat/completions';
 
 const DEFAULT_HTML = '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>My Project</title>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n  <h1>Hello World!</h1>\n  <p>Start building something amazing.</p>\n  <script src="script.js"><\/script>\n</body>\n</html>';
@@ -786,19 +775,13 @@ function getApiKey() {
 }
 
 function getModel() {
-    const hasCustomKey = !!getApiKey();
-    if (hasCustomKey) {
-        return localStorage.getItem('gb_mimo_model') || 'mimo-v2.5-pro';
-    }
-    return GITBLOCK_MODEL; // fallback for free proxy
+    return localStorage.getItem('gb_mimo_model') || 'mimo-v2.5-pro';
 }
 
 function openSettings() {
     const key = getApiKey();
     document.getElementById('settings-api-key').value = key;
     document.getElementById('settings-model').value = localStorage.getItem('gb_mimo_model') || 'mimo-v2.5-pro';
-    document.getElementById('settings-api-mode').value = key ? 'custom' : 'custom'; // Default to MiMo
-    toggleSettingsMode();
     document.getElementById('settings-modal').classList.remove('hidden');
 }
 
@@ -806,27 +789,15 @@ function closeSettings() {
     document.getElementById('settings-modal').classList.add('hidden');
 }
 
-function toggleSettingsMode() {
-    const mode = document.getElementById('settings-api-mode').value;
-    document.getElementById('settings-custom-section').style.display = mode === 'custom' ? 'block' : 'none';
-    const freeSection = document.getElementById('settings-free-section');
-    if (freeSection) freeSection.style.display = mode === 'free' ? 'block' : 'none';
-}
-
 function saveSettings() {
-    const mode = document.getElementById('settings-api-mode').value;
-    if (mode === 'custom') {
-        const key = document.getElementById('settings-api-key').value.trim();
-        const model = document.getElementById('settings-model').value;
-        if (key) {
-            localStorage.setItem('gb_mimo_api_key', key);
-        } else {
-            localStorage.removeItem('gb_mimo_api_key');
-        }
-        localStorage.setItem('gb_mimo_model', model);
+    const key = document.getElementById('settings-api-key').value.trim();
+    const model = document.getElementById('settings-model').value;
+    if (key) {
+        localStorage.setItem('gb_mimo_api_key', key);
     } else {
         localStorage.removeItem('gb_mimo_api_key');
     }
+    localStorage.setItem('gb_mimo_model', model);
 
     closeSettings();
     updateApiStatus();
@@ -842,8 +813,8 @@ function updateApiStatus() {
         dot.className = 'api-status-dot connected';
         text.textContent = getModel();
     } else {
-        dot.className = 'api-status-dot connected';
-        text.textContent = 'Free — Ready to build!';
+        dot.className = 'api-status-dot disconnected';
+        text.textContent = 'Add API key';
     }
 }
 
@@ -1279,10 +1250,18 @@ If the user asks for changes to existing code, provide the COMPLETE updated file
     let fullResponse = '';
 
     try {
-        const useCustom = !!apiKey;
-        const apiUrl = useCustom ? MIMO_API_URL : GITBLOCK_API_URL;
-        const authHeader = useCustom ? ('Bearer ' + apiKey) : GITBLOCK_AUTH_TOKEN;
+        if (!apiKey) {
+            // No key — prompt user
+            textEl.innerHTML = '<span style="color:#f59e0b;">⚠️ Please add your MiMo API key first. Click <i class="fas fa-cog"></i> Settings above, or <a href="https://platform.xiaomimimo.com/console" target="_blank" style="color:#2563eb;">get a free key here</a>.</span>';
+            isAIStreaming = false;
+            document.getElementById('ai-send-btn').disabled = false;
+            // Re-add the user message so it's not lost
+            return;
+        }
+
         const model = getModel();
+        const apiUrl = MIMO_API_URL;
+        const authHeader = 'Bearer ' + apiKey;
 
         const fetchBody = {
             model: model,
@@ -1290,14 +1269,10 @@ If the user asks for changes to existing code, provide the COMPLETE updated file
                 { role: 'system', content: systemPrompt },
                 ...aiHistory.slice(-10)
             ],
-            temperature: useCustom ? 0.7 : 0.3,
-            max_tokens: useCustom ? 4096 : 1024,
+            temperature: 0.7,
+            max_tokens: 4096,
+            stream: true
         };
-
-        // Try streaming first for custom keys; non-streaming for GitBlock proxy
-        if (useCustom) {
-            fetchBody.stream = true;
-        }
 
         const response = await fetch(apiUrl, {
             method: 'POST',
@@ -1313,8 +1288,8 @@ If the user asks for changes to existing code, provide the COMPLETE updated file
             throw new Error(errData.error?.message || errData.error || 'API error: ' + response.status);
         }
 
-        if (useCustom && response.headers.get('content-type')?.includes('text/event-stream')) {
-            // Streaming mode (custom API key)
+        if (response.headers.get('content-type')?.includes('text/event-stream')) {
+            // Streaming mode
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
             let buffer = '';
