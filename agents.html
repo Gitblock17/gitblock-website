@@ -166,24 +166,27 @@
 
 <!-- Setup -->
 <div class="setup-card">
-    <h3><i class="fas fa-key"></i> API Setup</h3>
-        <p style="font-size:0.84rem;color:#64748b;margin-bottom:14px;"><strong>How to get a key:</strong> Go to <a href="index.html#api" style="color:#2563eb;">GitBlock home</a> → Connect wallet → Get API key. Or <a href="https://platform.xiaomimimo.com/console" target="_blank" style="color:#2563eb;">get a MiMo key directly</a>. Same key works in Playground too. Stored locally — never sent to any server.</p>
+    <h3><i class="fas fa-microchip"></i> AI Engine — <span style="color:#059669;">Local (No API Key Needed)</span></h3>
+    <p style="font-size:0.84rem;color:#64748b;margin-bottom:14px;">
+        <strong>Runs AI models directly in your browser.</strong> Uses WebGPU — models download once (~1-2GB) then run offline.
+        No API keys, no servers, no accounts. <span id="local-ai-status" style="color:#2563eb;">Initializing...</span>
+    </p>
     <div class="setup-row">
         <div class="setup-field">
-            <label>MiMo API Key</label>
-            <input type="password" id="api-key" placeholder="sk-...">
-            <span class="hint" id="key-status">Not set</span>
-        </div>
-        <div class="setup-field">
-            <label>Model</label>
-            <select id="model-select">
-                <option value="mimo-v2.5-pro">MiMo V2.5 Pro (best)</option>
-                <option value="mimo-v2.5">MiMo V2.5 (balanced)</option>
-                <option value="mimo-v2-flash">MiMo V2 Flash (fast)</option>
+            <label>Model Size</label>
+            <select id="model-select" onchange="switchModel(this.value)">
+                <option value="fast">Fast (1B) — instant responses</option>
+                <option value="balanced" selected>Balanced (2B) — good quality</option>
+                <option value="best">Best (3B) — best quality, needs more GPU</option>
             </select>
         </div>
+        <div class="setup-field">
+            <label>Cloud API Key (optional — better models)</label>
+            <input type="password" id="api-key" placeholder="Get free key at platform.xiaomimimo.com">
+            <span class="hint" id="key-status">Not set · Using local AI</span>
+        </div>
         <button class="btn btn-outline btn-sm" onclick="saveSettings()"><i class="fas fa-save"></i> Save</button>
-        <button class="btn btn-outline btn-sm" onclick="testConnection()"><i class="fas fa-plug"></i> Test</button>
+        <button class="btn btn-outline btn-sm" id="btn-init-ai" onclick="initLocalAI()"><i class="fas fa-download"></i> Load AI Model</button>
     </div>
 </div>
 
@@ -275,6 +278,7 @@
     <p style="margin-top:4px;">&copy; 2026 GitBlock — Intelligence Without Gatekeepers</p>
 </footer>
 
+<script src="gb-inference.js"></script>
 <script>
 // ═══════════════════════════════════════════
 // CONFIGURATION
@@ -284,9 +288,70 @@ let selectedSkill = '';
 let agentRunning = false;
 let agentTimer = null;
 let nextRunTime = null;
+let localAI = null;  // GitBlockInference instance
+let aiMode = 'local'; // 'local' or 'cloud'
+
 function getApiKey() {
     return document.getElementById('api-key').value || localStorage.getItem('gb_api_key') || localStorage.getItem('gb_mimo_api_key') || '';
 }
+
+function usingCloudAI() {
+    return aiMode === 'cloud' && getApiKey();
+}
+
+// ═══════════════════════════════════════════
+// LOCAL AI
+// ═══════════════════════════════════════════
+async function initLocalAI(tier) {
+    tier = tier || document.getElementById('model-select').value || 'balanced';
+    const statusEl = document.getElementById('local-ai-status');
+    const btn = document.getElementById('btn-init-ai');
+
+    if (localAI && localAI.isReady) {
+        statusEl.textContent = 'Already running ✓';
+        statusEl.style.color = '#059669';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+    statusEl.textContent = 'Checking WebGPU support...';
+    statusEl.style.color = '#2563eb';
+
+    try {
+        localAI = new GitBlockInference();
+        await localAI.init(tier, (msg) => {
+            statusEl.textContent = msg;
+        });
+        aiMode = 'local';
+        statusEl.textContent = 'Local AI ready ✓ (' + localAI.modelName.split('-')[0] + ')';
+        statusEl.style.color = '#059669';
+        btn.innerHTML = '<i class="fas fa-check"></i> AI Ready';
+        btn.className = 'btn btn-outline btn-sm';
+        document.getElementById('key-status').textContent = 'Not set · Local AI active';
+    } catch (e) {
+        if (e.message === 'NO_WEBGPU') {
+            statusEl.textContent = '⚠️ WebGPU not available. Use Chrome/Edge or add a cloud API key.';
+            statusEl.style.color = '#f59e0b';
+        } else {
+            statusEl.textContent = '⚠️ Failed to load model. Try a smaller model or use cloud key.';
+            statusEl.style.color = '#dc2626';
+        }
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-redo"></i> Retry';
+    }
+}
+
+function switchModel(tier) {
+    if (localAI && localAI.isReady) {
+        // Need to re-init with new model
+        localAI = null;
+        initLocalAI(tier);
+    }
+}
+
+// Auto-init local AI on page load
+setTimeout(() => initLocalAI('balanced'), 500);
 
 // ═══════════════════════════════════════════
 // SKILL PROMPTS
@@ -500,13 +565,14 @@ async function runAgentCycle(skillId, varTarget, maxTurns) {
     const skill = SKILLS[skillId];
     if (!skill) return;
 
-    const apiKey = getApiKey();
-    if (!apiKey) {
-        appendOutput('error-msg', '❌ No API key set. Add your MiMo API key in the setup section above.');
+    // Determine AI mode
+    const useCloud = usingCloudAI();
+    if (!useCloud && (!localAI || !localAI.isReady)) {
+        appendOutput('error-msg', '❌ AI not ready. Click "Load AI Model" to download the local model, or add a cloud API key.');
         return;
     }
 
-    const model = document.getElementById('model-select').value;
+    const modelName = useCloud ? 'mimo-v2-flash' : localAI.modelName;
 
     // Load memory
     const memory = JSON.parse(localStorage.getItem('gb_agent_memory') || '{}');
@@ -516,7 +582,8 @@ async function runAgentCycle(skillId, varTarget, maxTurns) {
 
     const systemPrompt = skill.system + memStr + '\n\nTARGET: ' + (varTarget || skill.defaultVar);
 
-    appendOutput('info-msg', `🚀 Starting ${skill.name} session (model: ${model}, max ${maxTurns} turns)...`);
+    const engineLabel = useCloud ? '☁️ Cloud (MiMo)' : '💻 Local AI';
+    appendOutput('info-msg', `🚀 Starting ${skill.name} · ${engineLabel} · max ${maxTurns} turns...`);
 
     const messages = [{ role: 'system', content: systemPrompt }];
     let done = false;
@@ -527,80 +594,56 @@ async function runAgentCycle(skillId, varTarget, maxTurns) {
         turn++;
         appendOutput('turn-header', `── Turn ${turn}/${maxTurns} ──`);
 
-        // Call MiMo API
-        const body = {
-            model,
-            messages,
-            tools: TOOLS,
-            temperature: 0.4,
-            max_tokens: 800
-        };
-
-        let resp;
+        let data;
         try {
-            resp = await fetch(PROXY_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + apiKey
-                },
-                body: JSON.stringify(body)
-            });
+            if (useCloud) {
+                // Cloud AI: call proxy
+                const body = { model: modelName, messages, tools: TOOLS, temperature: 0.4, max_tokens: 800 };
+                const resp = await fetch(PROXY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getApiKey() },
+                    body: JSON.stringify(body)
+                });
+                if (!resp.ok) { const et = await resp.text(); throw new Error(`API ${resp.status}: ${et.substring(0,150)}`); }
+                data = await resp.json();
+            } else {
+                // Local AI: call WebLLM
+                data = await localAI.chat(messages, { temperature: 0.4, max_tokens: 400, tools: TOOLS });
+            }
         } catch (e) {
-            appendOutput('error-msg', `❌ API call failed: ${e.message}`);
+            appendOutput('error-msg', `❌ ${useCloud ? 'API' : 'AI'} call failed: ${e.message}`);
             return;
         }
 
-        if (!resp.ok) {
-            const errText = await resp.text();
-            appendOutput('error-msg', `❌ API error ${resp.status}: ${errText.substring(0, 200)}`);
-            return;
-        }
-
-        const data = await resp.json();
         const choice = data.choices?.[0];
-        if (!choice) {
-            appendOutput('error-msg', '❌ No response from API');
-            return;
-        }
+        if (!choice) { appendOutput('error-msg', '❌ No response from AI'); return; }
 
         const msg = choice.message;
         totalTokens += data.usage?.total_tokens || 0;
 
         // Check for tool calls
         if (msg.tool_calls && msg.tool_calls.length > 0) {
-            appendOutput('tool-call', `🔧 Calling: ${msg.tool_calls.map(tc => tc.function.name).join(', ')}`);
+            appendOutput('tool-call', `🔧 Calling: ${msg.tool_calls.map(tc => tc.function?.name || tc.name).join(', ')}`);
 
-            // Add assistant message
             messages.push({ role: 'assistant', content: msg.content || '', tool_calls: msg.tool_calls });
 
-            // Execute tools
             for (const tc of msg.tool_calls) {
-                const args = JSON.parse(tc.function.arguments || '{}');
-                const result = await executeTool(tc.function.name, args);
+                const fnName = tc.function?.name || tc.name;
+                const args = typeof tc.function?.arguments === 'string' ? JSON.parse(tc.function.arguments) : (tc.function?.arguments || {});
+                const result = await executeTool(fnName, args);
                 appendOutput('tool-result', `   ↳ ${JSON.stringify(result).substring(0, 200)}`);
-
-                messages.push({
-                    role: 'tool',
-                    tool_call_id: tc.id,
-                    content: JSON.stringify(result)
-                });
+                messages.push({ role: 'tool', tool_call_id: tc.id || 'call_0', content: JSON.stringify(result) });
             }
         } else {
-            // No tool calls = agent is done
             appendOutput('agent-output', msg.content || '(no output)');
             messages.push({ role: 'assistant', content: msg.content || '' });
             done = true;
         }
     }
 
-    if (!done) {
-        appendOutput('info-msg', `⚠️ Reached max turns (${maxTurns}) without completion.`);
-    }
+    if (!done) appendOutput('info-msg', `⚠️ Reached max turns (${maxTurns}).`);
+    appendOutput('info-msg', `✅ Session complete. ~${totalTokens} tokens used (${useCloud ? 'cloud' : 'local'}).`);
 
-    appendOutput('info-msg', `✅ Session complete. ~${totalTokens} tokens used.`);
-
-    // Update last run
     localStorage.setItem('gb_agent_last_run', new Date().toISOString());
     localStorage.setItem('gb_agent_run_count', (parseInt(localStorage.getItem('gb_agent_run_count') || '0') + 1).toString());
     renderMemory();
@@ -641,29 +684,20 @@ function setStatus(running, text) {
 
 function saveSettings() {
     const key = document.getElementById('api-key').value;
-    const model = document.getElementById('model-select').value;
-    if (key) localStorage.setItem('gb_mimo_api_key', key);
-    localStorage.setItem('gb_mimo_model', model);
+    if (key) {
+        localStorage.setItem('gb_mimo_api_key', key);
+        aiMode = 'cloud';
+        document.getElementById('key-status').textContent = 'Cloud key set ✓';
+        document.getElementById('key-status').style.color = '#059669';
+        document.getElementById('local-ai-status').textContent = 'Cloud mode active — using MiMo';
+        document.getElementById('local-ai-status').style.color = '#2563eb';
+    }
     updateKeyStatus();
 }
 
+// Cloud AI test removed — local AI is primary
 async function testConnection() {
-    const key = getApiKey();
-    if (!key) { alert('Enter your MiMo API key first.'); return; }
-
-    const resp = await fetch(PROXY_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-        body: JSON.stringify({ model: document.getElementById('model-select').value, messages: [{ role: 'user', content: 'Say "OK" if you can read this.' }], max_tokens: 10 })
-    });
-
-    if (resp.ok) {
-        document.getElementById('key-status').textContent = '✅ Connected';
-        document.getElementById('key-status').style.color = '#059669';
-    } else {
-        document.getElementById('key-status').textContent = '❌ Invalid key';
-        document.getElementById('key-status').style.color = '#dc2626';
-    }
+    appendOutput('info-msg', '💡 Local AI is the default. Click "Load AI Model" to initialize, or add a cloud key above.');
 }
 
 function selectSkill(skillId) {
@@ -688,7 +722,12 @@ async function runOnce() {
 
 function startAgent() {
     if (!selectedSkill) { alert('Select a skill template first.'); return; }
-    if (!getApiKey()) { alert('Set your MiMo API key first.'); return; }
+    if (!localAI || !localAI.isReady) {
+        if (!getApiKey()) {
+            alert('AI not ready. Click "Load AI Model" to download the local model (free, no key needed). Or add a cloud API key.');
+            return;
+        }
+    }
 
     agentRunning = true;
     document.getElementById('btn-start').style.display = 'none';
@@ -778,7 +817,10 @@ function updateKeyStatus() {
     const key = getApiKey();
     if (key) {
         document.getElementById('api-key').value = key;
-        document.getElementById('key-status').textContent = 'Key loaded from storage';
+        document.getElementById('key-status').textContent = 'Cloud key set ✓';
+        document.getElementById('key-status').style.color = '#059669';
+    } else {
+        document.getElementById('key-status').textContent = 'Not set · Local AI active';
         document.getElementById('key-status').style.color = '#64748b';
     }
 }
