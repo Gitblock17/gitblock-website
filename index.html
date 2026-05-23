@@ -1045,10 +1045,10 @@
         <p class="section-desc reveal">Run a node to get your free API key. Contribute GPU power to the network and earn $GITBLOCK.</p>
 
         <!-- Wallet Connect Box -->
-        <div class="wallet-box reveal" id="wallet-connect-box">
-            <h3><i class="fas fa-server" style="color:#059669;margin-right:8px;"></i>Run a Node</h3>
-            <p>Run a GitBlock node to get your free API key and earn $GITBLOCK.</p>
-            <div class="wallet-buttons" style="display:flex;justify-content:center">
+        <div class="wallet-box reveal" id="wallet-connect-box" style="text-align:center">
+            <h3 style="text-align:center"><i class="fas fa-server" style="color:#059669;margin-right:8px;"></i>Run a Node</h3>
+            <p style="text-align:center">Run a GitBlock node to get your free API key and earn $GITBLOCK.</p>
+            <div class="wallet-buttons" style="display:flex;justify-content:center;flex-direction:column;align-items:center">
                 <a href="node.html" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:20px;background:rgba(16,185,129,0.04);border-radius:12px;border:1px solid rgba(16,185,129,0.2);text-decoration:none;transition:all .15s" onmouseover="this.style.background='rgba(16,185,129,0.08)';this.style.borderColor='rgba(16,185,129,0.35)'" onmouseout="this.style.background='rgba(16,185,129,0.04)';this.style.borderColor='rgba(16,185,129,0.2)'">
                     <i class="fas fa-server" style="color:#059669;font-size:1.2rem"></i>
                     <span style="color:#059669;font-weight:600;font-size:.95rem">Run a Node → Get Free API Key</span>
@@ -1058,16 +1058,16 @@
         </div>
 
         <!-- Connected Section -->
-        <div class="connected-section" id="connected-section">
+        <div class="connected-section" id="connected-section" style="text-align:center">
             <!-- Address -->
-            <div class="address-display reveal">
+            <div class="address-display reveal" style="justify-content:center">
                 <span>Connected: <code id="wallet-address">—</code></span>
                 <span id="wallet-type-badge" style="display:inline-flex;align-items:center;padding:4px 12px;background:rgba(37,99,235,0.15);color:#2563eb;font-size:0.78rem;font-weight:600;border-radius:6px;"></span>
                 <button onclick="copyAddress()"><i class="fas fa-copy"></i> Copy</button>
             </div>
 
             <!-- API Key -->
-            <div class="api-key-box reveal">
+            <div class="api-key-box reveal" style="justify-content:center">
                 <span style="color:#94a3b8;font-size:0.85rem;font-weight:600;">API Key:</span>
                 <code id="api-key-display">—</code>
                 <div style="display:flex;gap:8px;">
@@ -1085,18 +1085,18 @@
                 </div>
                 <div style="display:flex;gap:8px;align-items:center;">
                     <span style="display:inline-block;padding:4px 12px;background:#059669;color:#fff;font-size:0.75rem;font-weight:700;border-radius:6px;">READY</span>
-                    <button onclick="copyModelName()" style="padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;"><i class="fas fa-copy"></i> Copy Model</button>
+                    <button onclick="copyModelName()" style="padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:Inter,sans-serif"><i class="fas fa-copy"></i> Copy Model</button>
                 </div>
             </div>
 
-            <!-- Model Selection — now in Console -->
+            <!-- Model Selection — now in Console (centered) -->
             <div style="text-align:center;padding:20px;margin:16px 0;background:rgba(37,99,235,0.03);border-radius:12px;border:1px solid rgba(37,99,235,0.08)">
                 <p style="font-size:.9rem;color:#64748b;margin-bottom:10px">Choose from 30+ models across 8 providers including OpenAI, Anthropic, Google, Meta, DeepSeek, xAI, and more.</p>
                 <a href="console.html" class="btn btn-primary" style="display:inline-flex"><i class="fas fa-terminal"></i> Open Console → Pick Your Model</a>
             </div>
 
             <!-- CLI Commands -->
-            <div class="cli-section reveal">
+            <div class="cli-section reveal" style="text-align:center">
                 <h4><i class="fas fa-terminal" style="margin-right:8px;"></i>Quick Commands</h4>
                 <div class="cli-cmd">
                     <code id="cli-curl">curl -X POST https://api.xiaomimimo.com/v1/chat/completions ...</code>
