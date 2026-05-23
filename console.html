@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Console — GitBlock</title>
+<link rel="icon" href="assets/gitblock.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/json/json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/active-line.min.js"></script>
+<style>
+:root{--bg:#ffffff;--surface:#f8fafc;--border:rgba(37,99,235,0.08);--text:#1e293b;--muted:#64748b;--accent:#2563eb;--accent-hover:#1d4ed8;--danger:#ef4444;--success:#059669;--radius:10px;--radius-lg:14px}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100vh;display:flex;flex-direction:column}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(37,99,235,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,0.03) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;z-index:0}
+body>*{position:relative;z-index:1}
+
+header{height:52px;background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:100;flex-shrink:0}
+.header-left{display:flex;align-items:center;gap:14px}
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--accent);font-weight:700;font-size:.9rem}
+.logo img{width:26px;height:26px;border-radius:7px;object-fit:cover}
+.header-nav{display:flex;gap:4px}
+.header-nav a{padding:5px 11px;color:var(--muted);text-decoration:none;font-size:.8rem;font-weight:500;border-radius:6px;transition:all .15s}
+.header-nav a:hover,.header-nav a.active{color:var(--accent);background:rgba(37,99,235,0.06)}
+.header-right{display:flex;align-items:center;gap:8px}
+.provider-select{padding:5px 10px;border:1px solid var(--border);border-radius:6px;font-size:.78rem;font-weight:500;color:var(--text);background:var(--surface);cursor:pointer;font-family:'Inter',sans-serif;outline:none;max-width:160px}
+.provider-select:focus{border-color:var(--accent)}
+.btn-sm{padding:5px 11px;border-radius:6px;font-size:.78rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--muted);transition:all .15s;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px}
+.btn-sm:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-sm.primary:hover{background:var(--accent-hover)}
+
+main{flex:1;display:flex;overflow:hidden}
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.sidebar-header{padding:12px;border-bottom:1px solid var(--border)}
+.sidebar-header h3{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.sidebar-tabs{display:flex;border-bottom:1px solid var(--border)}
+.sidebar-tab{flex:1;padding:8px;text-align:center;font-size:.7rem;font-weight:600;color:var(--muted);cursor:pointer;background:transparent;border:none;border-bottom:2px solid transparent;transition:all .15s;font-family:'Inter',sans-serif}
+.sidebar-tab:hover{color:var(--text)}
+.sidebar-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+.editor-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.toolbar{height:36px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 10px;flex-shrink:0}
+.toolbar-left{display:flex;align-items:center;gap:6px}
+.tb-btn{padding:4px 10px;background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:.73rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .15s;font-family:'Inter',sans-serif}
+.tb-btn:hover{background:rgba(37,99,235,0.04);border-color:var(--accent)}
+.tb-btn.run{background:var(--success);color:#fff;border-color:var(--success)}
+.tb-btn.run:hover{background:#047857}
+.lang-select{padding:4px 6px;border:1px solid var(--border);border-radius:5px;font-size:.73rem;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);outline:none}
+
+.panels{flex:1;display:flex;overflow:hidden}
+.editor-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.editor-panel .CodeMirror{flex:1;height:auto;font-family:'JetBrains Mono',monospace;font-size:14px;line-height:1.6}
+.output-panel{width:42%;min-width:280px;display:flex;flex-direction:column;border-left:1px solid var(--border);background:var(--bg)}
+.output-tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.output-tab{padding:7px 14px;background:transparent;border:none;color:var(--muted);font-size:.75rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px}
+.output-tab:hover{color:var(--text)}
+.output-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.output-content{flex:1;overflow:hidden;position:relative}
+.output-pane{position:absolute;top:0;left:0;width:100%;height:100%;display:none;overflow:auto}
+.output-pane.active{display:flex;flex-direction:column}
+.console-output{padding:10px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;flex:1}
+.preview-frame{width:100%;height:100%;border:none;background:#fff}
+.ai-panel{padding:14px;display:flex;flex-direction:column;height:100%}
+.ai-messages{flex:1;overflow-y:auto;margin-bottom:10px}
+.ai-msg{margin-bottom:10px;padding:10px 14px;border-radius:8px;font-size:.8rem;line-height:1.6}
+.ai-msg.user{background:rgba(37,99,235,0.06);border:1px solid rgba(37,99,235,0.1);margin-left:20px}
+.ai-msg.assistant{background:rgba(16,185,129,0.04);border:1px solid rgba(16,185,129,0.1);margin-right:20px}
+.ai-msg pre{background:var(--surface);border-radius:6px;padding:8px;margin:4px 0;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:.75rem}
+.ai-input-row{display:flex;gap:8px}
+.ai-input{flex:1;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.8rem;font-family:'Inter',sans-serif;outline:none}
+.ai-input:focus{border-color:var(--accent)}
+.ai-send{padding:9px 14px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:5px}
+.ai-send:hover{background:var(--accent-hover)}
+.ai-send:disabled{opacity:.5;cursor:not-allowed}
+
+.resize-handle{width:3px;background:var(--border);cursor:col-resize;transition:background .15s;flex-shrink:0}
+.resize-handle:hover{background:var(--accent)}
+
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.active{display:flex}
+.modal{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;max-width:520px;width:90%;box-shadow:0 16px 48px rgba(0,0,0,0.1)}
+.modal h3{font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--text)}
+.modal-field{margin-bottom:14px}
+.modal-field label{font-size:.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.modal-field input,.modal-field select{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:.85rem;font-family:'Inter',sans-serif;color:var(--text);background:var(--surface)}
+.modal-field input:focus,.modal-field select:focus{outline:none;border-color:var(--accent)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+
+.toast{position:fixed;bottom:20px;right:20px;padding:10px 18px;border-radius:8px;font-size:.82rem;font-weight:600;z-index:2000;animation:slideUp .3s ease;box-shadow:0 4px 16px rgba(0,0,0,0.1)}
+.toast.success{background:var(--success);color:#fff}
+.toast.error{background:var(--danger);color:#fff}
+.toast.info{background:var(--accent);color:#fff}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:768px){.sidebar{display:none}.output-panel{width:100%}.header-nav{display:none}}
+</style>
+</head>
+<body>
+
+<header>
+<div class="header-left">
+<a href="index.html" class="logo"><img src="assets/gitblock.jpg" alt="GitBlock"><span>GitBlock</span></a>
+<div class="header-nav">
+<a href="index.html">Home</a>
+<a href="aeon.html">Aeon</a>
+<a href="console.html" class="active">Console</a>
+</div>
+</div>
+<div class="header-right">
+<select class="provider-select" id="provider-select" onchange="switchProvider()"></select>
+<button class="btn-sm" onclick="openSettings()" title="Settings"><i class="fas fa-cog"></i></button>
+</div>
+</header>
+
+<main>
+<div class="sidebar" id="sidebar">
+<div class="sidebar-header"><h3>Projects</h3></div>
+<div class="sidebar-tabs">
+<button class="sidebar-tab active" onclick="switchTab('projects')">Files</button>
+<button class="sidebar-tab" onclick="switchTab('tutorials')">Tutorials</button>
+</div>
+<div id="sidebar-projects" style="flex:1;overflow-y:auto;padding:8px"></div>
+<div id="sidebar-tutorials" style="display:none;flex:1;overflow-y:auto;padding:8px"></div>
+</div>
+
+<div class="editor-area">
+<div class="toolbar">
+<div class="toolbar-left">
+<select class="lang-select" id="tab-select" onchange="switchEditorTab(this.value)">
+<option value="html">HTML</option><option value="css">CSS</option><option value="js">JS</option>
+</select>
+<button class="tb-btn run" onclick="runCode()"><i class="fas fa-play"></i> Run</button>
+<button class="tb-btn" onclick="formatCode()"><i class="fas fa-align-left"></i> Format</button>
+</div>
+<div style="display:flex;gap:6px;align-items:center">
+<input id="project-name" style="background:transparent;border:1px solid transparent;color:var(--text);font-size:.8rem;font-weight:600;padding:3px 8px;border-radius:5px;font-family:'Inter',sans-serif;outline:none;max-width:200px" value="untitled" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='transparent';saveProject()">
+<button class="tb-btn" onclick="newProject()"><i class="fas fa-plus"></i></button>
+<button class="tb-btn" onclick="exportProject()"><i class="fas fa-download"></i></button>
+</div>
+</div>
+
+<div class="panels">
+<div class="editor-panel" id="editor-container"></div>
+<div class="output-panel" id="output-panel">
+<div class="output-tabs">
+<button class="output-tab active" onclick="switchOutput('preview')"><i class="fas fa-eye"></i> Preview</button>
+<button class="output-tab" onclick="switchOutput('console')"><i class="fas fa-terminal"></i> Console</button>
+<button class="output-tab" onclick="switchOutput('ai')"><i class="fas fa-robot"></i> AI</button>
+</div>
+<div class="output-content">
+<div class="output-pane active" id="pane-preview"><iframe class="preview-frame" id="preview-frame"></iframe></div>
+<div class="output-pane" id="pane-console"><div class="console-output" id="console-log"></div></div>
+<div class="output-pane" id="pane-ai">
+<div class="ai-panel">
+<div class="ai-messages" id="ai-messages"></div>
+<div class="ai-input-row">
+<input class="ai-input" id="ai-input" placeholder="Ask AI to write, fix, or explain code..." onkeydown="if(event.key==='Enter')sendAIMessage()">
+<button class="ai-send" id="ai-send-btn" onclick="sendAIMessage()"><i class="fas fa-paper-plane"></i></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+<div class="modal-overlay" id="settings-modal">
+<div class="modal">
+<h3><i class="fas fa-cog"></i> Settings</h3>
+<div class="modal-field">
+<label>AI Provider</label>
+<select id="settings-provider" onchange="updateModelList()">
+<option value="mimo">MiMo (Free Tier, No Credit Card)</option>
+<option value="openai">OpenAI</option>
+<option value="anthropic">Anthropic (Claude)</option>
+<option value="groq">Groq (Free Tier)</option>
+<option value="together">Together AI</option>
+<option value="openrouter">OpenRouter</option>
+<option value="google">Google AI Studio (Free Tier)</option>
+<option value="deepseek">DeepSeek</option>
+<option value="xai">xAI (Grok)</option>
+</select>
+</div>
+<div class="modal-field"><label>API Key</label><input type="password" id="settings-key" placeholder="Enter your API key"><div style="font-size:.7rem;color:var(--muted);margin-top:4px" id="settings-key-hint">Get a free key at platform.xiaomimimo.com</div></div>
+<div class="modal-field"><label>Model</label><select id="settings-model"></select></div>
+<div class="modal-actions">
+<button class="btn-sm" onclick="closeSettings()">Cancel</button>
+<button class="btn-sm primary" onclick="saveSettings()">Save</button>
+</div>
+</div>
+</div>
+
+<script>
+// ═══════════════════ PROVIDERS ═══════════════════
+const PROVIDERS = {
+mimo:{name:'MiMo',url:'https://api.xiaomimimo.com/v1/chat/completions',auth:'Bearer',models:['mimo-v2.5-pro','mimo-v2.5','mimo-v2-flash','mimo-v2-omni'],hint:'Get a free key at platform.xiaomimimo.com — no credit card needed'},
+openai:{name:'OpenAI',url:'https://api.openai.com/v1/chat/completions',auth:'Bearer',models:['gpt-4o','gpt-4o-mini','gpt-4-turbo','o3-mini'],hint:'Get your key at platform.openai.com/api-keys'},
+anthropic:{name:'Anthropic',url:'https://api.anthropic.com/v1/messages',auth:'x-api-key',models:['claude-sonnet-4-20250514','claude-opus-4-20250514','claude-haiku-3-5-20250514'],hint:'Get your key at console.anthropic.com',format:'anthropic'},
+groq:{name:'Groq',url:'https://api.groq.com/openai/v1/chat/completions',auth:'Bearer',models:['llama-3.3-70b-versatile','llama-3.1-8b-instant','mixtral-8x7b-32768','gemma2-9b-it'],hint:'Get a free key at console.groq.com'},
+together:{name:'Together AI',url:'https://api.together.xyz/v1/chat/completions',auth:'Bearer',models:['meta-llama/Llama-3.3-70B-Instruct-Turbo','deepseek-ai/DeepSeek-V3','mistralai/Mixtral-8x22B-Instruct-v0.1'],hint:'Get your key at api.together.xyz'},
+openrouter:{name:'OpenRouter',url:'https://openrouter.ai/api/v1/chat/completions',auth:'Bearer',models:['openai/gpt-4o','anthropic/claude-sonnet-4','google/gemini-2.5-flash','meta-llama/llama-3.3-70b-instruct'],hint:'Get your key at openrouter.ai/keys'},
+google:{name:'Google AI',url:'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',auth:'x-goog-api-key',models:['gemini-2.0-flash','gemini-2.5-pro','gemini-1.5-pro'],hint:'Get a free key at aistudio.google.com',format:'google'},
+deepseek:{name:'DeepSeek',url:'https://api.deepseek.com/v1/chat/completions',auth:'Bearer',models:['deepseek-chat','deepseek-reasoner'],hint:'Get your key at platform.deepseek.com'},
+xai:{name:'xAI (Grok)',url:'https://api.x.ai/v1/chat/completions',auth:'Bearer',models:['grok-3','grok-3-mini'],hint:'Get your key at console.x.ai'},
+};
+
+let currentProvider = 'mimo';
+let aiHistory = [];
+let isAIStreaming = false;
+let editorInstances = {};
+let currentEditorTab = 'html';
+let currentOutputTab = 'preview';
+let currentProject = null;
+let projects = JSON.parse(localStorage.getItem('gb_projects')||'[]');
+
+if(!projects.length){projects=[{name:'Welcome Project',html:'<!-- Start coding! -->\n<h1>Hello GitBlock!</h1>\n<p>Edit this code and click Run.</p>',css:'body{font-family:sans-serif;text-align:center;padding:40px;background:#f0f4ff}\nh1{color:#2563eb}',js:'console.log("Hello from GitBlock!");'}];saveProjects();}
+currentProject = projects[0];
+
+// ═══════════════ INIT ═══════════════
+function init(){
+const sel = document.getElementById('provider-select');
+sel.innerHTML = Object.entries(PROVIDERS).map(([k,v])=>`<option value="${k}">${v.name}</option>`).join('');
+const savedProv = localStorage.getItem('gb_provider')||'mimo';
+sel.value = savedProv; currentProvider = savedProv;
+switchProvider();
+
+// Init CodeMirror
+['html','css','js'].forEach(lang=>{
+const mode = lang==='html'?'htmlmixed':lang==='css'?'css':'javascript';
+const el = document.createElement('div'); el.id='editor-'+lang; el.style.display=lang==='html'?'block':'none';
+document.getElementById('editor-container').appendChild(el);
+editorInstances[lang] = CodeMirror(el,{value:currentProject[lang]||'',mode,theme:'default',lineNumbers:true,autoCloseBrackets:true,matchBrackets:true,styleActiveLine:true,tabSize:2});
+editorInstances[lang].on('change',()=>{currentProject[lang]=editorInstances[lang].getValue();autoSave();});
+});
+renderProjects();
+renderTutorials();
+updateModelList();
+runCode();
+}
+
+function autoSave(){saveProjects();}
+function saveProjects(){localStorage.setItem('gb_projects',JSON.stringify(projects));}
+
+function switchProvider(){
+currentProvider = document.getElementById('provider-select').value;
+document.getElementById('settings-provider').value = currentProvider;
+updateModelList();
+}
+
+function updateModelList(){
+const prov = PROVIDERS[document.getElementById('settings-provider').value];
+const sel = document.getElementById('settings-model');
+sel.innerHTML = prov.models.map(m=>`<option>${m}</option>`).join('');
+document.getElementById('settings-key-hint').textContent = prov.hint;
+const savedKey = localStorage.getItem('gb_key_'+currentProvider);
+if(savedKey) document.getElementById('settings-key').value = savedKey;
+}
+
+function openSettings(){
+const prov = PROVIDERS[currentProvider];
+document.getElementById('settings-provider').value = currentProvider;
+document.getElementById('settings-key').value = localStorage.getItem('gb_key_'+currentProvider)||'';
+updateModelList();
+document.getElementById('settings-modal').classList.add('active');
+}
+function closeSettings(){document.getElementById('settings-modal').classList.remove('active');}
+
+function saveSettings(){
+const provId = document.getElementById('settings-provider').value;
+const key = document.getElementById('settings-key').value;
+const model = document.getElementById('settings-model').value;
+if(key) localStorage.setItem('gb_key_'+provId, key);
+localStorage.setItem('gb_provider', provId);
+localStorage.setItem('gb_model', model);
+currentProvider = provId;
+document.getElementById('provider-select').value = provId;
+closeSettings();
+showToast('Settings saved — using '+PROVIDERS[provId].name,'success');
+}
+
+// ═══════════════ EDITOR ═══════════════
+function switchEditorTab(tab){currentEditorTab=tab;Object.entries(editorInstances).forEach(([k,v])=>v.getWrapperElement().style.display=k===tab?'block':'none');}
+function switchOutput(tab){currentOutputTab=tab;document.querySelectorAll('.output-pane').forEach(p=>p.classList.remove('active'));document.getElementById('pane-'+tab).classList.add('active');document.querySelectorAll('.output-tab').forEach(t=>t.classList.remove('active'));event.target.classList.add('active');}
+
+function runCode(){
+const html = editorInstances.html.getValue();
+const css = editorInstances.css.getValue();
+const js = editorInstances.js.getValue();
+const full = `<!DOCTYPE html>\n<html><head><style>${css}</style></head><body>${html}\n<script>${js}<\/script></body></html>`;
+const frame = document.getElementById('preview-frame');
+frame.srcdoc = full;
+document.getElementById('console-log').innerHTML = '<div style="color:var(--muted);font-size:.8rem">Code executed. Check Preview tab.</div>';
+switchOutput('preview');
+}
+
+function formatCode(){
+const cm = editorInstances[currentEditorTab];
+const totalLines = cm.lineCount();
+cm.operation(()=>{for(let i=0;i<totalLines;i++)cm.indentLine(i,'smart');});
+showToast('Code formatted','info');
+}
+
+function newProject(){
+const name = prompt('Project name:','project-'+(projects.length+1));
+if(!name) return;
+projects.push({name,html:'',css:'',js:''});
+saveProjects();
+currentProject = projects[projects.length-1];
+Object.entries(editorInstances).forEach(([k,v])=>v.setValue(''));
+document.getElementById('project-name').value = name;
+renderProjects();
+showToast('New project created','success');
+}
+
+function exportProject(){
+const html = editorInstances.html.getValue();
+const css = editorInstances.css.getValue();
+const js = editorInstances.js.getValue();
+const full = `<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width,initial-scale=1.0">\n<title>${currentProject.name}</title>\n<style>\n${css}\n</style>\n</head>\n<body>\n${html}\n<script>\n${js}\n</script>\n</body>\n</html>`;
+const blob = new Blob([full],{type:'text/html'});
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');a.href=url;a.download=(currentProject.name||'project')+'.html';a.click();
+URL.revokeObjectURL(url);
+showToast('Project exported!','success');
+}
+
+function renderProjects(){
+const el = document.getElementById('sidebar-projects');
+el.innerHTML = projects.map((p,i)=>`<div style="padding:8px 10px;border-radius:6px;cursor:pointer;font-size:.78rem;margin-bottom:3px;${p===currentProject?'background:rgba(37,99,235,0.06);color:#2563eb;font-weight:600':'color:#475569'}" onclick="loadProject(${i})">📄 ${p.name||'untitled'}</div>`).join('');
+document.getElementById('project-name').value = currentProject.name||'untitled';
+}
+
+function loadProject(i){
+currentProject = projects[i];
+Object.entries(editorInstances).forEach(([k,v])=>v.setValue(currentProject[k]||''));
+document.getElementById('project-name').value = currentProject.name||'untitled';
+renderProjects();
+runCode();
+}
+
+// ═══════════════ TUTORIALS ═══════════════
+const TUTORIALS = [
+{title:'Quick Start',icon:'🚀',content:'1. Select an AI provider above (MiMo is free, no credit card)\n2. Click Settings → enter your API key\n3. Ask AI to write code in the chat panel\n4. Click Run to see your code live'},
+{title:'Build a Landing Page',icon:'🎨',content:'Ask AI: "Create a modern landing page with a hero section, features grid, and contact form." Click Run to preview. Edit any part yourself.'},
+{title:'API Integration',icon:'🔌',content:'Ask AI to write fetch() calls to any API. The JS editor has full browser API access. Try: "Fetch and display Bitcoin price from CoinGecko API."'},
+{title:'Switch Providers',icon:'🔄',content:'Click the provider dropdown in the top bar. Choose between MiMo (free), OpenAI, Anthropic, Groq, Google, DeepSeek, xAI, and more. Each needs its own API key.'},
+{title:'Save & Export',icon:'💾',content:'Projects auto-save to your browser. Click the download button in the toolbar to export as a complete HTML file. Share it, deploy it, whatever.'},
+];
+
+function renderTutorials(){
+document.getElementById('sidebar-tutorials').innerHTML = TUTORIALS.map(t=>`
+<div style="padding:10px;margin-bottom:6px;background:var(--surface);border:1px solid var(--border);border-radius:8px;cursor:pointer" onclick="this.querySelector('.tut-body').style.display=this.querySelector('.tut-body').style.display==='none'?'block':'none'">
+<div style="display:flex;align-items:center;gap:8px;font-size:.8rem;font-weight:600"><span>${t.icon}</span> ${t.title}</div>
+<div class="tut-body" style="display:none;margin-top:8px;font-size:.76rem;color:var(--muted);line-height:1.6;white-space:pre-line">${t.content}</div>
+</div>`).join('');
+}
+
+function switchTab(tab){
+document.querySelectorAll('.sidebar-tab').forEach(t=>t.classList.remove('active'));
+event.target.classList.add('active');
+document.getElementById('sidebar-projects').style.display = tab==='projects'?'block':'none';
+document.getElementById('sidebar-tutorials').style.display = tab==='tutorials'?'block':'none';
+if(tab==='tutorials') renderTutorials();
+}
+
+// ═══════════════ AI CHAT ═══════════════
+function getApiKey(){return localStorage.getItem('gb_key_'+currentProvider)||'';}
+function getModel(){return localStorage.getItem('gb_model')||PROVIDERS[currentProvider].models[0];}
+
+async function sendAIMessage(){
+const input = document.getElementById('ai-input');
+const text = input.value.trim();
+if(!text||isAIStreaming) return;
+const apiKey = getApiKey();
+input.value = '';
+addAIMessage('user',text);
+
+const currentCode = {html:editorInstances.html.getValue(),css:editorInstances.css.getValue(),js:editorInstances.js.getValue()};
+const systemPrompt = `You are a web development AI assistant. Help the user write HTML/CSS/JS code.
+
+CURRENT CODE:
+HTML: ${currentCode.html.slice(0,1500)}
+CSS: ${currentCode.css.slice(0,800)}
+JS: ${currentCode.js.slice(0,800)}
+
+RULES:
+1. Provide COMPLETE code — never partial snippets
+2. When building new projects, provide ALL THREE: html, css, js blocks
+3. Use modern CSS (flexbox, grid, variables)
+4. Use fenced code blocks with language tags: \`\`\`html ... \`\`\` \`\`\`css ... \`\`\` \`\`\`js ... \`\`\`
+5. Be concise — let the code speak`;
+
+aiHistory.push({role:'user',content:text});
+const assistantDiv = addAIMessage('assistant','');
+const textEl = assistantDiv.querySelector('.ai-msg-text');
+textEl.innerHTML = '<span style="color:var(--muted)">Thinking...</span>';
+isAIStreaming = true;
+document.getElementById('ai-send-btn').disabled = true;
+let fullResponse = '';
+
+try {
+if(!apiKey){textEl.innerHTML='<span style="color:#f59e0b">⚠️ No API key. Click <i class="fas fa-cog"></i> Settings to add your key. MiMo is free — no credit card needed.</span>';isAIStreaming=false;document.getElementById('ai-send-btn').disabled=false;return;}
+
+const provider = PROVIDERS[currentProvider];
+const body = provider.format==='anthropic' ? {model:getModel(),system:systemPrompt,messages:aiHistory.slice(-10).map(m=>({role:m.role,content:m.content})),max_tokens:4096,stream:true} :
+provider.format==='google' ? {contents:[{parts:[{text:systemPrompt+'\n\nUser: '+text}]}],generationConfig:{maxOutputTokens:4096}} :
+{model:getModel(),messages:[{role:'system',content:systemPrompt},...aiHistory.slice(-10)],temperature:.7,max_tokens:4096,stream:true};
+
+const headers = {'Content-Type':'application/json'};
+headers[provider.auth==='x-api-key'?'x-api-key':'Authorization'] = provider.auth==='x-api-key' ? apiKey : 'Bearer '+apiKey;
+if(provider.format==='google') headers['x-goog-api-key'] = apiKey;
+
+const resp = await fetch(provider.url,{method:'POST',headers,body:JSON.stringify(body)});
+if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error?.message||e.message||'API error '+resp.status);}
+
+if(provider.format==='anthropic'){
+const reader = resp.body.getReader();const decoder = new TextDecoder();let buf='';
+while(true){const{done,value}=await reader.read();if(done)break;buf+=decoder.decode(value,{stream:true});
+const lines=buf.split('\n');buf=lines.pop();
+for(const line of lines){if(line.startsWith('data:')){const d=line.slice(5).trim();if(!d||d==='[DONE]')continue;
+try{const j=JSON.parse(d);if(j.type==='content_block_delta'&&j.delta?.text){fullResponse+=j.delta.text;textEl.textContent=fullResponse;}}catch{}}}}
+}else if(provider.format==='google'){
+const j=await resp.json();
+fullResponse=j.candidates?.[0]?.content?.parts?.[0]?.text||'No response';
+textEl.textContent=fullResponse;
+}else{
+const reader=resp.body.getReader();const decoder=new TextDecoder();let buf='';
+while(true){const{done,value}=await reader.read();if(done)break;buf+=decoder.decode(value,{stream:true});
+const lines=buf.split('\n');buf=lines.pop();
+for(const line of lines){if(line.startsWith('data:')){const d=line.slice(5).trim();if(!d||d==='[DONE]')continue;
+try{const j=JSON.parse(d);const c=j.choices?.[0]?.delta?.content;if(c){fullResponse+=c;textEl.textContent=fullResponse;}}catch{}}}}
+}
+}catch(e){textEl.innerHTML='<span style="color:#dc2626">❌ '+e.message+'</span>';}
+
+isAIStreaming=false;document.getElementById('ai-send-btn').disabled=false;
+if(fullResponse){aiHistory.push({role:'assistant',content:fullResponse});applyCodeFromResponse(fullResponse);}
+}
+
+function addAIMessage(role,content){
+const el=document.getElementById('ai-messages');
+const div=document.createElement('div');div.className='ai-msg '+role;
+const textSpan=document.createElement('div');textSpan.className='ai-msg-text';
+if(content)textSpan.textContent=content;
+div.appendChild(textSpan);el.appendChild(div);el.scrollTop=el.scrollHeight;
+return div;
+}
+
+function applyCodeFromResponse(text){
+const htmlMatch=text.match(/```html\n?([\s\S]*?)```/);
+const cssMatch=text.match(/```css\n?([\s\S]*?)```/);
+const jsMatch=text.match(/```(?:js|javascript)\n?([\s\S]*?)```/);
+if(htmlMatch){editorInstances.html.setValue(htmlMatch[1].trim());currentEditorTab='html';switchEditorTab('html');}
+if(cssMatch)editorInstances.css.setValue(cssMatch[1].trim());
+if(jsMatch)editorInstances.js.setValue(jsMatch[1].trim());
+if(htmlMatch||cssMatch||jsMatch){runCode();showToast('AI code applied! Check Preview tab.','success');}
+}
+
+function showToast(m,t){const d=document.createElement('div');d.className='toast '+t;d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),2500);}
+
+init();
+</script>
+</body>
+</html>
