@@ -1,837 +1,446 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agents — GitBlock</title>
-    <link rel="icon" href="assets/gitblock.jpg">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f8fafc;
-            color: #1e293b;
-            line-height: 1.6;
-        }
-        body::before {
-            content: '';
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-image:
-                linear-gradient(rgba(37,99,235,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(37,99,235,0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-            pointer-events: none; z-index: 0;
-        }
-        body > *:not(script) { position: relative; z-index: 1; }
-
-        header {
-            position: fixed; top: 0; left: 0; width: 100%;
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(14px);
-            border-bottom: 1px solid rgba(37,99,235,0.1);
-            z-index: 1000;
-        }
-        .header-inner {
-            max-width: 1200px; margin: 0 auto; padding: 0 24px;
-            display: flex; align-items: center; justify-content: space-between; height: 60px;
-        }
-        .logo {
-            display: flex; align-items: center; gap: 10px;
-            text-decoration: none; color: #2563eb; font-weight: 800; font-size: 1.15rem;
-        }
-        .logo img { width: 32px; height: 32px; border-radius: 8px; object-fit: cover; }
-        nav { display: flex; gap: 24px; }
-        nav a { text-decoration: none; color: #64748b; font-size: 0.88rem; font-weight: 500; transition: color 0.15s; }
-        nav a:hover, nav a.active { color: #2563eb; }
-        nav a.active { font-weight: 600; }
-        .hamburger { display: none; background: none; border: none; font-size: 1.3rem; color: #2563eb; cursor: pointer; }
-        .mobile-menu { display: none; position: fixed; top: 60px; left: 0; width: 100%; background: rgba(255,255,255,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(37,99,235,0.1); flex-direction: column; padding: 16px 24px; gap: 12px; z-index: 999; }
-        .mobile-menu.open { display: flex; }
-        .mobile-menu a { text-decoration: none; color: #475569; font-size: 1rem; font-weight: 500; padding: 8px 0; border-bottom: 1px solid rgba(37,99,235,0.06); }
-
-        main { max-width: 900px; margin: 0 auto; padding: 80px 24px 40px; }
-
-        .setup-card {
-            background: #fff; border: 1px solid rgba(37,99,235,0.1); border-radius: 16px; padding: 24px; margin-bottom: 24px;
-        }
-        .setup-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 12px; color: #0f172a; }
-        .setup-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
-        .setup-field { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 4px; }
-        .setup-field label { font-size: 0.75rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
-        .setup-field input, .setup-field select {
-            padding: 9px 12px; border: 1px solid rgba(37,99,235,0.15); border-radius: 8px; font-size: 0.88rem;
-            font-family: 'Inter', sans-serif; color: #1e293b; background: #fafbfc;
-        }
-        .setup-field input:focus, .setup-field select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.06); }
-        .setup-field .hint { font-size: 0.7rem; color: #94a3b8; }
-        .setup-field .hint a { color: #2563eb; }
-
-        .btn {
-            display: inline-flex; align-items: center; gap: 7px;
-            padding: 10px 22px; border-radius: 8px; font-size: 0.88rem; font-weight: 600;
-            cursor: pointer; border: none; text-decoration: none; transition: all 0.15s; font-family: 'Inter', sans-serif;
-        }
-        .btn-primary { background: #2563eb; color: #fff; box-shadow: 0 2px 8px rgba(37,99,235,0.25); }
-        .btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); }
-        .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; }
-        .btn-outline { background: #fff; color: #2563eb; border: 1.5px solid rgba(37,99,235,0.2); }
-        .btn-outline:hover { border-color: #2563eb; }
-        .btn-danger { background: #fff; color: #ef4444; border: 1.5px solid rgba(239,68,68,0.2); }
-        .btn-danger:hover { background: #fef2f2; border-color: #ef4444; }
-        .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
-
-        .status-row {
-            display: flex; align-items: center; gap: 10px; padding: 10px 16px;
-            border-radius: 10px; margin-bottom: 16px; font-size: 0.85rem; font-weight: 500;
-        }
-        .status-row.idle { background: rgba(148,163,184,0.08); color: #64748b; }
-        .status-row.running { background: rgba(16,185,129,0.08); color: #059669; }
-        .status-row.error { background: rgba(239,68,68,0.08); color: #dc2626; }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-        .status-idle { background: #94a3b8; }
-        .status-running { background: #10b981; animation: pulse 1.5s infinite; }
-        .status-error { background: #ef4444; }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-        .output-panel {
-            background: #0f172a; border-radius: 14px; padding: 20px; margin-bottom: 24px;
-            max-height: 500px; overflow-y: auto; font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem; line-height: 1.7; color: #e2e8f0;
-        }
-        .output-panel .turn-header { color: #60a5fa; font-weight: 600; margin: 12px 0 6px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); }
-        .output-panel .turn-header:first-child { margin-top: 0; padding-top: 0; border: none; }
-        .output-panel .tool-call { color: #fbbf24; }
-        .output-panel .tool-result { color: #94a3b8; font-size: 0.75rem; }
-        .output-panel .agent-output { color: #e2e8f0; white-space: pre-wrap; }
-        .output-panel .error-msg { color: #f87171; }
-        .output-panel .info-msg { color: #94a3b8; font-style: italic; }
-
-        .memory-panel {
-            background: #fff; border: 1px solid rgba(37,99,235,0.1); border-radius: 14px; padding: 20px; margin-bottom: 24px;
-        }
-        .memory-panel h4 { font-size: 0.9rem; font-weight: 700; color: #0f172a; margin-bottom: 10px; }
-        .memory-item { padding: 8px 0; border-bottom: 1px solid rgba(37,99,235,0.05); font-size: 0.84rem; display: flex; justify-content: space-between; }
-        .memory-item .mk { font-weight: 600; color: #2563eb; }
-        .memory-item .mv { color: #475569; }
-
-        .templates-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
-        .tpl-card {
-            background: #fff; border: 2px solid rgba(37,99,235,0.08); border-radius: 14px; padding: 20px;
-            cursor: pointer; transition: all 0.15s;
-        }
-        .tpl-card:hover { border-color: rgba(37,99,235,0.25); box-shadow: 0 4px 16px rgba(37,99,235,0.06); }
-        .tpl-card.active { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
-        .tpl-card h4 { font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
-        .tpl-card .tpl-desc { font-size: 0.8rem; color: #64748b; line-height: 1.5; }
-        .tpl-card .tpl-icon { font-size: 1.3rem; margin-bottom: 8px; }
-
-        footer { text-align: center; padding: 40px 24px; color: #94a3b8; font-size: 0.8rem; border-top: 1px solid rgba(37,99,235,0.06); }
-        footer a { color: #2563eb; text-decoration: none; }
-
-        @media (max-width: 640px) {
-            nav { display: none; }
-            .hamburger { display: block; }
-            .templates-grid { grid-template-columns: 1fr; }
-            .setup-row { flex-direction: column; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agents — GitBlock</title>
+<link rel="icon" href="assets/gitblock.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#f8fafc;color:#1e293b;line-height:1.6}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(37,99,235,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,0.03) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;z-index:0}
+body>*:not(script){position:relative;z-index:1}
+header{position:fixed;top:0;left:0;width:100%;background:rgba(255,255,255,0.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(37,99,235,0.1);z-index:1000}
+.header-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#2563eb;font-weight:800;font-size:1.15rem}
+.logo img{width:32px;height:32px;border-radius:8px;object-fit:cover}
+nav{display:flex;gap:24px}
+nav a{text-decoration:none;color:#64748b;font-size:.88rem;font-weight:500;transition:color .15s}
+nav a:hover,nav a.active{color:#2563eb}
+nav a.active{font-weight:600}
+.hamburger{display:none;background:none;border:none;font-size:1.3rem;color:#2563eb;cursor:pointer}
+.mobile-menu{display:none;position:fixed;top:60px;left:0;width:100%;background:rgba(255,255,255,0.98);backdrop-filter:blur(12px);border-bottom:1px solid rgba(37,99,235,0.1);flex-direction:column;padding:16px 24px;gap:12px;z-index:999}
+.mobile-menu.open{display:flex}
+.mobile-menu a{text-decoration:none;color:#475569;font-size:1rem;font-weight:500;padding:8px 0;border-bottom:1px solid rgba(37,99,235,0.06)}
+main{max-width:900px;margin:0 auto;padding:80px 24px 40px}
+.setup-card{background:#fff;border:1px solid rgba(37,99,235,0.1);border-radius:16px;padding:24px;margin-bottom:24px}
+.setup-card h3{font-size:1.05rem;font-weight:700;margin-bottom:12px;color:#0f172a}
+.setup-row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+.setup-field{flex:1;min-width:180px;display:flex;flex-direction:column;gap:4px}
+.setup-field label{font-size:.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
+.setup-field input,.setup-field select{padding:9px 12px;border:1px solid rgba(37,99,235,0.15);border-radius:8px;font-size:.88rem;font-family:'Inter',sans-serif;color:#1e293b;background:#fafbfc}
+.setup-field input:focus,.setup-field select:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,0.06)}
+.setup-field .hint{font-size:.7rem;color:#94a3b8}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 22px;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:all .15s;font-family:'Inter',sans-serif}
+.btn-primary{background:#2563eb;color:#fff;box-shadow:0 2px 8px rgba(37,99,235,0.25)}
+.btn-primary:hover{background:#1d4ed8;transform:translateY(-1px)}
+.btn-primary:disabled{background:#94a3b8;cursor:not-allowed;box-shadow:none}
+.btn-outline{background:#fff;color:#2563eb;border:1.5px solid rgba(37,99,235,0.2)}
+.btn-outline:hover{border-color:#2563eb}
+.btn-danger{background:#fff;color:#ef4444;border:1.5px solid rgba(239,68,68,0.2)}
+.btn-danger:hover{background:#fef2f2;border-color:#ef4444}
+.btn-sm{padding:6px 14px;font-size:.8rem}
+.status-row{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;margin-bottom:16px;font-size:.85rem;font-weight:500}
+.status-row.idle{background:rgba(148,163,184,0.08);color:#64748b}
+.status-row.running{background:rgba(16,185,129,0.08);color:#059669}
+.status-row.error{background:rgba(239,68,68,0.08);color:#dc2626}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.status-idle{background:#94a3b8}
+.status-running{background:#10b981;animation:pulse 1.5s infinite}
+.status-error{background:#ef4444}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.output-panel{background:#0f172a;border-radius:14px;padding:20px;margin-bottom:24px;max-height:500px;overflow-y:auto;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.7;color:#e2e8f0}
+.output-panel .turn-header{color:#60a5fa;font-weight:600;margin:12px 0 6px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06)}
+.output-panel .turn-header:first-child{margin-top:0;padding-top:0;border:none}
+.output-panel .tool-call{color:#fbbf24}
+.output-panel .tool-result{color:#94a3b8;font-size:.75rem}
+.output-panel .agent-output{color:#e2e8f0;white-space:pre-wrap}
+.output-panel .error-msg{color:#f87171}
+.output-panel .info-msg{color:#94a3b8;font-style:italic}
+.memory-panel{background:#fff;border:1px solid rgba(37,99,235,0.1);border-radius:14px;padding:20px;margin-bottom:24px}
+.memory-panel h4{font-size:.9rem;font-weight:700;color:#0f172a;margin-bottom:10px}
+.memory-item{padding:8px 0;border-bottom:1px solid rgba(37,99,235,0.05);font-size:.84rem;display:flex;justify-content:space-between}
+.memory-item .mk{font-weight:600;color:#2563eb}
+.memory-item .mv{color:#475569}
+.templates-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:24px}
+.tpl-card{background:#fff;border:2px solid rgba(37,99,235,0.08);border-radius:14px;padding:20px;cursor:pointer;transition:all .15s}
+.tpl-card:hover{border-color:rgba(37,99,235,0.25);box-shadow:0 4px 16px rgba(37,99,235,0.06)}
+.tpl-card.active{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,0.08)}
+.tpl-card h4{font-size:.95rem;font-weight:700;color:#0f172a;margin-bottom:4px}
+.tpl-card .tpl-desc{font-size:.8rem;color:#64748b;line-height:1.5}
+.tpl-card .tpl-icon{font-size:1.3rem;margin-bottom:8px}
+footer{text-align:center;padding:40px 24px;color:#94a3b8;font-size:.8rem;border-top:1px solid rgba(37,99,235,0.06)}
+footer a{color:#2563eb;text-decoration:none}
+@media(max-width:640px){nav{display:none}.hamburger{display:block}.templates-grid{grid-template-columns:1fr}.setup-row{flex-direction:column}}
+</style>
 </head>
 <body>
 
 <header id="header">
-    <div class="header-inner">
-        <a href="index.html" class="logo">
-            <img src="assets/gitblock.jpg" alt="GitBlock"><span>GitBlock</span>
-        </a>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="usage.html">Docs</a>
-            <a href="editor.html">Editor</a>
-            <a href="playground.html">Playground</a>
-            <a href="agents.html" class="active">Agents</a>
-        </nav>
-        <button class="hamburger" onclick="document.getElementById('mobile-menu').classList.toggle('open')"><i class="fas fa-bars"></i></button>
-    </div>
+<div class="header-inner">
+<a href="index.html" class="logo"><img src="assets/gitblock.jpg" alt="GitBlock"><span>GitBlock</span></a>
+<nav>
+<a href="index.html">Home</a><a href="usage.html">Docs</a><a href="editor.html">Editor</a><a href="playground.html">Playground</a><a href="agents.html" class="active">Agents</a>
+</nav>
+<button class="hamburger" onclick="document.getElementById('mobile-menu').classList.toggle('open')"><i class="fas fa-bars"></i></button>
+</div>
 </header>
 <div class="mobile-menu" id="mobile-menu">
-    <a href="index.html">Home</a><a href="usage.html">Docs</a><a href="editor.html">Editor</a><a href="playground.html">Playground</a><a href="agents.html">Agents</a>
+<a href="index.html">Home</a><a href="usage.html">Docs</a><a href="editor.html">Editor</a><a href="playground.html">Playground</a><a href="agents.html">Agents</a>
 </div>
 
 <main>
 
-<!-- Setup -->
 <div class="setup-card">
-    <h3><i class="fas fa-microchip"></i> AI Engine — <span style="color:#059669;">Local (No API Key Needed)</span></h3>
-    <p style="font-size:0.84rem;color:#64748b;margin-bottom:14px;">
-        <strong>Runs AI models directly in your browser.</strong> Uses WebGPU — models download once (~1-2GB) then run offline.
-        No API keys, no servers, no accounts. <span id="local-ai-status" style="color:#2563eb;">Initializing...</span>
-    </p>
-    <div class="setup-row">
-        <div class="setup-field">
-            <label>Model Size</label>
-            <select id="model-select" onchange="switchModel(this.value)">
-                <option value="fast">Fast (1B) — instant responses</option>
-                <option value="balanced" selected>Balanced (2B) — good quality</option>
-                <option value="best">Best (3B) — best quality, needs more GPU</option>
-            </select>
-        </div>
-        <div class="setup-field">
-            <label>Cloud API Key (optional — better models)</label>
-            <input type="password" id="api-key" placeholder="Get free key at platform.xiaomimimo.com">
-            <span class="hint" id="key-status">Not set · Using local AI</span>
-        </div>
-        <button class="btn btn-outline btn-sm" onclick="saveSettings()"><i class="fas fa-save"></i> Save</button>
-        <button class="btn btn-outline btn-sm" id="btn-init-ai" onclick="initLocalAI()"><i class="fas fa-download"></i> Load AI Model</button>
-    </div>
+<h3><i class="fas fa-microchip"></i> AI Engine — <span style="color:#059669;">Free · No Key Needed</span></h3>
+<p style="font-size:.84rem;color:#64748b;margin-bottom:14px">
+Powered by <strong>Puter.js</strong> — free access to GPT, Claude, Gemini, Llama, and 400+ models.
+No API keys, no signup, no credit card. Runs directly from your browser.
+<span id="ai-status" style="color:#2563eb;">Loading AI engine...</span>
+</p>
 </div>
 
-<!-- Templates -->
 <div class="templates-grid" id="templates">
-    <div class="tpl-card" data-skill="crypto-monitor" onclick="selectSkill('crypto-monitor')">
-        <div class="tpl-icon">📈</div>
-        <h4>Crypto Monitor</h4>
-        <p class="tpl-desc">Checks token prices every 30 min. Alerts on 5%+ moves. Uses CoinGecko for real data.</p>
-    </div>
-    <div class="tpl-card" data-skill="morning-brief" onclick="selectSkill('morning-brief')">
-        <div class="tpl-icon">🌅</div>
-        <h4>Morning Brief</h4>
-        <p class="tpl-desc">Daily digest of AI/crypto news. Searches the web, curates top stories, delivers summary.</p>
-    </div>
-    <div class="tpl-card" data-skill="market-scanner" onclick="selectSkill('market-scanner')">
-        <div class="tpl-icon">🔍</div>
-        <h4>Market Scanner</h4>
-        <p class="tpl-desc">Scans prediction markets (Polymarket) for big moves. Reports volume spikes and price swings.</p>
-    </div>
-    <div class="tpl-card" data-skill="sentiment-tracker" onclick="selectSkill('sentiment-tracker')">
-        <div class="tpl-icon">💬</div>
-        <h4>Sentiment Tracker</h4>
-        <p class="tpl-desc">Tracks social sentiment for any token. Searches X/Reddit mentions, scores bullish/bearish.</p>
-    </div>
+<div class="tpl-card active" data-skill="crypto-monitor" onclick="selectSkill('crypto-monitor')">
+<div class="tpl-icon">📈</div><h4>Crypto Monitor</h4><p class="tpl-desc">Checks token prices. Alerts on 5%+ moves. Uses CoinGecko for real data.</p>
+</div>
+<div class="tpl-card" data-skill="morning-brief" onclick="selectSkill('morning-brief')">
+<div class="tpl-icon">🌅</div><h4>Morning Brief</h4><p class="tpl-desc">Daily digest of AI/crypto news. Searches the web, curates top stories.</p>
+</div>
+<div class="tpl-card" data-skill="market-scanner" onclick="selectSkill('market-scanner')">
+<div class="tpl-icon">🔍</div><h4>Market Scanner</h4><p class="tpl-desc">Scans Polymarket for big moves. Reports volume spikes and price swings.</p>
+</div>
+<div class="tpl-card" data-skill="sentiment-tracker" onclick="selectSkill('sentiment-tracker')">
+<div class="tpl-icon">💬</div><h4>Sentiment Tracker</h4><p class="tpl-desc">Tracks social sentiment for any token. Scores bullish/bearish.</p>
+</div>
 </div>
 
-<!-- Config -->
 <div class="setup-card">
-    <h3><i class="fas fa-sliders"></i> Agent Config</h3>
-    <div class="setup-row">
-        <div class="setup-field">
-            <label>Focus Target</label>
-            <input type="text" id="agent-var" placeholder="e.g. $GITBLOCK, bitcoin, ethereum">
-            <span class="hint">Token, topic, or market to monitor</span>
-        </div>
-        <div class="setup-field">
-            <label>Run Interval</label>
-            <select id="agent-interval">
-                <option value="5">Every 5 min (testing)</option>
-                <option value="30" selected>Every 30 min</option>
-                <option value="60">Every hour</option>
-                <option value="360">Every 6 hours</option>
-                <option value="1440">Every 24 hours</option>
-            </select>
-        </div>
-        <div class="setup-field">
-            <label>Max Turns / Session</label>
-            <select id="agent-max-turns">
-                <option value="3">3 (quick check)</option>
-                <option value="5" selected>5 (standard)</option>
-                <option value="10">10 (deep research)</option>
-                <option value="20">20 (exhaustive)</option>
-            </select>
-        </div>
-    </div>
+<h3><i class="fas fa-sliders"></i> Agent Config</h3>
+<div class="setup-row">
+<div class="setup-field"><label>Focus Target</label><input type="text" id="agent-var" value="bitcoin" placeholder="e.g. $GITBLOCK, bitcoin"><span class="hint">Token, topic, or market to monitor</span></div>
+<div class="setup-field"><label>Run Interval</label><select id="agent-interval"><option value="5">Every 5 min (testing)</option><option value="30" selected>Every 30 min</option><option value="60">Every hour</option><option value="360">Every 6 hours</option></select></div>
+<div class="setup-field"><label>Max Turns</label><select id="agent-max-turns"><option value="2">2 (quick)</option><option value="4" selected>4 (standard)</option><option value="8">8 (deep)</option></select></div>
+</div>
 </div>
 
-<!-- Controls -->
-<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
-    <button class="btn btn-primary" id="btn-start" onclick="startAgent()"><i class="fas fa-play"></i> Start Agent</button>
-    <button class="btn btn-outline" id="btn-stop" onclick="stopAgent()" style="display:none;"><i class="fas fa-stop"></i> Stop Agent</button>
-    <button class="btn btn-outline" id="btn-run-once" onclick="runOnce()"><i class="fas fa-forward-step"></i> Run Once Now</button>
-    <button class="btn btn-danger btn-sm" onclick="clearMemory()"><i class="fas fa-trash"></i> Clear Memory</button>
-    <span style="font-size:0.8rem;color:#94a3b8;display:flex;align-items:center;margin-left:auto;" id="next-run-display"></span>
+<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+<button class="btn btn-primary" id="btn-start" onclick="startAgent()"><i class="fas fa-play"></i> Start Agent</button>
+<button class="btn btn-outline" id="btn-stop" onclick="stopAgent()" style="display:none"><i class="fas fa-stop"></i> Stop</button>
+<button class="btn btn-outline" id="btn-run-once" onclick="runOnce()"><i class="fas fa-forward-step"></i> Run Once Now</button>
+<button class="btn btn-danger btn-sm" onclick="clearMemory()"><i class="fas fa-trash"></i> Clear Memory</button>
+<span style="font-size:.8rem;color:#94a3b8;display:flex;align-items:center;margin-left:auto" id="next-run-display"></span>
 </div>
 
-<!-- Status -->
 <div class="status-row idle" id="status-bar">
-    <div class="status-dot status-idle" id="status-dot"></div>
-    <span id="status-text">Ready. Select a skill, configure, and start your agent.</span>
+<div class="status-dot status-idle" id="status-dot"></div>
+<span id="status-text">Ready. Pick a skill and click "Run Once Now" to test.</span>
 </div>
 
-<!-- Output -->
-<div class="output-panel" id="output-panel">
-    <span class="info-msg">Agent output will appear here. Click "Run Once Now" to test your setup.</span>
-</div>
+<div class="output-panel" id="output-panel"><span class="info-msg">Agent output appears here. Click "Run Once Now" to start.</span></div>
 
-<!-- Memory -->
-<div class="memory-panel" id="memory-panel" style="display:none;">
-    <h4><i class="fas fa-brain"></i> Agent Memory</h4>
-    <div id="memory-list"><span style="color:#94a3b8;font-size:0.82rem;">No memory yet. Memory builds as the agent runs.</span></div>
+<div class="memory-panel" id="memory-panel" style="display:none">
+<h4><i class="fas fa-brain"></i> Agent Memory</h4>
+<div id="memory-list"><span style="color:#94a3b8;font-size:.82rem">Memory builds as the agent runs.</span></div>
 </div>
 
 </main>
 
 <footer>
-    <p>GitBlock Agents · Powered by MiMo AI · Runs locally in your browser — no servers needed</p>
-    <p style="margin-top:4px;">&copy; 2026 GitBlock — Intelligence Without Gatekeepers</p>
+<p>GitBlock Agents · Powered by Puter.js (free LLM) · Zero API keys · Runs in your browser</p>
+<p style="margin-top:4px">&copy; 2026 GitBlock — Intelligence Without Gatekeepers</p>
 </footer>
 
-<script src="gb-inference.js"></script>
+<script src="https://js.puter.com/v2/"></script>
 <script>
-// ═══════════════════════════════════════════
-// CONFIGURATION
-// ═══════════════════════════════════════════
-const PROXY_URL = 'https://gitblock-api.onrender.com/v1/chat/completions';
-let selectedSkill = '';
+// --- STATE ---
+let selectedSkill = 'crypto-monitor';
 let agentRunning = false;
 let agentTimer = null;
 let nextRunTime = null;
-let localAI = null;  // GitBlockInference instance
-let aiMode = 'local'; // 'local' or 'cloud'
 
-function getApiKey() {
-    return document.getElementById('api-key').value || localStorage.getItem('gb_api_key') || localStorage.getItem('gb_mimo_api_key') || '';
-}
-
-function usingCloudAI() {
-    return aiMode === 'cloud' && getApiKey();
-}
-
-// ═══════════════════════════════════════════
-// LOCAL AI
-// ═══════════════════════════════════════════
-async function initLocalAI(tier) {
-    tier = tier || document.getElementById('model-select').value || 'balanced';
-    const statusEl = document.getElementById('local-ai-status');
-    const btn = document.getElementById('btn-init-ai');
-
-    if (localAI && localAI.isReady) {
-        statusEl.textContent = 'Already running ✓';
-        statusEl.style.color = '#059669';
-        return;
-    }
-
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-    statusEl.textContent = 'Checking WebGPU support...';
-    statusEl.style.color = '#2563eb';
-
-    try {
-        localAI = new GitBlockInference();
-        await localAI.init(tier, (msg) => {
-            statusEl.textContent = msg;
-        });
-        aiMode = 'local';
-        statusEl.textContent = 'Local AI ready ✓ (' + localAI.modelName.split('-')[0] + ')';
-        statusEl.style.color = '#059669';
-        btn.innerHTML = '<i class="fas fa-check"></i> AI Ready';
-        btn.className = 'btn btn-outline btn-sm';
-        document.getElementById('key-status').textContent = 'Not set · Local AI active';
-    } catch (e) {
-        if (e.message === 'NO_WEBGPU') {
-            statusEl.textContent = '⚠️ WebGPU not available. Use Chrome/Edge or add a cloud API key.';
-            statusEl.style.color = '#f59e0b';
-        } else {
-            statusEl.textContent = '⚠️ Failed to load model. Try a smaller model or use cloud key.';
-            statusEl.style.color = '#dc2626';
-        }
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-redo"></i> Retry';
-    }
-}
-
-function switchModel(tier) {
-    if (localAI && localAI.isReady) {
-        // Need to re-init with new model
-        localAI = null;
-        initLocalAI(tier);
-    }
-}
-
-// Auto-init local AI on page load
-setTimeout(() => initLocalAI('balanced'), 500);
-
-// ═══════════════════════════════════════════
-// SKILL PROMPTS
-// ═══════════════════════════════════════════
+// --- SKILL PROMPTS ---
 const SKILLS = {
-    'crypto-monitor': {
-        name: 'Crypto Monitor',
-        system: `You are a cryptocurrency price monitoring agent. Your job: check prices and alert on significant moves.
+  'crypto-monitor': {
+    name: 'Crypto Monitor',
+    prompt: `You are a crypto price monitor. Check prices and report on significant moves.
 
-AVAILABLE TOOLS — you MUST use these, never invent data:
-- get_price(token) — returns {token, price_usd, change_24h_pct, source}
-- search_web(query) — returns {results: [{title, url, snippet}]}
-- save_memory(key, value) — save findings to persistent memory
-- get_time() — returns current UTC time
+TOOLS — use these, never invent data:
+- get_price(token) — returns {token, price_usd, change_24h_pct}
+- search_web(query) — returns search results
+- save_memory(key, value) — save findings
+- get_time() — current UTC time
 
-RULES:
-1. ALWAYS call get_price() for the target token first
-2. If 24h change > 5%, explain what's moving it
-3. If price is stable, report briefly and end
-4. Save any notable observation to memory
-5. Be concise — 5 sentences max
-6. NEVER make up prices or data
+RULES: Call get_price() first. Report price + 24h change. If change >5%, note what's driving it. 4-5 sentences max. Be concise.`
+  },
+  'morning-brief': {
+    name: 'Morning Brief',
+    prompt: `You are a daily news digest agent. Create a morning brief.
 
-Format: Start with "📊 [Token] — $[price] ([change])" then analysis.`,
-        defaultVar: 'bitcoin'
-    },
-    'morning-brief': {
-        name: 'Morning Brief',
-        system: `You are a daily news digest agent. You create a morning brief of top stories.
+TOOLS: search_web(query), save_memory(key, value), get_time()
 
-AVAILABLE TOOLS — you MUST use these:
-- search_web(query) — returns {results: [{title, url, snippet}]}
-- save_memory(key, value) — save to memory
-- get_time() — returns current UTC time
+RULES: Search for 2-3 queries on AI/crypto news. Pick 3-5 top stories. For each: headline + one sentence. Keep under 200 words. End with date. NEVER invent news.`
+  },
+  'market-scanner': {
+    name: 'Market Scanner',
+    prompt: `You are a prediction market scanner.
 
-RULES:
-1. Search for 2-3 queries on current AI/crypto news
-2. Pick the 3-5 most important stories
-3. For each: headline + one-sentence why it matters + source
-4. Keep the brief under 300 words
-5. End with "That's the brief for [today's date]."
-6. NEVER invent news — only report what search returns`,
-        defaultVar: 'AI and cryptocurrency news'
-    },
-    'market-scanner': {
-        name: 'Market Scanner',
-        system: `You are a prediction market scanning agent. You monitor markets for big moves.
+TOOLS: search_web(query), save_memory(key, value), get_time()
 
-AVAILABLE TOOLS:
-- search_web(query) — returns {results: [{title, url, snippet}]}
-- save_memory(key, value) — save to memory
-- get_time() — returns current UTC time
+RULES: Search for Polymarket activity on the target topic. Report notable price/volume moves. Markets are 0-100 cents. Be concise — data and brief read.`
+  },
+  'sentiment-tracker': {
+    name: 'Sentiment Tracker',
+    prompt: `You are a social sentiment analyst.
 
-RULES:
-1. Search for active Polymarket markets on your focus topic
-2. Identify any with significant price or volume moves
-3. Report: market name, current odds, what you think is driving it
-4. Markets are probabilities (0-100 cents). Treat them as such.
-5. Be concise — no fluff, just data and read`,
-        defaultVar: 'crypto prediction markets'
-    },
-    'sentiment-tracker': {
-        name: 'Sentiment Tracker',
-        system: `You are a social sentiment analysis agent. You track what people are saying.
+TOOLS: search_web(query), save_memory(key, value), get_time()
 
-AVAILABLE TOOLS:
-- search_web(query) — returns {results: [{title, url, snippet}]}
-- save_memory(key, value) — save to memory
-- get_time() — returns current UTC time
-
-RULES:
-1. Search for recent mentions/discussions of the target token/topic
-2. Assess sentiment: bullish, bearish, or neutral
-3. Report 2-3 representative takes with source links
-4. Give a 1-line sentiment verdict
-5. Be objective — don't hype, don't FUD
-6. Save sentiment score to memory for trend tracking`,
-        defaultVar: '$GITBLOCK'
-    }
+RULES: Search for recent mentions of the target. Assess bullish/bearish/neutral. 2-3 representative takes with sources. One-line verdict. Save sentiment to memory.`
+  }
 };
 
-// ═══════════════════════════════════════════
-// TOOLS (real implementations)
-// ═══════════════════════════════════════════
+// --- TOOLS ---
 async function executeTool(name, args) {
-    switch (name) {
-        case 'get_price':
-            return await toolGetPrice(args.token || 'bitcoin');
-        case 'search_web':
-            return await toolSearchWeb(args.query || '');
-        case 'save_memory':
-            return toolSaveMemory(args.key, args.value);
-        case 'get_time':
-            return toolGetTime();
-        default:
-            return { error: `Unknown tool: ${name}` };
-    }
+  switch(name) {
+    case 'get_price': return await toolGetPrice(args.token || 'bitcoin');
+    case 'search_web': return await toolSearchWeb(args.query || '');
+    case 'save_memory': return toolSaveMemory(args.key, args.value);
+    case 'get_time': return toolGetTime();
+    default: return {error: 'Unknown tool: '+name};
+  }
 }
 
 async function toolGetPrice(token) {
-    const tokenMap = {
-        'bitcoin': 'bitcoin', 'btc': 'bitcoin',
-        'ethereum': 'ethereum', 'eth': 'ethereum',
-        'solana': 'solana', 'sol': 'solana',
-        'gitblock': 'gitblock', 'gblock': 'gitblock',
-        'dogecoin': 'dogecoin', 'doge': 'dogecoin',
-        'cardano': 'cardano', 'ada': 'cardano',
-    };
-    const id = tokenMap[token.toLowerCase().replace('$','')] || token.toLowerCase().replace('$','');
-    try {
-        const resp = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd&include_24hr_change=true`, {
-            headers: { 'Accept': 'application/json' }
-        });
-        const data = await resp.json();
-        if (data[id]) {
-            return { token, price_usd: data[id].usd, change_24h_pct: data[id].usd_24h_change || 0, source: 'CoinGecko' };
-        }
-        return { error: `Token "${token}" not found on CoinGecko`, token };
-    } catch (e) {
-        return { error: `Price fetch failed: ${e.message}`, token };
-    }
+  const map = {bitcoin:'bitcoin',btc:'bitcoin',ethereum:'ethereum',eth:'ethereum',solana:'solana',sol:'solana',dogecoin:'dogecoin',doge:'dogecoin'};
+  const id = map[token.toLowerCase().replace('$','')] || token.toLowerCase().replace('$','');
+  try {
+    const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd&include_24hr_change=true`);
+    const d = await r.json();
+    if (d[id]) return {token, price_usd:d[id].usd, change_24h_pct:d[id].usd_24h_change||0, source:'CoinGecko'};
+    return {error:'Token not found', token};
+  } catch(e) { return {error:'Price fetch failed: '+e.message, token}; }
 }
 
 async function toolSearchWeb(query) {
-    try {
-        const resp = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1`, {
-            headers: { 'User-Agent': 'GitBlock-Agent/1.0' }
-        });
-        const data = await resp.json();
-        const results = (data.RelatedTopics || []).slice(0, 5).map(t => ({
-            title: (t.Text || '').split(' - ')[0] || t.Text?.substring(0, 80),
-            url: t.FirstURL || '',
-            snippet: t.Text || ''
-        })).filter(r => r.snippet);
-        return { results: results.length ? results : [], query };
-    } catch (e) {
-        return { error: `Search failed: ${e.message}`, results: [], query };
-    }
+  try {
+    const r = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1`);
+    const d = await r.json();
+    const results = (d.RelatedTopics||[]).slice(0,5).map(t=>({title:(t.Text||'').split(' - ')[0]||'',url:t.FirstURL||'',snippet:t.Text||''})).filter(x=>x.snippet);
+    return {results:results.length?results:[], query};
+  } catch(e) { return {error:'Search failed: '+e.message, results:[], query}; }
 }
 
 function toolSaveMemory(key, value) {
-    const mem = JSON.parse(localStorage.getItem('gb_agent_memory') || '{}');
-    mem[key] = { value, timestamp: new Date().toISOString() };
-    localStorage.setItem('gb_agent_memory', JSON.stringify(mem));
-    renderMemory();
-    return { saved: true, key, preview: value.substring(0, 100) };
+  const mem = JSON.parse(localStorage.getItem('gb_agent_memory')||'{}');
+  mem[key] = {value, timestamp: new Date().toISOString()};
+  localStorage.setItem('gb_agent_memory', JSON.stringify(mem));
+  renderMemory();
+  return {saved:true, key};
 }
 
 function toolGetTime() {
-    const now = new Date();
-    return { utc: now.toISOString(), unix: Math.floor(now.getTime()/1000), readable: now.toUTCString() };
+  return {utc:new Date().toISOString(), readable:new Date().toUTCString()};
 }
 
-// ═══════════════════════════════════════════
-// TOOL DEFINITIONS (for MiMo function calling)
-// ═══════════════════════════════════════════
-const TOOLS = [
-    {
-        type: 'function',
-        function: {
-            name: 'get_price',
-            description: 'Get current price and 24h change for a cryptocurrency token from CoinGecko.',
-            parameters: {
-                type: 'object',
-                properties: { token: { type: 'string', description: 'Token name or symbol (e.g. bitcoin, ethereum, solana)' } },
-                required: ['token']
-            }
-        }
-    },
-    {
-        type: 'function',
-        function: {
-            name: 'search_web',
-            description: 'Search the web for current information. Returns titles, URLs, and snippets.',
-            parameters: {
-                type: 'object',
-                properties: { query: { type: 'string', description: 'Search query string' } },
-                required: ['query']
-            }
-        }
-    },
-    {
-        type: 'function',
-        function: {
-            name: 'save_memory',
-            description: 'Save a key-value pair to persistent agent memory for future sessions.',
-            parameters: {
-                type: 'object',
-                properties: {
-                    key: { type: 'string', description: 'Key/name for this memory entry' },
-                    value: { type: 'string', description: 'Value to store' }
-                },
-                required: ['key', 'value']
-            }
-        }
-    },
-    {
-        type: 'function',
-        function: {
-            name: 'get_time',
-            description: 'Get the current UTC time.',
-            parameters: { type: 'object', properties: {} }
-        }
-    }
-];
-
-// ═══════════════════════════════════════════
-// AGENT LOOP
-// ═══════════════════════════════════════════
+// --- AGENT LOOP ---
 async function runAgentCycle(skillId, varTarget, maxTurns) {
-    const skill = SKILLS[skillId];
-    if (!skill) return;
+  const skill = SKILLS[skillId];
+  if (!skill) return;
 
-    // Determine AI mode
-    const useCloud = usingCloudAI();
-    if (!useCloud && (!localAI || !localAI.isReady)) {
-        appendOutput('error-msg', '❌ AI not ready. Click "Load AI Model" to download the local model, or add a cloud API key.');
-        return;
-    }
+  if (typeof puter === 'undefined' || !puter.ai) {
+    appendOutput('error-msg', '❌ AI engine not loaded. Please wait a moment and try again.');
+    return;
+  }
 
-    const modelName = useCloud ? 'mimo-v2-flash' : localAI.modelName;
+  const memory = JSON.parse(localStorage.getItem('gb_agent_memory')||'{}');
+  const memStr = Object.keys(memory).length ? '\n\nPERSISTENT MEMORY:\n'+Object.entries(memory).map(([k,v])=>`- ${k}: ${v.value}`).join('\n') : '';
+  const systemPrompt = skill.prompt + memStr + '\n\nCURRENT TARGET: '+(varTarget||'bitcoin');
+  const target = varTarget || 'bitcoin';
 
-    // Load memory
-    const memory = JSON.parse(localStorage.getItem('gb_agent_memory') || '{}');
-    const memStr = Object.keys(memory).length > 0
-        ? '\n\nPERSISTENT MEMORY (from past runs):\n' + Object.entries(memory).map(([k,v]) => `- ${k}: ${v.value}`).join('\n')
-        : '';
+  appendOutput('info-msg', `🚀 Starting ${skill.name} · target: ${target} · max ${maxTurns} turns...`);
 
-    const systemPrompt = skill.system + memStr + '\n\nTARGET: ' + (varTarget || skill.defaultVar);
+  const messages = [
+    {role:'system', content:systemPrompt},
+    {role:'user', content:`Analyze "${target}". Use get_price if it's a token, search_web for news/sentiment. Save notable findings to memory. Be concise.`}
+  ];
 
-    const engineLabel = useCloud ? '☁️ Cloud (MiMo)' : '💻 Local AI';
-    appendOutput('info-msg', `🚀 Starting ${skill.name} · ${engineLabel} · max ${maxTurns} turns...`);
+  for (let turn = 1; turn <= maxTurns; turn++) {
+    appendOutput('turn-header', `── Turn ${turn}/${maxTurns} ──`);
 
-    const messages = [{ role: 'system', content: systemPrompt }];
-    let done = false;
-    let turn = 0;
-    let totalTokens = 0;
+    try {
+      // Call puter.ai
+      const response = await puter.ai.chat(JSON.stringify(messages), {
+        model: 'gpt-4o-mini',
+        stream: false
+      });
 
-    while (!done && turn < maxTurns) {
-        turn++;
-        appendOutput('turn-header', `── Turn ${turn}/${maxTurns} ──`);
+      let content = '';
+      if (typeof response === 'string') {
+        content = response;
+      } else if (response.message?.content) {
+        content = response.message.content;
+      } else {
+        content = JSON.stringify(response);
+      }
 
-        let data;
-        try {
-            if (useCloud) {
-                // Cloud AI: call proxy
-                const body = { model: modelName, messages, tools: TOOLS, temperature: 0.4, max_tokens: 800 };
-                const resp = await fetch(PROXY_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getApiKey() },
-                    body: JSON.stringify(body)
-                });
-                if (!resp.ok) { const et = await resp.text(); throw new Error(`API ${resp.status}: ${et.substring(0,150)}`); }
-                data = await resp.json();
-            } else {
-                // Local AI: call WebLLM
-                data = await localAI.chat(messages, { temperature: 0.4, max_tokens: 400, tools: TOOLS });
-            }
-        } catch (e) {
-            appendOutput('error-msg', `❌ ${useCloud ? 'API' : 'AI'} call failed: ${e.message}`);
-            return;
-        }
+      // Check if the AI wants to use tools
+      const toolPattern = /(get_price|search_web|save_memory|get_time)\s*\(/g;
+      const toolMatches = content.match(toolPattern);
 
-        const choice = data.choices?.[0];
-        if (!choice) { appendOutput('error-msg', '❌ No response from AI'); return; }
+      if (toolMatches && turn < maxTurns) {
+        // Extract and execute tool calls
+        appendOutput('tool-call', '🔧 AI requested tools: '+[...new Set(toolMatches.map(m=>m.replace('(','')))].join(', '));
 
-        const msg = choice.message;
-        totalTokens += data.usage?.total_tokens || 0;
-
-        // Check for tool calls
-        if (msg.tool_calls && msg.tool_calls.length > 0) {
-            appendOutput('tool-call', `🔧 Calling: ${msg.tool_calls.map(tc => tc.function?.name || tc.name).join(', ')}`);
-
-            messages.push({ role: 'assistant', content: msg.content || '', tool_calls: msg.tool_calls });
-
-            for (const tc of msg.tool_calls) {
-                const fnName = tc.function?.name || tc.name;
-                const args = typeof tc.function?.arguments === 'string' ? JSON.parse(tc.function.arguments) : (tc.function?.arguments || {});
-                const result = await executeTool(fnName, args);
-                appendOutput('tool-result', `   ↳ ${JSON.stringify(result).substring(0, 200)}`);
-                messages.push({ role: 'tool', tool_call_id: tc.id || 'call_0', content: JSON.stringify(result) });
-            }
+        // Execute any get_price calls
+        const priceMatch = content.match(/get_price\s*\(\s*["']([^"']+)["']\s*\)/);
+        if (priceMatch) {
+          const result = await toolGetPrice(priceMatch[1]);
+          appendOutput('tool-result', `   ↳ get_price(${priceMatch[1]}): ${JSON.stringify(result).substring(0,150)}`);
+          messages.push({role:'assistant', content});
+          messages.push({role:'user', content:`Tool result for get_price("${priceMatch[1]}"): ${JSON.stringify(result)}\n\nContinue your analysis with this real data. Be concise.`});
         } else {
-            appendOutput('agent-output', msg.content || '(no output)');
-            messages.push({ role: 'assistant', content: msg.content || '' });
-            done = true;
+          // Auto-execute relevant tools
+          if (content.includes('search_web')) {
+            const sq = target+' crypto news today';
+            const result = await toolSearchWeb(sq);
+            appendOutput('tool-result', `   ↳ search_web: ${result.results?.length||0} results`);
+            messages.push({role:'assistant', content});
+            messages.push({role:'user', content:`Search results for "${sq}": ${JSON.stringify(result.results?.slice(0,3))}\n\nContinue with this data. Be concise.`});
+          } else {
+            messages.push({role:'assistant', content});
+            messages.push({role:'user', content:'Continue. Execute any needed tools and provide your final analysis.'});
+          }
         }
+      } else {
+        // Final output
+        appendOutput('agent-output', content);
+        break;
+      }
+    } catch(e) {
+      appendOutput('error-msg', `❌ AI error: ${e.message}`);
+      return;
     }
+  }
 
-    if (!done) appendOutput('info-msg', `⚠️ Reached max turns (${maxTurns}).`);
-    appendOutput('info-msg', `✅ Session complete. ~${totalTokens} tokens used (${useCloud ? 'cloud' : 'local'}).`);
-
-    localStorage.setItem('gb_agent_last_run', new Date().toISOString());
-    localStorage.setItem('gb_agent_run_count', (parseInt(localStorage.getItem('gb_agent_run_count') || '0') + 1).toString());
-    renderMemory();
-    updateStats();
+  appendOutput('info-msg', '✅ Session complete.');
+  localStorage.setItem('gb_agent_last_run', new Date().toISOString());
+  localStorage.setItem('gb_agent_run_count', (parseInt(localStorage.getItem('gb_agent_run_count')||'0')+1).toString());
+  renderMemory();
 }
 
-// ═══════════════════════════════════════════
-// UI HELPERS
-// ═══════════════════════════════════════════
+// --- UI ---
 function appendOutput(cls, text) {
-    const panel = document.getElementById('output-panel');
-    const div = document.createElement('div');
-    div.className = cls;
-    div.textContent = text;
-    panel.appendChild(div);
-    panel.scrollTop = panel.scrollHeight;
+  const panel = document.getElementById('output-panel');
+  const div = document.createElement('div');
+  div.className = cls;
+  div.textContent = text;
+  panel.appendChild(div);
+  panel.scrollTop = panel.scrollHeight;
 }
 
-function clearOutput() {
-    const panel = document.getElementById('output-panel');
-    panel.innerHTML = '';
-}
+function clearOutput() { document.getElementById('output-panel').innerHTML = ''; }
 
 function setStatus(running, text) {
-    const bar = document.getElementById('status-bar');
-    const dot = document.getElementById('status-dot');
-    const txt = document.getElementById('status-text');
-
-    bar.className = 'status-row ' + (running ? 'running' : 'idle');
-    dot.className = 'status-dot ' + (running ? 'status-running' : 'status-idle');
-    txt.textContent = text;
+  const bar = document.getElementById('status-bar');
+  const dot = document.getElementById('status-dot');
+  document.getElementById('status-text').textContent = text;
+  bar.className = 'status-row '+(running?'running':'idle');
+  dot.className = 'status-dot '+(running?'status-running':'status-idle');
 }
 
-// ═══════════════════════════════════════════
-// ACTIONS
-// ═══════════════════════════════════════════
-// getApiKey defined above in CONFIGURATION section
-
-function saveSettings() {
-    const key = document.getElementById('api-key').value;
-    if (key) {
-        localStorage.setItem('gb_mimo_api_key', key);
-        aiMode = 'cloud';
-        document.getElementById('key-status').textContent = 'Cloud key set ✓';
-        document.getElementById('key-status').style.color = '#059669';
-        document.getElementById('local-ai-status').textContent = 'Cloud mode active — using MiMo';
-        document.getElementById('local-ai-status').style.color = '#2563eb';
-    }
-    updateKeyStatus();
-}
-
-// Cloud AI test removed — local AI is primary
-async function testConnection() {
-    appendOutput('info-msg', '💡 Local AI is the default. Click "Load AI Model" to initialize, or add a cloud key above.');
-}
-
-function selectSkill(skillId) {
-    selectedSkill = skillId;
-    document.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('active'));
-    document.querySelector(`[data-skill="${skillId}"]`).classList.add('active');
-    const skill = SKILLS[skillId];
-    document.getElementById('agent-var').value = skill.defaultVar;
-    document.getElementById('agent-var').placeholder = `e.g. ${skill.defaultVar}`;
-    setStatus(false, `Selected: ${skill.name}. Configure and click "Start Agent" or "Run Once Now".`);
+function selectSkill(id) {
+  selectedSkill = id;
+  document.querySelectorAll('.tpl-card').forEach(c=>c.classList.remove('active'));
+  document.querySelector(`[data-skill="${id}"]`).classList.add('active');
+  setStatus(false, `Selected: ${SKILLS[id].name}. Click "Run Once Now" to test.`);
 }
 
 async function runOnce() {
-    if (!selectedSkill) { alert('Select a skill template first.'); return; }
-    clearOutput();
-    setStatus(true, 'Running agent session...');
-    const varTarget = document.getElementById('agent-var').value;
-    const maxTurns = parseInt(document.getElementById('agent-max-turns').value);
-    await runAgentCycle(selectedSkill, varTarget, maxTurns);
-    setStatus(false, 'Session complete. Agent is idle.');
+  clearOutput();
+  setStatus(true, 'Running agent...');
+  const v = document.getElementById('agent-var').value;
+  const t = parseInt(document.getElementById('agent-max-turns').value);
+  await runAgentCycle(selectedSkill, v, t);
+  setStatus(false, 'Complete. Agent is idle.');
 }
 
 function startAgent() {
-    if (!selectedSkill) { alert('Select a skill template first.'); return; }
-    if (!localAI || !localAI.isReady) {
-        if (!getApiKey()) {
-            alert('AI not ready. Click "Load AI Model" to download the local model (free, no key needed). Or add a cloud API key.');
-            return;
-        }
-    }
+  agentRunning = true;
+  document.getElementById('btn-start').style.display = 'none';
+  document.getElementById('btn-stop').style.display = 'inline-flex';
+  const min = parseInt(document.getElementById('agent-interval').value);
+  const ms = min*60*1000;
+  setStatus(true, `Agent running. Next run in ${min} min.`);
+  nextRunTime = new Date(Date.now()+ms);
+  document.getElementById('next-run-display').textContent = 'Next: '+nextRunTime.toLocaleTimeString();
 
-    agentRunning = true;
-    document.getElementById('btn-start').style.display = 'none';
-    document.getElementById('btn-stop').style.display = 'inline-flex';
-
-    const intervalMin = parseInt(document.getElementById('agent-interval').value);
-    const ms = intervalMin * 60 * 1000;
-
-    setStatus(true, `Agent running. Next run in ${intervalMin} minutes.`);
-
-    // Calculate next run time
-    nextRunTime = new Date(Date.now() + ms);
-    updateNextRunDisplay();
-
-    // Run immediately
-    const varTarget = document.getElementById('agent-var').value;
-    const maxTurns = parseInt(document.getElementById('agent-max-turns').value);
-    runAgentCycle(selectedSkill, varTarget, maxTurns).then(() => {
-        if (agentRunning) setStatus(true, `Agent running. Next run in ${intervalMin} minutes.`);
-    });
-
-    // Schedule repeats
-    agentTimer = setInterval(() => {
-        if (!agentRunning) { clearInterval(agentTimer); return; }
-        const varT = document.getElementById('agent-var').value;
-        const maxT = parseInt(document.getElementById('agent-max-turns').value);
-        clearOutput();
-        runAgentCycle(selectedSkill, varT, maxT);
-        nextRunTime = new Date(Date.now() + ms);
-        updateNextRunDisplay();
-    }, ms);
+  runOnce();
+  agentTimer = setInterval(()=>{
+    if(!agentRunning){clearInterval(agentTimer);return;}
+    clearOutput();
+    const v = document.getElementById('agent-var').value;
+    const t = parseInt(document.getElementById('agent-max-turns').value);
+    runAgentCycle(selectedSkill, v, t);
+    nextRunTime = new Date(Date.now()+ms);
+    document.getElementById('next-run-display').textContent = 'Next: '+nextRunTime.toLocaleTimeString();
+  }, ms);
 }
 
 function stopAgent() {
-    agentRunning = false;
-    if (agentTimer) { clearInterval(agentTimer); agentTimer = null; }
-    nextRunTime = null;
-    document.getElementById('btn-start').style.display = 'inline-flex';
-    document.getElementById('btn-stop').style.display = 'none';
-    document.getElementById('next-run-display').textContent = '';
-    setStatus(false, 'Agent stopped.');
-}
-
-function updateNextRunDisplay() {
-    if (nextRunTime) {
-        document.getElementById('next-run-display').textContent = 'Next run: ' + nextRunTime.toLocaleTimeString();
-    }
+  agentRunning = false;
+  if(agentTimer){clearInterval(agentTimer);agentTimer=null;}
+  nextRunTime = null;
+  document.getElementById('btn-start').style.display = 'inline-flex';
+  document.getElementById('btn-stop').style.display = 'none';
+  document.getElementById('next-run-display').textContent = '';
+  setStatus(false, 'Agent stopped.');
 }
 
 function clearMemory() {
-    if (confirm('Delete all agent memory?')) {
-        localStorage.removeItem('gb_agent_memory');
-        localStorage.removeItem('gb_agent_run_count');
-        localStorage.removeItem('gb_agent_last_run');
-        renderMemory();
-        updateStats();
-    }
+  if(confirm('Delete all agent memory?')){
+    localStorage.removeItem('gb_agent_memory');
+    localStorage.removeItem('gb_agent_run_count');
+    renderMemory();
+  }
 }
 
 function renderMemory() {
-    const mem = JSON.parse(localStorage.getItem('gb_agent_memory') || '{}');
-    const panel = document.getElementById('memory-panel');
-    const list = document.getElementById('memory-list');
-
-    const keys = Object.keys(mem);
-    if (keys.length === 0) {
-        panel.style.display = 'none';
-        return;
-    }
-
-    panel.style.display = 'block';
-    list.innerHTML = keys.map(k => `
-        <div class="memory-item">
-            <span class="mk">${k}</span>
-            <span class="mv">${mem[k].value.substring(0, 120)}</span>
-        </div>
-    `).join('');
+  const mem = JSON.parse(localStorage.getItem('gb_agent_memory')||'{}');
+  const panel = document.getElementById('memory-panel');
+  const list = document.getElementById('memory-list');
+  const keys = Object.keys(mem);
+  if(!keys.length){panel.style.display='none';return;}
+  panel.style.display='block';
+  list.innerHTML = keys.map(k=>`<div class="memory-item"><span class="mk">${k}</span><span class="mv">${mem[k].value.substring(0,120)}</span></div>`).join('');
 }
 
-function updateStats() {
-    const runs = parseInt(localStorage.getItem('gb_agent_run_count') || '0');
-    const lastRun = localStorage.getItem('gb_agent_last_run');
-    document.getElementById('key-status').textContent = `${runs} sessions run${lastRun ? ' · Last: ' + new Date(lastRun).toLocaleString() : ''}`;
-}
-
-function updateKeyStatus() {
-    const key = getApiKey();
-    if (key) {
-        document.getElementById('api-key').value = key;
-        document.getElementById('key-status').textContent = 'Cloud key set ✓';
-        document.getElementById('key-status').style.color = '#059669';
+// --- INIT ---
+(function init(){
+  renderMemory();
+  setStatus(false, 'AI engine loading...');
+  // Check puter.js loaded
+  let checks = 0;
+  const checkAI = setInterval(()=>{
+    checks++;
+    if (typeof puter !== 'undefined' && puter.ai) {
+      clearInterval(checkAI);
+      document.getElementById('ai-status').textContent = 'AI ready ✓ (GPT-4o-mini, Claude, Gemini, Llama)';
+      document.getElementById('ai-status').style.color = '#059669';
+      setStatus(false, 'Ready. Pick a skill and click "Run Once Now".');
+    } else if (checks > 30) {
+      clearInterval(checkAI);
+      document.getElementById('ai-status').textContent = '⚠️ AI engine load timeout. Please refresh.';
+      document.getElementById('ai-status').style.color = '#f59e0b';
+      setStatus(false, 'AI engine failed to load. Please refresh the page.');
     } else {
-        document.getElementById('key-status').textContent = 'Not set · Local AI active';
-        document.getElementById('key-status').style.color = '#64748b';
+      document.getElementById('ai-status').textContent = 'Loading AI engine... ('+checks+'s)';
     }
-}
-
-// ═══════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════
-updateKeyStatus();
-updateStats();
-// Pre-select crypto-monitor
-selectSkill('crypto-monitor');
+  }, 1000);
+})();
 </script>
 </body>
 </html>

@@ -752,7 +752,7 @@
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<script src="gb-inference.js"></script>
+<script src="https://js.puter.com/v2/"></script>
 <script>
 // ========== STATE ==========
 let currentUser = null;
@@ -1253,26 +1253,19 @@ If the user asks for changes to existing code, provide the COMPLETE updated file
 
     try {
         if (!apiKey) {
-            // Try local AI
-            if (window.GitBlockInference) {
+            // Use puter.js free AI
+            if (typeof puter !== 'undefined' && puter.ai) {
                 try {
-                    if (!window._gbLocalAI) {
-                        textEl.innerHTML = '<span style="color:#f59e0b;">⏳ Loading local AI model (one-time download)...</span>';
-                        window._gbLocalAI = new GitBlockInference();
-                        await window._gbLocalAI.init('fast', (msg) => { textEl.innerHTML = '<span style="color:#f59e0b;">⏳ ' + msg + '</span>'; });
-                    }
-                    const localAI = window._gbLocalAI;
-                    textEl.innerHTML = '<span style="color:#f59e0b;">💻 Running on local AI...</span>';
-                    const msgs = [{ role: 'system', content: systemPrompt }, ...aiHistory.slice(-10)];
-                    const result = await localAI.chat(msgs, { temperature: 0.7, max_tokens: 1024 });
-                    fullResponse = result.choices[0].message.content;
+                    textEl.innerHTML = '<span style="color:#2563eb;">💡 Using free AI (Puter.js)...</span>';
+                    const response = await puter.ai.chat(systemPrompt + '\n\nUser: ' + text, { model: 'gpt-4o-mini', stream: false });
+                    fullResponse = typeof response === 'string' ? response : (response.message?.content || JSON.stringify(response));
                     textEl.innerHTML = formatMarkdown(fullResponse);
                     aiHistory.push({ role: 'assistant', content: fullResponse });
                 } catch (e) {
-                    textEl.innerHTML = '<span style="color:#dc2626;">❌ Local AI: ' + e.message + '. <br>Add a <a href="https://platform.xiaomimimo.com/console" target="_blank" style="color:#2563eb;">free MiMo key</a> for cloud AI.</span>';
+                    textEl.innerHTML = '<span style="color:#dc2626;">❌ AI error: ' + e.message + '. <a href="https://platform.xiaomimimo.com/console" target="_blank" style="color:#2563eb;">Get a free MiMo key</a> for faster responses.</span>';
                 }
             } else {
-                textEl.innerHTML = '<span style="color:#f59e0b;">⚠️ No API key and WebGPU not available. <a href="https://platform.xiaomimimo.com/console" target="_blank" style="color:#2563eb;">Get a free MiMo key</a> or use Chrome/Edge with WebGPU.</span>';
+                textEl.innerHTML = '<span style="color:#f59e0b;">⚠️ AI engine not available. <a href="https://platform.xiaomimimo.com/console" target="_blank" style="color:#2563eb;">Get a free MiMo key</a> for cloud AI.</span>';
             }
             isAIStreaming = false;
             document.getElementById('ai-send-btn').disabled = false;
