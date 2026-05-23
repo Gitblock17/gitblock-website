@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Bot — GitBlock</title>
+<link rel="icon" href="assets/gitblock.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fff;color:#1e293b;line-height:1.6;overflow-x:hidden}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(37,99,235,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,0.04) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0}
+body>*:not(script){position:relative;z-index:1}
+
+header{position:fixed;top:0;left:0;width:100%;background:rgba(255,255,255,0.94);backdrop-filter:blur(14px);border-bottom:1px solid rgba(37,99,235,0.1);z-index:1000}
+.header-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#2563eb;font-weight:800;font-size:1.25rem}
+.logo img{width:36px;height:36px;border-radius:8px;object-fit:cover}
+nav{display:flex;align-items:center;gap:28px}
+nav a{text-decoration:none;color:#475569;font-size:.9rem;font-weight:500;transition:color .2s}
+nav a:hover,nav a.active{color:#2563eb}
+nav a.active{font-weight:600}
+.hamburger{display:none;background:none;border:none;font-size:1.4rem;color:#2563eb;cursor:pointer}
+.mobile-menu{display:none;position:fixed;top:64px;left:0;width:100%;background:rgba(255,255,255,0.98);backdrop-filter:blur(12px);border-bottom:1px solid rgba(37,99,235,0.1);flex-direction:column;padding:16px 24px;gap:12px;z-index:999}
+.mobile-menu.open{display:flex}
+.mobile-menu a{text-decoration:none;color:#475569;font-size:1rem;font-weight:500;padding:8px 0;border-bottom:1px solid rgba(37,99,235,0.06)}
+
+main{max-width:1100px;margin:0 auto;padding:90px 24px 60px}
+
+.hero{text-align:center;margin-bottom:40px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);color:#059669;font-size:.8rem;font-weight:600;padding:5px 14px;border-radius:100px;margin-bottom:14px}
+.hero-badge .live-dot{width:7px;height:7px;background:#10b981;border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-size:2.2rem;font-weight:800;color:#0f172a;margin-bottom:8px}
+.hero h1 span{color:#2563eb}
+.hero p{font-size:.95rem;color:#64748b;max-width:500px;margin:0 auto}
+
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:20px;padding:16px;background:#fff;border:1px solid rgba(37,99,235,0.08);border-radius:14px}
+.ctrl-field{display:flex;flex-direction:column;gap:4px}
+.ctrl-field label{font-size:.7rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
+.ctrl-field input,.ctrl-field select{padding:8px 12px;border:1px solid rgba(37,99,235,0.15);border-radius:8px;font-size:.85rem;font-family:'Inter',sans-serif;color:#1e293b}
+.ctrl-field input:focus,.ctrl-field select:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 2px rgba(37,99,235,0.06)}
+.ctrl-field input{width:140px}
+
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:all .15s;font-family:'Inter',sans-serif;white-space:nowrap}
+.btn-primary{background:#2563eb;color:#fff;box-shadow:0 2px 8px rgba(37,99,235,0.25)}
+.btn-primary:hover{background:#1d4ed8;transform:translateY(-1px)}
+.btn-outline{background:#fff;color:#2563eb;border:1.5px solid rgba(37,99,235,0.2)}
+.btn-outline:hover{border-color:#2563eb}
+.btn-danger{background:#fff;color:#ef4444;border:1.5px solid rgba(239,68,68,0.2)}
+.btn-danger:hover{background:#fef2f2}
+.btn-sm{padding:5px 12px;font-size:.78rem}
+
+.dashboard{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:768px){.dashboard{grid-template-columns:1fr}nav{display:none}.hamburger{display:block}}
+
+.card{background:#fff;border:1px solid rgba(37,99,235,0.08);border-radius:14px;padding:20px}
+.card h3{font-size:.9rem;font-weight:700;color:#0f172a;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card h3 .status{width:8px;height:8px;border-radius:50%;background:#94a3b8}
+.card h3 .status.live{background:#10b981;animation:pulse 1.5s infinite}
+
+.price-display{font-family:'JetBrains Mono',monospace}
+.price-main{font-size:2rem;font-weight:800;color:#0f172a}
+.price-change{font-size:1rem;font-weight:600;margin-left:8px}
+.price-change.up{color:#059669}
+.price-change.down{color:#dc2626}
+.price-details{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.price-detail{background:#f8fafc;border-radius:8px;padding:10px}
+.price-detail .label{font-size:.7rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px}
+.price-detail .value{font-size:.9rem;font-weight:700;color:#0f172a;font-family:'JetBrains Mono',monospace}
+
+.alerts-list{max-height:300px;overflow-y:auto}
+.alert-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(37,99,235,0.05);font-size:.82rem}
+.alert-item .alert-icon{font-size:1rem;flex-shrink:0}
+.alert-item .alert-time{color:#94a3b8;font-size:.72rem;min-width:65px}
+.alert-item .alert-msg{color:#334155;flex:1}
+.alert-item .alert-price{font-weight:700;font-family:'JetBrains Mono',monospace}
+
+.chart-area{height:200px;display:flex;align-items:flex-end;gap:2px;padding:4px 0}
+.chart-bar{flex:1;background:rgba(37,99,235,0.15);border-radius:2px 2px 0 0;min-width:3px;transition:height .3s}
+.chart-bar.up{background:rgba(16,185,129,0.3)}
+.chart-bar.down{background:rgba(239,68,68,0.2)}
+
+.log-panel{background:#0f172a;border-radius:12px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:#e2e8f0;max-height:200px;overflow-y:auto;line-height:1.6}
+.log-panel .log-line{padding:2px 0}
+.log-panel .log-time{color:#64748b}
+.log-panel .log-alert{color:#fbbf24}
+.log-panel .log-info{color:#94a3b8}
+
+footer{text-align:center;padding:40px 24px;color:#94a3b8;font-size:.82rem;border-top:1px solid rgba(37,99,235,0.06)}
+footer a{color:#2563eb;text-decoration:none}
+</style>
+</head>
+<body>
+
+<header id="header">
+<div class="header-inner">
+<a href="index.html" class="logo"><img src="assets/gitblock.jpg" alt="GitBlock"><span>GitBlock</span></a>
+<nav>
+<a href="index.html">Home</a><a href="usage.html">Docs</a><a href="editor.html">Editor</a><a href="playground.html">Playground</a><a href="trading-bot.html" class="active">Bot</a>
+</nav>
+<button class="hamburger" onclick="document.getElementById('mobile-menu').classList.toggle('open')"><i class="fas fa-bars"></i></button>
+</div>
+</header>
+<div class="mobile-menu" id="mobile-menu">
+<a href="index.html">Home</a><a href="usage.html">Docs</a><a href="editor.html">Editor</a><a href="playground.html">Playground</a><a href="trading-bot.html">Bot</a>
+</div>
+
+<main>
+
+<div class="hero">
+<div class="hero-badge"><span class="live-dot"></span> Live · CoinGecko Data</div>
+<h1>Trading <span>Bot</span></h1>
+<p>Real-time crypto price monitor. Set thresholds. Get alerts. Runs in your browser — no API keys, no servers.</p>
+</div>
+
+<div class="controls">
+<div class="ctrl-field"><label>Token</label><select id="token-select"><option value="bitcoin">Bitcoin (BTC)</option><option value="ethereum">Ethereum (ETH)</option><option value="solana">Solana (SOL)</option><option value="dogecoin">Dogecoin (DOGE)</option><option value="cardano">Cardano (ADA)</option><option value="polkadot">Polkadot (DOT)</option><option value="chainlink">Chainlink (LINK)</option><option value="avalanche-2">Avalanche (AVAX)</option></select></div>
+<div class="ctrl-field"><label>Alert: Price Above $</label><input type="number" id="alert-above" placeholder="e.g. 100000" step="any"></div>
+<div class="ctrl-field"><label>Alert: Price Below $</label><input type="number" id="alert-below" placeholder="e.g. 80000" step="any"></div>
+<div class="ctrl-field"><label>Alert: 5min Move %</label><input type="number" id="alert-move" placeholder="e.g. 2" step="0.1" value="2"></div>
+<div class="ctrl-field"><label>Check Every</label><select id="interval-select"><option value="30">30 sec</option><option value="60" selected>1 min</option><option value="300">5 min</option><option value="900">15 min</option></select></div>
+<button class="btn btn-primary" id="btn-start" onclick="startBot()"><i class="fas fa-play"></i> Start Bot</button>
+<button class="btn btn-outline" id="btn-stop" onclick="stopBot()" style="display:none"><i class="fas fa-stop"></i> Stop</button>
+<button class="btn btn-outline btn-sm" onclick="checkNow()"><i class="fas fa-sync"></i> Check Now</button>
+<button class="btn btn-danger btn-sm" onclick="clearAlerts()"><i class="fas fa-trash"></i> Clear</button>
+</div>
+
+<div class="dashboard">
+<div class="card">
+<h3><span class="status" id="price-status"></span> <span id="token-name">Bitcoin</span> Price</h3>
+<div class="price-display">
+<span class="price-main" id="price-main">—</span>
+<span class="price-change" id="price-change"></span>
+</div>
+<div class="price-details">
+<div class="price-detail"><div class="label">24h High</div><div class="value" id="price-high">—</div></div>
+<div class="price-detail"><div class="label">24h Low</div><div class="value" id="price-low">—</div></div>
+<div class="price-detail"><div class="label">24h Volume</div><div class="value" id="price-volume">—</div></div>
+<div class="price-detail"><div class="label">Market Cap</div><div class="value" id="price-mcap">—</div></div>
+</div>
+</div>
+
+<div class="card">
+<h3><i class="fas fa-chart-bar" style="color:#2563eb"></i> Price History (last 30 checks)</h3>
+<div class="chart-area" id="chart-area" style="height:170px"></div>
+<div style="display:flex;justify-content:space-between;font-size:.68rem;color:#94a3b8;margin-top:4px;font-family:'JetBrains Mono',monospace">
+<span id="chart-min">—</span><span id="chart-max">—</span>
+</div>
+</div>
+
+<div class="card">
+<h3><i class="fas fa-bell" style="color:#f59e0b"></i> Alerts <span id="alert-count" style="font-size:.75rem;color:#94a3b8">(0)</span></h3>
+<div class="alerts-list" id="alerts-list"><span style="color:#94a3b8;font-size:.82rem">No alerts yet. Start the bot to begin monitoring.</span></div>
+</div>
+
+<div class="card">
+<h3><i class="fas fa-terminal" style="color:#64748b"></i> Activity Log</h3>
+<div class="log-panel" id="log-panel"><span class="log-info">Bot ready. Configure alerts and click Start.</span></div>
+</div>
+</div>
+
+</main>
+
+<footer>
+<p>Trading Bot · Real-time data from CoinGecko · Runs in your browser · No API keys needed</p>
+<p style="margin-top:4px">&copy; 2026 GitBlock — Intelligence Without Gatekeepers</p>
+</footer>
+
+<script>
+const CG_BASE = 'https://api.coingecko.com/api/v3';
+let botRunning = false, botTimer = null;
+let alertAbove = null, alertBelow = null, alertMovePct = null;
+let priceHistory = [], lastPrice = null;
+let checkCount = 0;
+
+const TOKEN_NAMES = {bitcoin:'Bitcoin',ethereum:'Ethereum',solana:'Solana',dogecoin:'Dogecoin',cardano:'Cardano',polkadot:'Polkadot',chainlink:'Chainlink','avalanche-2':'Avalanche'};
+
+function log(msg, type) {
+  const panel = document.getElementById('log-panel');
+  const now = new Date().toLocaleTimeString();
+  const cls = type === 'alert' ? 'log-alert' : 'log-info';
+  panel.innerHTML += `<div class="log-line"><span class="log-time">${now}</span> <span class="${cls}">${msg}</span></div>`;
+  panel.scrollTop = panel.scrollHeight;
+}
+
+function addAlert(icon, msg, price) {
+  const list = document.getElementById('alerts-list');
+  const now = new Date().toLocaleTimeString();
+  if (list.querySelector('span') && list.querySelector('span').textContent === 'No alerts yet. Start the bot to begin monitoring.') {
+    list.innerHTML = '';
+  }
+  list.innerHTML = `<div class="alert-item"><span class="alert-icon">${icon}</span><span class="alert-time">${now}</span><span class="alert-msg">${msg}</span><span class="alert-price">${price}</span></div>` + list.innerHTML;
+  document.getElementById('alert-count').textContent = '(' + list.querySelectorAll('.alert-item').length + ')';
+}
+
+async function fetchPrice(tokenId) {
+  try {
+    const r = await fetch(`${CG_BASE}/simple/price?ids=${tokenId}&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true`);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    if (!d[tokenId]) throw new Error('No data');
+    return d[tokenId];
+  } catch(e) {
+    log('Price fetch failed: ' + e.message, 'info');
+    return null;
+  }
+}
+
+async function fetchDetails(tokenId) {
+  try {
+    const r = await fetch(`${CG_BASE}/coins/${tokenId}?localization=false&tickers=false&community_data=false&developer_data=false`);
+    if (!r.ok) return null;
+    const d = await r.json();
+    return {
+      high: d.market_data?.high_24h?.usd,
+      low: d.market_data?.low_24h?.usd,
+      volume: d.market_data?.total_volume?.usd,
+      mcap: d.market_data?.market_cap?.usd,
+    };
+  } catch(e) { return null; }
+}
+
+function formatUSD(n) {
+  if (n == null) return '—';
+  if (n >= 1e9) return '$' + (n/1e9).toFixed(2) + 'B';
+  if (n >= 1e6) return '$' + (n/1e6).toFixed(2) + 'M';
+  if (n >= 1) return '$' + n.toLocaleString(undefined, {minimumFractionDigits:2,maximumFractionDigits:2});
+  return '$' + n.toFixed(6);
+}
+
+function formatPrice(n) {
+  if (n == null) return '—';
+  if (n >= 1) return '$' + n.toLocaleString(undefined, {minimumFractionDigits:2,maximumFractionDigits:2});
+  return '$' + n.toFixed(6);
+}
+
+function renderChart() {
+  const area = document.getElementById('chart-area');
+  if (!priceHistory.length) { area.innerHTML = ''; return; }
+  const prices = priceHistory.map(p => p.price);
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const range = max - min || 1;
+  document.getElementById('chart-min').textContent = formatPrice(min);
+  document.getElementById('chart-max').textContent = formatPrice(max);
+
+  area.innerHTML = prices.map((p, i) => {
+    const h = ((p - min) / range) * 100;
+    const cls = i > 0 ? (p >= prices[i-1] ? 'up' : 'down') : 'up';
+    return `<div class="chart-bar ${cls}" style="height:${Math.max(2, h)}%"></div>`;
+  }).join('');
+}
+
+async function checkNow() {
+  const tokenId = document.getElementById('token-select').value;
+  const tokenName = TOKEN_NAMES[tokenId] || tokenId;
+  document.getElementById('token-name').textContent = tokenName;
+  document.getElementById('price-status').className = 'status';
+
+  checkCount++;
+  log(`Check #${checkCount}: Fetching ${tokenName} price...`, 'info');
+
+  // Fetch price and details in parallel
+  const [priceData, details] = await Promise.all([
+    fetchPrice(tokenId),
+    checkCount === 1 || checkCount % 10 === 0 ? fetchDetails(tokenId) : Promise.resolve(null)
+  ]);
+
+  if (!priceData) {
+    document.getElementById('price-status').className = 'status';
+    log('Failed to get price data', 'info');
+    return;
+  }
+
+  const price = priceData.usd;
+  const change24h = priceData.usd_24h_change || 0;
+
+  // Update display
+  document.getElementById('price-status').className = 'status live';
+  document.getElementById('price-main').textContent = formatPrice(price);
+  const changeEl = document.getElementById('price-change');
+  changeEl.textContent = (change24h >= 0 ? '+' : '') + change24h.toFixed(2) + '%';
+  changeEl.className = 'price-change ' + (change24h >= 0 ? 'up' : 'down');
+
+  if (details) {
+    document.getElementById('price-high').textContent = formatUSD(details.high);
+    document.getElementById('price-low').textContent = formatUSD(details.low);
+    document.getElementById('price-volume').textContent = formatUSD(details.volume);
+    document.getElementById('price-mcap').textContent = formatUSD(details.mcap);
+  }
+
+  // Price history
+  priceHistory.push({ price, time: Date.now() });
+  if (priceHistory.length > 30) priceHistory = priceHistory.slice(-30);
+  renderChart();
+
+  // Alert checks
+  alertAbove = parseFloat(document.getElementById('alert-above').value) || null;
+  alertBelow = parseFloat(document.getElementById('alert-below').value) || null;
+  alertMovePct = parseFloat(document.getElementById('alert-move').value) || null;
+
+  if (alertAbove && price >= alertAbove) {
+    const msg = `${tokenName} crossed ABOVE $${alertAbove.toLocaleString()}`;
+    log(msg, 'alert');
+    addAlert('🔔', msg, formatPrice(price));
+    document.getElementById('alert-above').value = ''; // Clear one-shot alert
+  }
+
+  if (alertBelow && price <= alertBelow) {
+    const msg = `${tokenName} crossed BELOW $${alertBelow.toLocaleString()}`;
+    log(msg, 'alert');
+    addAlert('🔔', msg, formatPrice(price));
+    document.getElementById('alert-below').value = '';
+  }
+
+  if (alertMovePct && lastPrice && lastPrice > 0) {
+    const movePct = Math.abs((price - lastPrice) / lastPrice * 100);
+    if (movePct >= alertMovePct) {
+      const dir = price > lastPrice ? 'UP' : 'DOWN';
+      const msg = `${tokenName} moved ${dir} ${movePct.toFixed(1)}% in one check`;
+      log(msg, 'alert');
+      addAlert('⚡', msg, formatPrice(price));
+    }
+  }
+
+  lastPrice = price;
+  log(`Price: ${formatPrice(price)} | 24h: ${change24h.toFixed(2)}%`, 'info');
+}
+
+function startBot() {
+  botRunning = true;
+  document.getElementById('btn-start').style.display = 'none';
+  document.getElementById('btn-stop').style.display = 'inline-flex';
+  const sec = parseInt(document.getElementById('interval-select').value);
+  log(`Bot STARTED — checking every ${sec}s`, 'alert');
+
+  checkNow();
+  botTimer = setInterval(checkNow, sec * 1000);
+}
+
+function stopBot() {
+  botRunning = false;
+  if (botTimer) { clearInterval(botTimer); botTimer = null; }
+  document.getElementById('btn-start').style.display = 'inline-flex';
+  document.getElementById('btn-stop').style.display = 'none';
+  document.getElementById('price-status').className = 'status';
+  log('Bot STOPPED', 'alert');
+}
+
+function clearAlerts() {
+  document.getElementById('alerts-list').innerHTML = '<span style="color:#94a3b8;font-size:.82rem">No alerts yet. Start the bot to begin monitoring.</span>';
+  document.getElementById('alert-count').textContent = '(0)';
+}
+
+// Init
+document.getElementById('token-select').addEventListener('change', function() {
+  priceHistory = []; lastPrice = null;
+  document.getElementById('price-main').textContent = '—';
+  document.getElementById('price-change').textContent = '';
+  document.getElementById('chart-area').innerHTML = '';
+  document.getElementById('token-name').textContent = TOKEN_NAMES[this.value] || this.value;
+});
+</script>
+</body>
+</html>
