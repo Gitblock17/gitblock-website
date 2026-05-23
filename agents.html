@@ -11,558 +11,142 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
         body {
             font-family: 'Inter', sans-serif;
-            background: #ffffff;
+            background: #f8fafc;
             color: #1e293b;
             line-height: 1.6;
-            overflow-x: hidden;
         }
         body::before {
             content: '';
-            position: fixed;
-            top: 0; left: 0;
+            position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
             background-image:
-                linear-gradient(rgba(37, 99, 235, 0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(37, 99, 235, 0.04) 1px, transparent 1px);
-            background-size: 60px 60px;
-            pointer-events: none;
-            z-index: 0;
+                linear-gradient(rgba(37,99,235,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37,99,235,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none; z-index: 0;
         }
         body > *:not(script) { position: relative; z-index: 1; }
 
-        /* Reveal */
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
-        }
-        .reveal.visible { opacity: 1; transform: translateY(0); }
-
-        /* Header */
         header {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.94);
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: rgba(255,255,255,0.95);
             backdrop-filter: blur(14px);
-            border-bottom: 1px solid rgba(37, 99, 235, 0.1);
+            border-bottom: 1px solid rgba(37,99,235,0.1);
             z-index: 1000;
         }
         .header-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 64px;
+            max-width: 1200px; margin: 0 auto; padding: 0 24px;
+            display: flex; align-items: center; justify-content: space-between; height: 60px;
         }
         .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: #2563eb;
-            font-weight: 800;
-            font-size: 1.2rem;
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none; color: #2563eb; font-weight: 800; font-size: 1.15rem;
         }
-        .logo img { width: 34px; height: 34px; border-radius: 8px; object-fit: cover; }
-        nav { display: flex; align-items: center; gap: 28px; }
-        nav a {
-            text-decoration: none;
-            color: #475569;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
+        .logo img { width: 32px; height: 32px; border-radius: 8px; object-fit: cover; }
+        nav { display: flex; gap: 24px; }
+        nav a { text-decoration: none; color: #64748b; font-size: 0.88rem; font-weight: 500; transition: color 0.15s; }
         nav a:hover, nav a.active { color: #2563eb; }
         nav a.active { font-weight: 600; }
-        .hamburger {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.3rem;
-            color: #2563eb;
-            cursor: pointer;
-        }
-        .mobile-menu {
-            display: none;
-            position: fixed;
-            top: 64px; left: 0;
-            width: 100%;
-            background: rgba(255,255,255,0.98);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(37,99,235,0.1);
-            flex-direction: column;
-            padding: 16px 24px;
-            gap: 12px;
-            z-index: 999;
-        }
+        .hamburger { display: none; background: none; border: none; font-size: 1.3rem; color: #2563eb; cursor: pointer; }
+        .mobile-menu { display: none; position: fixed; top: 60px; left: 0; width: 100%; background: rgba(255,255,255,0.98); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(37,99,235,0.1); flex-direction: column; padding: 16px 24px; gap: 12px; z-index: 999; }
         .mobile-menu.open { display: flex; }
-        .mobile-menu a {
-            text-decoration: none;
-            color: #475569;
-            font-size: 1rem;
-            font-weight: 500;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(37,99,235,0.06);
-        }
-        .mobile-menu a:hover { color: #2563eb; }
+        .mobile-menu a { text-decoration: none; color: #475569; font-size: 1rem; font-weight: 500; padding: 8px 0; border-bottom: 1px solid rgba(37,99,235,0.06); }
 
-        /* Hero */
-        .hero {
-            padding: 120px 24px 80px;
-            text-align: center;
-            max-width: 900px;
-            margin: 0 auto;
+        main { max-width: 900px; margin: 0 auto; padding: 80px 24px 40px; }
+
+        .setup-card {
+            background: #fff; border: 1px solid rgba(37,99,235,0.1); border-radius: 16px; padding: 24px; margin-bottom: 24px;
         }
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(139,92,246,0.08));
-            border: 1px solid rgba(139,92,246,0.2);
-            color: #7c3aed;
-            font-size: 0.82rem;
-            font-weight: 600;
-            padding: 6px 16px;
-            border-radius: 100px;
-            margin-bottom: 24px;
+        .setup-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 12px; color: #0f172a; }
+        .setup-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+        .setup-field { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 4px; }
+        .setup-field label { font-size: 0.75rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+        .setup-field input, .setup-field select {
+            padding: 9px 12px; border: 1px solid rgba(37,99,235,0.15); border-radius: 8px; font-size: 0.88rem;
+            font-family: 'Inter', sans-serif; color: #1e293b; background: #fafbfc;
         }
-        .hero-badge i { font-size: 0.75rem; }
-        .hero h1 {
-            font-size: 3rem;
-            font-weight: 800;
-            line-height: 1.15;
-            color: #0f172a;
-            margin-bottom: 16px;
-        }
-        .hero h1 span {
-            background: linear-gradient(135deg, #2563eb, #7c3aed);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .hero p {
-            font-size: 1.15rem;
-            color: #64748b;
-            max-width: 640px;
-            margin: 0 auto 36px;
-            line-height: 1.7;
-        }
-        .hero-buttons {
-            display: flex;
-            gap: 14px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
+        .setup-field input:focus, .setup-field select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.06); }
+        .setup-field .hint { font-size: 0.7rem; color: #94a3b8; }
+        .setup-field .hint a { color: #2563eb; }
+
         .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 13px 28px;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            text-decoration: none;
-            transition: all 0.2s;
-            font-family: 'Inter', sans-serif;
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 10px 22px; border-radius: 8px; font-size: 0.88rem; font-weight: 600;
+            cursor: pointer; border: none; text-decoration: none; transition: all 0.15s; font-family: 'Inter', sans-serif;
         }
-        .btn-primary {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(37,99,235,0.3);
-        }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,0.4); }
-        .btn-outline {
-            background: #fff;
-            color: #2563eb;
-            border: 2px solid rgba(37,99,235,0.2);
-        }
-        .btn-outline:hover { border-color: #2563eb; background: rgba(37,99,235,0.04); }
+        .btn-primary { background: #2563eb; color: #fff; box-shadow: 0 2px 8px rgba(37,99,235,0.25); }
+        .btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); }
+        .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; }
+        .btn-outline { background: #fff; color: #2563eb; border: 1.5px solid rgba(37,99,235,0.2); }
+        .btn-outline:hover { border-color: #2563eb; }
+        .btn-danger { background: #fff; color: #ef4444; border: 1.5px solid rgba(239,68,68,0.2); }
+        .btn-danger:hover { background: #fef2f2; border-color: #ef4444; }
+        .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
 
-        /* Sections */
-        section {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 80px 24px;
+        .status-row {
+            display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+            border-radius: 10px; margin-bottom: 16px; font-size: 0.85rem; font-weight: 500;
         }
-        .section-header {
-            text-align: center;
-            margin-bottom: 56px;
-        }
-        .section-header h2 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 12px;
-        }
-        .section-header p {
-            font-size: 1.05rem;
-            color: #64748b;
-            max-width: 560px;
-            margin: 0 auto;
-        }
-
-        /* How it works */
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 28px;
-        }
-        .step-card {
-            background: #fff;
-            border: 1px solid rgba(37,99,235,0.1);
-            border-radius: 16px;
-            padding: 32px 24px;
-            text-align: center;
-            transition: box-shadow 0.2s;
-            position: relative;
-        }
-        .step-card:hover { box-shadow: 0 8px 30px rgba(37,99,235,0.08); }
-        .step-num {
-            width: 40px; height: 40px;
-            background: linear-gradient(135deg, #2563eb, #7c3aed);
-            color: #fff;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin: 0 auto 16px;
-        }
-        .step-card h3 { font-size: 1.05rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
-        .step-card p { font-size: 0.88rem; color: #64748b; line-height: 1.6; }
-
-        /* Agent Templates */
-        .template-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-        }
-        .template-card {
-            background: #fff;
-            border: 1px solid rgba(37,99,235,0.1);
-            border-radius: 16px;
-            padding: 28px;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-        }
-        .template-card:hover {
-            border-color: rgba(37,99,235,0.3);
-            box-shadow: 0 8px 30px rgba(37,99,235,0.08);
-            transform: translateY(-2px);
-        }
-        .template-card.selected {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
-        }
-        .template-icon {
-            width: 48px; height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            margin-bottom: 16px;
-        }
-        .icon-blue { background: rgba(37,99,235,0.1); color: #2563eb; }
-        .icon-purple { background: rgba(139,92,246,0.1); color: #7c3aed; }
-        .icon-green { background: rgba(16,185,129,0.1); color: #10b981; }
-        .icon-orange { background: rgba(249,115,22,0.1); color: #f97316; }
-        .icon-amber { background: rgba(245,158,11,0.1); color: #f59e0b; }
-        .icon-rose { background: rgba(244,63,94,0.1); color: #f43f5e; }
-        .template-card h3 { font-size: 1.05rem; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
-        .template-card .desc { font-size: 0.85rem; color: #64748b; line-height: 1.5; margin-bottom: 14px; }
-        .template-tags { display: flex; gap: 6px; flex-wrap: wrap; }
-        .tag {
-            font-size: 0.72rem;
-            font-weight: 600;
-            padding: 3px 10px;
-            border-radius: 100px;
-            background: rgba(37,99,235,0.06);
-            color: #2563eb;
-        }
-        .template-card .select-indicator {
-            position: absolute;
-            top: 16px; right: 16px;
-            width: 22px; height: 22px;
-            border-radius: 50%;
-            border: 2px solid rgba(37,99,235,0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.65rem;
-            color: transparent;
-            transition: all 0.2s;
-        }
-        .template-card.selected .select-indicator {
-            background: #2563eb;
-            border-color: #2563eb;
-            color: #fff;
-        }
-
-        /* Config Panel */
-        .config-panel {
-            background: #fff;
-            border: 1px solid rgba(37,99,235,0.1);
-            border-radius: 20px;
-            padding: 36px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .config-row {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-            align-items: flex-end;
-        }
-        .config-field {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .config-field label {
-            font-size: 0.82rem;
-            font-weight: 600;
-            color: #475569;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .config-field input, .config-field select {
-            padding: 10px 14px;
-            border: 1px solid rgba(37,99,235,0.15);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-family: 'Inter', sans-serif;
-            color: #1e293b;
-            background: #fafbfc;
-            transition: border-color 0.2s;
-        }
-        .config-field input:focus, .config-field select:focus {
-            outline: none;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
-        }
-        .config-field select { cursor: pointer; }
-        .notify-toggles {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .notify-toggle {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 14px;
-            border: 1px solid rgba(37,99,235,0.15);
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.84rem;
-            font-weight: 500;
-            color: #64748b;
-            background: #fafbfc;
-            transition: all 0.2s;
-        }
-        .notify-toggle.active {
-            background: rgba(37,99,235,0.08);
-            border-color: #2563eb;
-            color: #2563eb;
-        }
-        .notify-toggle i { font-size: 0.9rem; }
-
-        /* Deploy Card */
-        .deploy-card {
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            border-radius: 20px;
-            padding: 40px;
-            color: #fff;
-            text-align: center;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .deploy-card h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
-        .deploy-card .summary {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin: 28px 0;
-        }
-        .summary-item {
-            background: rgba(255,255,255,0.06);
-            border-radius: 12px;
-            padding: 16px;
-        }
-        .summary-item .val { font-size: 1.3rem; font-weight: 700; }
-        .summary-item .lbl { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
-        .deploy-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 16px 40px;
-            border-radius: 12px;
-            font-size: 1.05rem;
-            font-weight: 700;
-            cursor: pointer;
-            border: none;
-            background: linear-gradient(135deg, #2563eb, #7c3aed);
-            color: #fff;
-            box-shadow: 0 4px 20px rgba(37,99,235,0.4);
-            transition: all 0.2s;
-            font-family: 'Inter', sans-serif;
-        }
-        .deploy-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(37,99,235,0.5); }
-        .deploy-btn.deployed {
-            background: linear-gradient(135deg, #10b981, #059669);
-            box-shadow: 0 4px 20px rgba(16,185,129,0.4);
-        }
-        .deploy-status {
-            margin-top: 16px;
-            font-size: 0.88rem;
-            color: #94a3b8;
-        }
-        .deploy-status i { margin-right: 6px; }
-        .deploy-status.success { color: #34d399; }
-
-        /* Active Agents List */
-        .agent-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .agent-item {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            background: #fff;
-            border: 1px solid rgba(37,99,235,0.08);
-            border-radius: 14px;
-            padding: 16px 20px;
-            transition: box-shadow 0.2s;
-        }
-        .agent-item:hover { box-shadow: 0 4px 16px rgba(37,99,235,0.06); }
-        .agent-status {
-            width: 10px; height: 10px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        .status-running { background: #10b981; box-shadow: 0 0 8px rgba(16,185,129,0.4); }
-        .status-stopped { background: #94a3b8; }
+        .status-row.idle { background: rgba(148,163,184,0.08); color: #64748b; }
+        .status-row.running { background: rgba(16,185,129,0.08); color: #059669; }
+        .status-row.error { background: rgba(239,68,68,0.08); color: #dc2626; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .status-idle { background: #94a3b8; }
+        .status-running { background: #10b981; animation: pulse 1.5s infinite; }
         .status-error { background: #ef4444; }
-        .agent-info { flex: 1; }
-        .agent-info .name { font-weight: 600; color: #0f172a; font-size: 0.95rem; }
-        .agent-info .meta { font-size: 0.8rem; color: #94a3b8; }
-        .agent-actions { display: flex; gap: 8px; }
-        .agent-actions button {
-            padding: 6px 14px;
-            border-radius: 6px;
-            border: 1px solid rgba(37,99,235,0.15);
-            background: #fff;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: #475569;
-            transition: all 0.15s;
-            font-family: 'Inter', sans-serif;
-        }
-        .agent-actions button:hover { border-color: #2563eb; color: #2563eb; }
-        .agent-actions button.danger:hover { border-color: #ef4444; color: #ef4444; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-        /* Comparison Table */
-        .compare-table {
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            border-collapse: collapse;
+        .output-panel {
+            background: #0f172a; border-radius: 14px; padding: 20px; margin-bottom: 24px;
+            max-height: 500px; overflow-y: auto; font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem; line-height: 1.7; color: #e2e8f0;
         }
-        .compare-table th, .compare-table td {
-            padding: 14px 20px;
-            text-align: left;
-            border-bottom: 1px solid rgba(37,99,235,0.08);
-        }
-        .compare-table th {
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .compare-table td { font-size: 0.9rem; color: #475569; }
-        .compare-table td:first-child { font-weight: 600; color: #0f172a; }
-        .check { color: #10b981; }
-        .cross { color: #94a3b8; }
+        .output-panel .turn-header { color: #60a5fa; font-weight: 600; margin: 12px 0 6px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); }
+        .output-panel .turn-header:first-child { margin-top: 0; padding-top: 0; border: none; }
+        .output-panel .tool-call { color: #fbbf24; }
+        .output-panel .tool-result { color: #94a3b8; font-size: 0.75rem; }
+        .output-panel .agent-output { color: #e2e8f0; white-space: pre-wrap; }
+        .output-panel .error-msg { color: #f87171; }
+        .output-panel .info-msg { color: #94a3b8; font-style: italic; }
 
-        /* CTA */
-        .cta-section {
-            background: linear-gradient(135deg, #2563eb, #7c3aed);
-            border-radius: 24px;
-            padding: 64px 48px;
-            text-align: center;
-            color: #fff;
+        .memory-panel {
+            background: #fff; border: 1px solid rgba(37,99,235,0.1); border-radius: 14px; padding: 20px; margin-bottom: 24px;
         }
-        .cta-section h2 { font-size: 2rem; font-weight: 700; margin-bottom: 12px; }
-        .cta-section p { font-size: 1.05rem; opacity: 0.9; max-width: 520px; margin: 0 auto 28px; }
-        .btn-white {
-            background: #fff;
-            color: #2563eb;
-            padding: 14px 32px;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: transform 0.2s;
-        }
-        .btn-white:hover { transform: translateY(-2px); }
+        .memory-panel h4 { font-size: 0.9rem; font-weight: 700; color: #0f172a; margin-bottom: 10px; }
+        .memory-item { padding: 8px 0; border-bottom: 1px solid rgba(37,99,235,0.05); font-size: 0.84rem; display: flex; justify-content: space-between; }
+        .memory-item .mk { font-weight: 600; color: #2563eb; }
+        .memory-item .mv { color: #475569; }
 
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 40px 24px;
-            color: #94a3b8;
-            font-size: 0.82rem;
-            border-top: 1px solid rgba(37,99,235,0.06);
+        .templates-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .tpl-card {
+            background: #fff; border: 2px solid rgba(37,99,235,0.08); border-radius: 14px; padding: 20px;
+            cursor: pointer; transition: all 0.15s;
         }
+        .tpl-card:hover { border-color: rgba(37,99,235,0.25); box-shadow: 0 4px 16px rgba(37,99,235,0.06); }
+        .tpl-card.active { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
+        .tpl-card h4 { font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+        .tpl-card .tpl-desc { font-size: 0.8rem; color: #64748b; line-height: 1.5; }
+        .tpl-card .tpl-icon { font-size: 1.3rem; margin-bottom: 8px; }
+
+        footer { text-align: center; padding: 40px 24px; color: #94a3b8; font-size: 0.8rem; border-top: 1px solid rgba(37,99,235,0.06); }
         footer a { color: #2563eb; text-decoration: none; }
 
-        /* Responsive */
-        @media (max-width: 900px) {
-            .steps { grid-template-columns: repeat(2, 1fr); }
-            .template-grid { grid-template-columns: repeat(2, 1fr); }
-            .config-row { flex-direction: column; }
-        }
         @media (max-width: 640px) {
-            .hero h1 { font-size: 2rem; }
-            .steps { grid-template-columns: 1fr; }
-            .template-grid { grid-template-columns: 1fr; }
             nav { display: none; }
             .hamburger { display: block; }
-            .deploy-card .summary { grid-template-columns: 1fr; }
-            .cta-section { padding: 40px 24px; }
-            .cta-section h2 { font-size: 1.5rem; }
+            .templates-grid { grid-template-columns: 1fr; }
+            .setup-row { flex-direction: column; }
         }
     </style>
 </head>
 <body>
 
-<!-- Header -->
 <header id="header">
     <div class="header-inner">
         <a href="index.html" class="logo">
-            <img src="assets/gitblock.jpg" alt="GitBlock">
-            <span>GitBlock</span>
+            <img src="assets/gitblock.jpg" alt="GitBlock"><span>GitBlock</span>
         </a>
         <nav>
             <a href="index.html">Home</a>
@@ -571,410 +155,640 @@
             <a href="playground.html">Playground</a>
             <a href="agents.html" class="active">Agents</a>
         </nav>
-        <button class="hamburger" onclick="document.getElementById('mobile-menu').classList.toggle('open')">
-            <i class="fas fa-bars"></i>
-        </button>
+        <button class="hamburger" onclick="document.getElementById('mobile-menu').classList.toggle('open')"><i class="fas fa-bars"></i></button>
     </div>
 </header>
 <div class="mobile-menu" id="mobile-menu">
-    <a href="index.html">Home</a>
-    <a href="usage.html">Docs</a>
-    <a href="editor.html">Editor</a>
-    <a href="playground.html">Playground</a>
-    <a href="agents.html">Agents</a>
+    <a href="index.html">Home</a><a href="usage.html">Docs</a><a href="editor.html">Editor</a><a href="playground.html">Playground</a><a href="agents.html">Agents</a>
 </div>
 
-<!-- Hero -->
-<section class="hero reveal">
-    <div class="hero-badge">
-        <i class="fas fa-link"></i> Powered by Aeon — 121 skills, self-healing
-    </div>
-    <h1>Autonomous AI Agents.<br><span>No servers. No babysitting.</span></h1>
-    <p>
-        Deploy autonomous agents that run on GitBlock's decentralized GPU network.
-        Configure once — they run forever on open models, with zero inference bills.
-    </p>
-    <div class="hero-buttons">
-        <a href="#templates" class="btn btn-primary"><i class="fas fa-rocket"></i> Pick an Agent</a>
-        <a href="#how-it-works" class="btn btn-outline"><i class="fas fa-circle-nodes"></i> How It Works</a>
-    </div>
-</section>
+<main>
 
-<!-- How It Works -->
-<section id="how-it-works">
-    <div class="section-header reveal">
-        <h2>How It Works</h2>
-        <p>Autonomous agents that run across GitBlock's node network. Powered by the Aeon framework.</p>
+<!-- Setup -->
+<div class="setup-card">
+    <h3><i class="fas fa-key"></i> API Setup</h3>
+        <p style="font-size:0.84rem;color:#64748b;margin-bottom:14px;"><strong>How to get a key:</strong> Go to <a href="index.html#api" style="color:#2563eb;">GitBlock home</a> → Connect wallet → Get API key. Or <a href="https://platform.xiaomimimo.com/console" target="_blank" style="color:#2563eb;">get a MiMo key directly</a>. Same key works in Playground too. Stored locally — never sent to any server.</p>
+    <div class="setup-row">
+        <div class="setup-field">
+            <label>MiMo API Key</label>
+            <input type="password" id="api-key" placeholder="sk-...">
+            <span class="hint" id="key-status">Not set</span>
+        </div>
+        <div class="setup-field">
+            <label>Model</label>
+            <select id="model-select">
+                <option value="mimo-v2.5-pro">MiMo V2.5 Pro (best)</option>
+                <option value="mimo-v2.5">MiMo V2.5 (balanced)</option>
+                <option value="mimo-v2-flash">MiMo V2 Flash (fast)</option>
+            </select>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="saveSettings()"><i class="fas fa-save"></i> Save</button>
+        <button class="btn btn-outline btn-sm" onclick="testConnection()"><i class="fas fa-plug"></i> Test</button>
     </div>
-    <div class="steps">
-        <div class="step-card reveal">
-            <div class="step-num">1</div>
-            <h3>Pick a Skill</h3>
-            <p>Choose from 121 pre-built agent skills — crypto monitor, research digest, price alerts, and more.</p>
-        </div>
-        <div class="step-card reveal">
-            <div class="step-num">2</div>
-            <h3>Set Schedule</h3>
-            <p>Your agent runs on cron. Every hour, every day, or reactively — you decide when it works.</p>
-        </div>
-        <div class="step-card reveal">
-            <div class="step-num">3</div>
-            <h3>Nodes Execute</h3>
-            <p>GitBlock node operators run your agent on their GPUs using open models. No API keys, no rate limits.</p>
-        </div>
-        <div class="step-card reveal">
-            <div class="step-num">4</div>
-            <h3>Get Results</h3>
-            <p>Output delivered to Telegram, Discord, or email. Agents self-heal when skills fail — no babysitting.</p>
-        </div>
-    </div>
-</section>
+</div>
 
-<!-- Agent Templates -->
-<section id="templates">
-    <div class="section-header reveal">
-        <h2>Agent Templates</h2>
-        <p>Pick a template below, customize it, and deploy. Each agent runs on GitBlock's decentralized node network.</p>
+<!-- Templates -->
+<div class="templates-grid" id="templates">
+    <div class="tpl-card" data-skill="crypto-monitor" onclick="selectSkill('crypto-monitor')">
+        <div class="tpl-icon">📈</div>
+        <h4>Crypto Monitor</h4>
+        <p class="tpl-desc">Checks token prices every 30 min. Alerts on 5%+ moves. Uses CoinGecko for real data.</p>
     </div>
-    <div class="template-grid" id="template-grid">
-        <div class="template-card reveal" data-skill="token-alert" onclick="selectTemplate(this)">
-            <div class="select-indicator"><i class="fas fa-check"></i></div>
-            <div class="template-icon icon-green"><i class="fas fa-chart-line"></i></div>
-            <h3>Crypto Price Monitor</h3>
-            <p class="desc">Tracks token prices, alerts on ±20% moves, ATH detection. Runs every 30 minutes.</p>
-            <div class="template-tags"><span class="tag">crypto</span><span class="tag">alerts</span><span class="tag">realtime</span></div>
-        </div>
-        <div class="template-card reveal" data-skill="morning-brief" onclick="selectTemplate(this)">
-            <div class="select-indicator"><i class="fas fa-check"></i></div>
-            <div class="template-icon icon-blue"><i class="fas fa-sun"></i></div>
-            <h3>Morning Brief</h3>
-            <p class="desc">Daily AI/crypto news digest delivered at 7 AM. Curated from 20+ sources.</p>
-            <div class="template-tags"><span class="tag">news</span><span class="tag">daily</span><span class="tag">research</span></div>
-        </div>
-        <div class="template-card reveal" data-skill="token-report" onclick="selectTemplate(this)">
-            <div class="select-indicator"><i class="fas fa-check"></i></div>
-            <div class="template-icon icon-orange"><i class="fas fa-coins"></i></div>
-            <h3>Token Report</h3>
-            <p class="desc">Daily price/volume report from GeckoTerminal with market context and narrative tracking.</p>
-            <div class="template-tags"><span class="tag">defi</span><span class="tag">daily</span><span class="tag">analysis</span></div>
-        </div>
-        <div class="template-card reveal" data-skill="monitor-polymarket" onclick="selectTemplate(this)">
-            <div class="select-indicator"><i class="fas fa-check"></i></div>
-            <div class="template-icon icon-purple"><i class="fas fa-chart-pie"></i></div>
-            <h3>Polymarket Scanner</h3>
-            <p class="desc">Monitors prediction markets for 24h price moves and volume changes. Always watching.</p>
-            <div class="template-tags"><span class="tag">markets</span><span class="tag">trading</span><span class="tag">alerts</span></div>
-        </div>
-        <div class="template-card reveal" data-skill="pr-review" onclick="selectTemplate(this)">
-            <div class="select-indicator"><i class="fas fa-check"></i></div>
-            <div class="template-icon icon-amber"><i class="fas fa-code-pull-request"></i></div>
-            <h3>PR Reviewer</h3>
-            <p class="desc">Auto-reviews pull requests with inline comments. Security-conscious, supports cross-repo.</p>
-            <div class="template-tags"><span class="tag">dev</span><span class="tag">github</span><span class="tag">automation</span></div>
-        </div>
-        <div class="template-card reveal" data-skill="write-tweet" onclick="selectTemplate(this)">
-            <div class="select-indicator"><i class="fas fa-check"></i></div>
-            <div class="template-icon icon-rose"><i class="fab fa-x-twitter"></i></div>
-            <h3>Social Poster</h3>
-            <p class="desc">Drafts tweets and threads from your topics. You review before posting. On-brand every time.</p>
-            <div class="template-tags"><span class="tag">social</span><span class="tag">content</span><span class="tag">automation</span></div>
-        </div>
+    <div class="tpl-card" data-skill="morning-brief" onclick="selectSkill('morning-brief')">
+        <div class="tpl-icon">🌅</div>
+        <h4>Morning Brief</h4>
+        <p class="tpl-desc">Daily digest of AI/crypto news. Searches the web, curates top stories, delivers summary.</p>
     </div>
-</section>
+    <div class="tpl-card" data-skill="market-scanner" onclick="selectSkill('market-scanner')">
+        <div class="tpl-icon">🔍</div>
+        <h4>Market Scanner</h4>
+        <p class="tpl-desc">Scans prediction markets (Polymarket) for big moves. Reports volume spikes and price swings.</p>
+    </div>
+    <div class="tpl-card" data-skill="sentiment-tracker" onclick="selectSkill('sentiment-tracker')">
+        <div class="tpl-icon">💬</div>
+        <h4>Sentiment Tracker</h4>
+        <p class="tpl-desc">Tracks social sentiment for any token. Searches X/Reddit mentions, scores bullish/bearish.</p>
+    </div>
+</div>
 
-<!-- Configuration -->
-<section id="configure">
-    <div class="section-header reveal">
-        <h2>Configure Your Agent</h2>
-        <p>Customize your selected agent. All configuration is stored locally — no account needed.</p>
-    </div>
-    <div class="config-panel reveal" id="config-form">
-        <div class="config-row">
-            <div class="config-field">
-                <label>Selected Skill</label>
-                <select id="cfg-skill" onchange="updateConfig()">
-                    <option value="">— Pick a template above —</option>
-                    <option value="token-alert">Crypto Price Monitor</option>
-                    <option value="morning-brief">Morning Brief</option>
-                    <option value="token-report">Token Report</option>
-                    <option value="monitor-polymarket">Polymarket Scanner</option>
-                    <option value="pr-review">PR Reviewer</option>
-                    <option value="write-tweet">Social Poster</option>
-                </select>
-            </div>
-            <div class="config-field">
-                <label>Focus (var)</label>
-                <input type="text" id="cfg-var" placeholder="e.g. $GITBLOCK, solana, owner/repo">
-            </div>
+<!-- Config -->
+<div class="setup-card">
+    <h3><i class="fas fa-sliders"></i> Agent Config</h3>
+    <div class="setup-row">
+        <div class="setup-field">
+            <label>Focus Target</label>
+            <input type="text" id="agent-var" placeholder="e.g. $GITBLOCK, bitcoin, ethereum">
+            <span class="hint">Token, topic, or market to monitor</span>
         </div>
-        <div class="config-row">
-            <div class="config-field">
-                <label>Schedule</label>
-                <select id="cfg-schedule">
-                    <option value="*/30 * * * *">Every 30 minutes</option>
-                    <option value="0 * * * *">Every hour</option>
-                    <option value="0 7 * * *" selected>Daily at 7 AM UTC</option>
-                    <option value="0 9 * * *">Daily at 9 AM UTC</option>
-                    <option value="0 12 * * *">Daily at 12 PM UTC</option>
-                    <option value="0 17 * * *">Daily at 5 PM UTC</option>
-                    <option value="0 9 * * 1">Every Monday</option>
-                    <option value="reactive">Reactive (triggered by conditions)</option>
-                </select>
-            </div>
-            <div class="config-field">
-                <label>Model</label>
-                <select id="cfg-model">
-                    <option value="llama-3.3-70b">Llama 3.3 70B</option>
-                    <option value="deepseek-coder-33b">DeepSeek Coder 33B</option>
-                    <option value="qwen-2.5-72b">Qwen 2.5 72B</option>
-                    <option value="mistral-7b">Mistral 7B (fast)</option>
-                    <option value="gemma-4-9b">Gemma 4 9B (fast)</option>
-                </select>
-            </div>
+        <div class="setup-field">
+            <label>Run Interval</label>
+            <select id="agent-interval">
+                <option value="5">Every 5 min (testing)</option>
+                <option value="30" selected>Every 30 min</option>
+                <option value="60">Every hour</option>
+                <option value="360">Every 6 hours</option>
+                <option value="1440">Every 24 hours</option>
+            </select>
         </div>
-        <div class="config-row">
-            <div class="config-field">
-                <label>Notifications</label>
-                <div class="notify-toggles">
-                    <div class="notify-toggle active" data-channel="telegram" onclick="toggleNotify(this)"><i class="fab fa-telegram"></i> Telegram</div>
-                    <div class="notify-toggle" data-channel="discord" onclick="toggleNotify(this)"><i class="fab fa-discord"></i> Discord</div>
-                    <div class="notify-toggle" data-channel="email" onclick="toggleNotify(this)"><i class="fas fa-envelope"></i> Email</div>
-                </div>
-            </div>
+        <div class="setup-field">
+            <label>Max Turns / Session</label>
+            <select id="agent-max-turns">
+                <option value="3">3 (quick check)</option>
+                <option value="5" selected>5 (standard)</option>
+                <option value="10">10 (deep research)</option>
+                <option value="20">20 (exhaustive)</option>
+            </select>
         </div>
     </div>
-</section>
+</div>
 
-<!-- Deploy -->
-<section id="deploy">
-    <div class="section-header reveal">
-        <h2>Deploy</h2>
-        <p>Your agent runs on GitBlock's decentralized network. Node operators earn $GITBLOCK for executing your agent sessions.</p>
-    </div>
-    <div class="deploy-card reveal" id="deploy-card">
-        <h3><i class="fas fa-circle-nodes"></i> Ready to Deploy</h3>
-        <div class="summary">
-            <div class="summary-item">
-                <div class="val" id="summary-skill">—</div>
-                <div class="lbl">Skill</div>
-            </div>
-            <div class="summary-item">
-                <div class="val" id="summary-schedule">Daily</div>
-                <div class="lbl">Schedule</div>
-            </div>
-            <div class="summary-item">
-                <div class="val" id="summary-model">Llama 3.3 70B</div>
-                <div class="lbl">Model</div>
-            </div>
-        </div>
-        <button class="deploy-btn" id="deploy-btn" onclick="deployAgent()">
-            <i class="fas fa-rocket"></i> <span id="deploy-btn-text">Deploy Agent</span>
-        </button>
-        <div class="deploy-status" id="deploy-status"></div>
-    </div>
-</section>
+<!-- Controls -->
+<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+    <button class="btn btn-primary" id="btn-start" onclick="startAgent()"><i class="fas fa-play"></i> Start Agent</button>
+    <button class="btn btn-outline" id="btn-stop" onclick="stopAgent()" style="display:none;"><i class="fas fa-stop"></i> Stop Agent</button>
+    <button class="btn btn-outline" id="btn-run-once" onclick="runOnce()"><i class="fas fa-forward-step"></i> Run Once Now</button>
+    <button class="btn btn-danger btn-sm" onclick="clearMemory()"><i class="fas fa-trash"></i> Clear Memory</button>
+    <span style="font-size:0.8rem;color:#94a3b8;display:flex;align-items:center;margin-left:auto;" id="next-run-display"></span>
+</div>
 
-<!-- Active Agents -->
-<section id="active">
-    <div class="section-header reveal">
-        <h2>Your Agents</h2>
-        <p>Agents you've deployed. They run autonomously on GitBlock's node network.</p>
-    </div>
-    <div class="agent-list reveal" id="agent-list">
-        <div style="text-align:center;padding:32px;color:#94a3b8;">
-            <i class="fas fa-inbox" style="font-size:2rem;display:block;margin-bottom:8px;"></i>
-            No agents deployed yet. Pick a template above and deploy your first agent.
-        </div>
-    </div>
-</section>
+<!-- Status -->
+<div class="status-row idle" id="status-bar">
+    <div class="status-dot status-idle" id="status-dot"></div>
+    <span id="status-text">Ready. Select a skill, configure, and start your agent.</span>
+</div>
 
-<!-- Comparison -->
-<section>
-    <div class="section-header reveal">
-        <h2>Why GitBlock Agents?</h2>
-        <p>Autonomous agents should run on decentralized infrastructure, not centralized APIs.</p>
-    </div>
-    <table class="compare-table reveal">
-        <thead>
-            <tr><th>Feature</th><th>GitBlock Agents</th><th>Traditional Agents</th></tr>
-        </thead>
-        <tbody>
-            <tr><td>Runtime</td><td><span class="check">Decentralized GPU network</span></td><td><span class="cross">Centralized cloud</span></td></tr>
-            <tr><td>Inference cost</td><td><span class="check">Free (open models)</span></td><td><span class="cross">Per-token billing</span></td></tr>
-            <tr><td>Rate limits</td><td><span class="check">Unlimited</span></td><td><span class="cross">API quotas</span></td></tr>
-            <tr><td>Censorship resistance</td><td><span class="check">High (distributed nodes)</span></td><td><span class="cross">Provider can ban</span></td></tr>
-            <tr><td>Skills available</td><td><span class="check">121 (Aeon framework)</span></td><td><span class="cross">Custom-built only</span></td></tr>
-            <tr><td>Self-healing</td><td><span class="check">Auto-detects and fixes broken skills</span></td><td><span class="cross">Manual intervention</span></td></tr>
-            <tr><td>Node operator rewards</td><td><span class="check">$GITBLOCK per session</span></td><td><span class="cross">None</span></td></tr>
-            <tr><td>Memory</td><td><span class="check">Persistent across runs</span></td><td><span class="cross">Stateless</span></td></tr>
-        </tbody>
-    </table>
-</section>
+<!-- Output -->
+<div class="output-panel" id="output-panel">
+    <span class="info-msg">Agent output will appear here. Click "Run Once Now" to test your setup.</span>
+</div>
 
-<!-- CTA -->
-<section>
-    <div class="cta-section reveal">
-        <h2>Run a Node. Earn $GITBLOCK.</h2>
-        <p>Node operators earn rewards for running agent sessions on their GPUs. Sustained agent workloads pay 10x more than single inference calls.</p>
-        <a href="index.html#api" class="btn-white"><i class="fas fa-server"></i> Become a Node Operator</a>
-    </div>
-</section>
+<!-- Memory -->
+<div class="memory-panel" id="memory-panel" style="display:none;">
+    <h4><i class="fas fa-brain"></i> Agent Memory</h4>
+    <div id="memory-list"><span style="color:#94a3b8;font-size:0.82rem;">No memory yet. Memory builds as the agent runs.</span></div>
+</div>
 
-<!-- Footer -->
+</main>
+
 <footer>
-    <p>GitBlock Agents · Powered by <a href="https://github.com/aaronjmars/aeon" target="_blank">Aeon</a> · Running on open models via GitBlock node network</p>
-    <p style="margin-top:6px;">&copy; 2026 GitBlock — Intelligence Without Gatekeepers</p>
+    <p>GitBlock Agents · Powered by MiMo AI · Runs locally in your browser — no servers needed</p>
+    <p style="margin-top:4px;">&copy; 2026 GitBlock — Intelligence Without Gatekeepers</p>
 </footer>
 
 <script>
-// Reveal on scroll
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.1 });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+// ═══════════════════════════════════════════
+// CONFIGURATION
+// ═══════════════════════════════════════════
+const MIMO_API_URL = 'https://api.xiaomimimo.com/v1/chat/completions';
+let selectedSkill = '';
+let agentRunning = false;
+let agentTimer = null;
+let nextRunTime = null;
 
-// Header scroll effect
-window.addEventListener('scroll', () => {
-    document.getElementById('header').classList.toggle('scrolled', window.scrollY > 10);
-});
+// ═══════════════════════════════════════════
+// SKILL PROMPTS
+// ═══════════════════════════════════════════
+const SKILLS = {
+    'crypto-monitor': {
+        name: 'Crypto Monitor',
+        system: `You are a cryptocurrency price monitoring agent. Your job: check prices and alert on significant moves.
 
-// Template selection
-let selectedTemplate = null;
-function selectTemplate(card) {
-    document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
-    card.classList.add('selected');
-    selectedTemplate = card.dataset.skill;
-    document.getElementById('cfg-skill').value = selectedTemplate;
-    updateConfig();
-    document.getElementById('configure').scrollIntoView({ behavior: 'smooth' });
+AVAILABLE TOOLS — you MUST use these, never invent data:
+- get_price(token) — returns {token, price_usd, change_24h_pct, source}
+- search_web(query) — returns {results: [{title, url, snippet}]}
+- save_memory(key, value) — save findings to persistent memory
+- get_time() — returns current UTC time
+
+RULES:
+1. ALWAYS call get_price() for the target token first
+2. If 24h change > 5%, explain what's moving it
+3. If price is stable, report briefly and end
+4. Save any notable observation to memory
+5. Be concise — 5 sentences max
+6. NEVER make up prices or data
+
+Format: Start with "📊 [Token] — $[price] ([change])" then analysis.`,
+        defaultVar: 'bitcoin'
+    },
+    'morning-brief': {
+        name: 'Morning Brief',
+        system: `You are a daily news digest agent. You create a morning brief of top stories.
+
+AVAILABLE TOOLS — you MUST use these:
+- search_web(query) — returns {results: [{title, url, snippet}]}
+- save_memory(key, value) — save to memory
+- get_time() — returns current UTC time
+
+RULES:
+1. Search for 2-3 queries on current AI/crypto news
+2. Pick the 3-5 most important stories
+3. For each: headline + one-sentence why it matters + source
+4. Keep the brief under 300 words
+5. End with "That's the brief for [today's date]."
+6. NEVER invent news — only report what search returns`,
+        defaultVar: 'AI and cryptocurrency news'
+    },
+    'market-scanner': {
+        name: 'Market Scanner',
+        system: `You are a prediction market scanning agent. You monitor markets for big moves.
+
+AVAILABLE TOOLS:
+- search_web(query) — returns {results: [{title, url, snippet}]}
+- save_memory(key, value) — save to memory
+- get_time() — returns current UTC time
+
+RULES:
+1. Search for active Polymarket markets on your focus topic
+2. Identify any with significant price or volume moves
+3. Report: market name, current odds, what you think is driving it
+4. Markets are probabilities (0-100 cents). Treat them as such.
+5. Be concise — no fluff, just data and read`,
+        defaultVar: 'crypto prediction markets'
+    },
+    'sentiment-tracker': {
+        name: 'Sentiment Tracker',
+        system: `You are a social sentiment analysis agent. You track what people are saying.
+
+AVAILABLE TOOLS:
+- search_web(query) — returns {results: [{title, url, snippet}]}
+- save_memory(key, value) — save to memory
+- get_time() — returns current UTC time
+
+RULES:
+1. Search for recent mentions/discussions of the target token/topic
+2. Assess sentiment: bullish, bearish, or neutral
+3. Report 2-3 representative takes with source links
+4. Give a 1-line sentiment verdict
+5. Be objective — don't hype, don't FUD
+6. Save sentiment score to memory for trend tracking`,
+        defaultVar: '$GITBLOCK'
+    }
+};
+
+// ═══════════════════════════════════════════
+// TOOLS (real implementations)
+// ═══════════════════════════════════════════
+async function executeTool(name, args) {
+    switch (name) {
+        case 'get_price':
+            return await toolGetPrice(args.token || 'bitcoin');
+        case 'search_web':
+            return await toolSearchWeb(args.query || '');
+        case 'save_memory':
+            return toolSaveMemory(args.key, args.value);
+        case 'get_time':
+            return toolGetTime();
+        default:
+            return { error: `Unknown tool: ${name}` };
+    }
 }
 
-// Notification toggles
-function toggleNotify(el) { el.classList.toggle('active'); }
-
-// Update config summary
-function updateConfig() {
-    const skill = document.getElementById('cfg-skill');
-    const schedule = document.getElementById('cfg-schedule');
-    const model = document.getElementById('cfg-model');
-    const varField = document.getElementById('cfg-var');
-
-    if (skill.value) {
-        selectedTemplate = skill.value;
-        // Auto-select template card
-        document.querySelectorAll('.template-card').forEach(c => {
-            c.classList.toggle('selected', c.dataset.skill === skill.value);
+async function toolGetPrice(token) {
+    const tokenMap = {
+        'bitcoin': 'bitcoin', 'btc': 'bitcoin',
+        'ethereum': 'ethereum', 'eth': 'ethereum',
+        'solana': 'solana', 'sol': 'solana',
+        'gitblock': 'gitblock', 'gblock': 'gitblock',
+        'dogecoin': 'dogecoin', 'doge': 'dogecoin',
+        'cardano': 'cardano', 'ada': 'cardano',
+    };
+    const id = tokenMap[token.toLowerCase().replace('$','')] || token.toLowerCase().replace('$','');
+    try {
+        const resp = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd&include_24hr_change=true`, {
+            headers: { 'Accept': 'application/json' }
         });
+        const data = await resp.json();
+        if (data[id]) {
+            return { token, price_usd: data[id].usd, change_24h_pct: data[id].usd_24h_change || 0, source: 'CoinGecko' };
+        }
+        return { error: `Token "${token}" not found on CoinGecko`, token };
+    } catch (e) {
+        return { error: `Price fetch failed: ${e.message}`, token };
     }
-
-    document.getElementById('summary-skill').textContent = skill.options[skill.selectedIndex].text || '—';
-    document.getElementById('summary-schedule').textContent = schedule.options[schedule.selectedIndex].text;
-    document.getElementById('summary-model').textContent = model.options[model.selectedIndex].text;
 }
 
-// Deploy agent
-function deployAgent() {
-    if (!selectedTemplate && !document.getElementById('cfg-skill').value) {
-        alert('Please select an agent template first.');
-        document.getElementById('templates').scrollIntoView({ behavior: 'smooth' });
+async function toolSearchWeb(query) {
+    try {
+        const resp = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1`, {
+            headers: { 'User-Agent': 'GitBlock-Agent/1.0' }
+        });
+        const data = await resp.json();
+        const results = (data.RelatedTopics || []).slice(0, 5).map(t => ({
+            title: (t.Text || '').split(' - ')[0] || t.Text?.substring(0, 80),
+            url: t.FirstURL || '',
+            snippet: t.Text || ''
+        })).filter(r => r.snippet);
+        return { results: results.length ? results : [], query };
+    } catch (e) {
+        return { error: `Search failed: ${e.message}`, results: [], query };
+    }
+}
+
+function toolSaveMemory(key, value) {
+    const mem = JSON.parse(localStorage.getItem('gb_agent_memory') || '{}');
+    mem[key] = { value, timestamp: new Date().toISOString() };
+    localStorage.setItem('gb_agent_memory', JSON.stringify(mem));
+    renderMemory();
+    return { saved: true, key, preview: value.substring(0, 100) };
+}
+
+function toolGetTime() {
+    const now = new Date();
+    return { utc: now.toISOString(), unix: Math.floor(now.getTime()/1000), readable: now.toUTCString() };
+}
+
+// ═══════════════════════════════════════════
+// TOOL DEFINITIONS (for MiMo function calling)
+// ═══════════════════════════════════════════
+const TOOLS = [
+    {
+        type: 'function',
+        function: {
+            name: 'get_price',
+            description: 'Get current price and 24h change for a cryptocurrency token from CoinGecko.',
+            parameters: {
+                type: 'object',
+                properties: { token: { type: 'string', description: 'Token name or symbol (e.g. bitcoin, ethereum, solana)' } },
+                required: ['token']
+            }
+        }
+    },
+    {
+        type: 'function',
+        function: {
+            name: 'search_web',
+            description: 'Search the web for current information. Returns titles, URLs, and snippets.',
+            parameters: {
+                type: 'object',
+                properties: { query: { type: 'string', description: 'Search query string' } },
+                required: ['query']
+            }
+        }
+    },
+    {
+        type: 'function',
+        function: {
+            name: 'save_memory',
+            description: 'Save a key-value pair to persistent agent memory for future sessions.',
+            parameters: {
+                type: 'object',
+                properties: {
+                    key: { type: 'string', description: 'Key/name for this memory entry' },
+                    value: { type: 'string', description: 'Value to store' }
+                },
+                required: ['key', 'value']
+            }
+        }
+    },
+    {
+        type: 'function',
+        function: {
+            name: 'get_time',
+            description: 'Get the current UTC time.',
+            parameters: { type: 'object', properties: {} }
+        }
+    }
+];
+
+// ═══════════════════════════════════════════
+// AGENT LOOP
+// ═══════════════════════════════════════════
+async function runAgentCycle(skillId, varTarget, maxTurns) {
+    const skill = SKILLS[skillId];
+    if (!skill) return;
+
+    const apiKey = getApiKey();
+    if (!apiKey) {
+        appendOutput('error-msg', '❌ No API key set. Add your MiMo API key in the setup section above.');
         return;
     }
 
-    const skill = selectedTemplate || document.getElementById('cfg-skill').value;
-    const schedule = document.getElementById('cfg-schedule').value;
-    const model = document.getElementById('cfg-model').value;
-    const varVal = document.getElementById('cfg-var').value;
-    const channels = [];
-    document.querySelectorAll('.notify-toggle.active').forEach(t => channels.push(t.dataset.channel));
+    const model = document.getElementById('model-select').value;
 
-    const agent = {
-        id: 'agent_' + Date.now(),
-        skill: skill,
-        schedule: schedule,
-        model: model,
-        var: varVal,
-        channels: channels,
-        deployed: new Date().toISOString(),
-        status: 'running'
-    };
+    // Load memory
+    const memory = JSON.parse(localStorage.getItem('gb_agent_memory') || '{}');
+    const memStr = Object.keys(memory).length > 0
+        ? '\n\nPERSISTENT MEMORY (from past runs):\n' + Object.entries(memory).map(([k,v]) => `- ${k}: ${v.value}`).join('\n')
+        : '';
 
-    // Save to localStorage
-    const agents = JSON.parse(localStorage.getItem('gb_agents') || '[]');
-    agents.push(agent);
-    localStorage.setItem('gb_agents', JSON.stringify(agents));
+    const systemPrompt = skill.system + memStr + '\n\nTARGET: ' + (varTarget || skill.defaultVar);
 
-    // Update UI
-    const btn = document.getElementById('deploy-btn');
-    btn.classList.add('deployed');
-    document.getElementById('deploy-btn-text').textContent = 'Deployed!';
-    document.getElementById('deploy-status').innerHTML = '<span class="success"><i class="fas fa-check-circle"></i> Agent deployed successfully! Running on GitBlock node network.</span>';
-    document.getElementById('deploy-status').classList.add('success');
+    appendOutput('info-msg', `🚀 Starting ${skill.name} session (model: ${model}, max ${maxTurns} turns)...`);
 
-    setTimeout(() => {
-        btn.classList.remove('deployed');
-        document.getElementById('deploy-btn-text').textContent = 'Deploy Another';
-        document.getElementById('deploy-status').innerHTML = '';
-        document.getElementById('deploy-status').classList.remove('success');
-    }, 3000);
+    const messages = [{ role: 'system', content: systemPrompt }];
+    let done = false;
+    let turn = 0;
+    let totalTokens = 0;
 
-    renderAgents();
-    document.getElementById('active').scrollIntoView({ behavior: 'smooth' });
+    while (!done && turn < maxTurns) {
+        turn++;
+        appendOutput('turn-header', `── Turn ${turn}/${maxTurns} ──`);
+
+        // Call MiMo API
+        const body = {
+            model,
+            messages,
+            tools: TOOLS,
+            temperature: 0.4,
+            max_tokens: 800
+        };
+
+        let resp;
+        try {
+            resp = await fetch(MIMO_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + apiKey
+                },
+                body: JSON.stringify(body)
+            });
+        } catch (e) {
+            appendOutput('error-msg', `❌ API call failed: ${e.message}`);
+            return;
+        }
+
+        if (!resp.ok) {
+            const errText = await resp.text();
+            appendOutput('error-msg', `❌ API error ${resp.status}: ${errText.substring(0, 200)}`);
+            return;
+        }
+
+        const data = await resp.json();
+        const choice = data.choices?.[0];
+        if (!choice) {
+            appendOutput('error-msg', '❌ No response from API');
+            return;
+        }
+
+        const msg = choice.message;
+        totalTokens += data.usage?.total_tokens || 0;
+
+        // Check for tool calls
+        if (msg.tool_calls && msg.tool_calls.length > 0) {
+            appendOutput('tool-call', `🔧 Calling: ${msg.tool_calls.map(tc => tc.function.name).join(', ')}`);
+
+            // Add assistant message
+            messages.push({ role: 'assistant', content: msg.content || '', tool_calls: msg.tool_calls });
+
+            // Execute tools
+            for (const tc of msg.tool_calls) {
+                const args = JSON.parse(tc.function.arguments || '{}');
+                const result = await executeTool(tc.function.name, args);
+                appendOutput('tool-result', `   ↳ ${JSON.stringify(result).substring(0, 200)}`);
+
+                messages.push({
+                    role: 'tool',
+                    tool_call_id: tc.id,
+                    content: JSON.stringify(result)
+                });
+            }
+        } else {
+            // No tool calls = agent is done
+            appendOutput('agent-output', msg.content || '(no output)');
+            messages.push({ role: 'assistant', content: msg.content || '' });
+            done = true;
+        }
+    }
+
+    if (!done) {
+        appendOutput('info-msg', `⚠️ Reached max turns (${maxTurns}) without completion.`);
+    }
+
+    appendOutput('info-msg', `✅ Session complete. ~${totalTokens} tokens used.`);
+
+    // Update last run
+    localStorage.setItem('gb_agent_last_run', new Date().toISOString());
+    localStorage.setItem('gb_agent_run_count', (parseInt(localStorage.getItem('gb_agent_run_count') || '0') + 1).toString());
+    renderMemory();
+    updateStats();
 }
 
-// Render agent list
-function renderAgents() {
-    const agents = JSON.parse(localStorage.getItem('gb_agents') || '[]');
-    const container = document.getElementById('agent-list');
+// ═══════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════
+function appendOutput(cls, text) {
+    const panel = document.getElementById('output-panel');
+    const div = document.createElement('div');
+    div.className = cls;
+    div.textContent = text;
+    panel.appendChild(div);
+    panel.scrollTop = panel.scrollHeight;
+}
 
-    if (agents.length === 0) {
-        container.innerHTML = '<div style="text-align:center;padding:32px;color:#94a3b8;"><i class="fas fa-inbox" style="font-size:2rem;display:block;margin-bottom:8px;"></i>No agents deployed yet. Pick a template above and deploy your first agent.</div>';
+function clearOutput() {
+    const panel = document.getElementById('output-panel');
+    panel.innerHTML = '';
+}
+
+function setStatus(running, text) {
+    const bar = document.getElementById('status-bar');
+    const dot = document.getElementById('status-dot');
+    const txt = document.getElementById('status-text');
+
+    bar.className = 'status-row ' + (running ? 'running' : 'idle');
+    dot.className = 'status-dot ' + (running ? 'status-running' : 'status-idle');
+    txt.textContent = text;
+}
+
+// ═══════════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════════
+function getApiKey() {
+    return document.getElementById('api-key').value || localStorage.getItem('gb_mimo_api_key') || '';
+}
+
+function saveSettings() {
+    const key = document.getElementById('api-key').value;
+    const model = document.getElementById('model-select').value;
+    if (key) localStorage.setItem('gb_mimo_api_key', key);
+    localStorage.setItem('gb_mimo_model', model);
+    updateKeyStatus();
+}
+
+async function testConnection() {
+    const key = getApiKey();
+    if (!key) { alert('Enter your MiMo API key first.'); return; }
+
+    const resp = await fetch(MIMO_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+        body: JSON.stringify({ model: document.getElementById('model-select').value, messages: [{ role: 'user', content: 'Say "OK" if you can read this.' }], max_tokens: 10 })
+    });
+
+    if (resp.ok) {
+        document.getElementById('key-status').textContent = '✅ Connected';
+        document.getElementById('key-status').style.color = '#059669';
+    } else {
+        document.getElementById('key-status').textContent = '❌ Invalid key';
+        document.getElementById('key-status').style.color = '#dc2626';
+    }
+}
+
+function selectSkill(skillId) {
+    selectedSkill = skillId;
+    document.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('active'));
+    document.querySelector(`[data-skill="${skillId}"]`).classList.add('active');
+    const skill = SKILLS[skillId];
+    document.getElementById('agent-var').value = skill.defaultVar;
+    document.getElementById('agent-var').placeholder = `e.g. ${skill.defaultVar}`;
+    setStatus(false, `Selected: ${skill.name}. Configure and click "Start Agent" or "Run Once Now".`);
+}
+
+async function runOnce() {
+    if (!selectedSkill) { alert('Select a skill template first.'); return; }
+    clearOutput();
+    setStatus(true, 'Running agent session...');
+    const varTarget = document.getElementById('agent-var').value;
+    const maxTurns = parseInt(document.getElementById('agent-max-turns').value);
+    await runAgentCycle(selectedSkill, varTarget, maxTurns);
+    setStatus(false, 'Session complete. Agent is idle.');
+}
+
+function startAgent() {
+    if (!selectedSkill) { alert('Select a skill template first.'); return; }
+    if (!getApiKey()) { alert('Set your MiMo API key first.'); return; }
+
+    agentRunning = true;
+    document.getElementById('btn-start').style.display = 'none';
+    document.getElementById('btn-stop').style.display = 'inline-flex';
+
+    const intervalMin = parseInt(document.getElementById('agent-interval').value);
+    const ms = intervalMin * 60 * 1000;
+
+    setStatus(true, `Agent running. Next run in ${intervalMin} minutes.`);
+
+    // Calculate next run time
+    nextRunTime = new Date(Date.now() + ms);
+    updateNextRunDisplay();
+
+    // Run immediately
+    const varTarget = document.getElementById('agent-var').value;
+    const maxTurns = parseInt(document.getElementById('agent-max-turns').value);
+    runAgentCycle(selectedSkill, varTarget, maxTurns).then(() => {
+        if (agentRunning) setStatus(true, `Agent running. Next run in ${intervalMin} minutes.`);
+    });
+
+    // Schedule repeats
+    agentTimer = setInterval(() => {
+        if (!agentRunning) { clearInterval(agentTimer); return; }
+        const varT = document.getElementById('agent-var').value;
+        const maxT = parseInt(document.getElementById('agent-max-turns').value);
+        clearOutput();
+        runAgentCycle(selectedSkill, varT, maxT);
+        nextRunTime = new Date(Date.now() + ms);
+        updateNextRunDisplay();
+    }, ms);
+}
+
+function stopAgent() {
+    agentRunning = false;
+    if (agentTimer) { clearInterval(agentTimer); agentTimer = null; }
+    nextRunTime = null;
+    document.getElementById('btn-start').style.display = 'inline-flex';
+    document.getElementById('btn-stop').style.display = 'none';
+    document.getElementById('next-run-display').textContent = '';
+    setStatus(false, 'Agent stopped.');
+}
+
+function updateNextRunDisplay() {
+    if (nextRunTime) {
+        document.getElementById('next-run-display').textContent = 'Next run: ' + nextRunTime.toLocaleTimeString();
+    }
+}
+
+function clearMemory() {
+    if (confirm('Delete all agent memory?')) {
+        localStorage.removeItem('gb_agent_memory');
+        localStorage.removeItem('gb_agent_run_count');
+        localStorage.removeItem('gb_agent_last_run');
+        renderMemory();
+        updateStats();
+    }
+}
+
+function renderMemory() {
+    const mem = JSON.parse(localStorage.getItem('gb_agent_memory') || '{}');
+    const panel = document.getElementById('memory-panel');
+    const list = document.getElementById('memory-list');
+
+    const keys = Object.keys(mem);
+    if (keys.length === 0) {
+        panel.style.display = 'none';
         return;
     }
 
-    const skillNames = {
-        'token-alert': 'Crypto Price Monitor',
-        'morning-brief': 'Morning Brief',
-        'token-report': 'Token Report',
-        'monitor-polymarket': 'Polymarket Scanner',
-        'pr-review': 'PR Reviewer',
-        'write-tweet': 'Social Poster'
-    };
-
-    container.innerHTML = agents.map(a => `
-        <div class="agent-item">
-            <div class="agent-status ${a.status === 'running' ? 'status-running' : a.status === 'error' ? 'status-error' : 'status-stopped'}"></div>
-            <div class="agent-info">
-                <div class="name">${skillNames[a.skill] || a.skill}</div>
-                <div class="meta">${a.schedule} · ${a.model} · Deployed ${new Date(a.deployed).toLocaleDateString()}</div>
-            </div>
-            <div class="agent-actions">
-                <button onclick="toggleAgent('${a.id}')">${a.status === 'running' ? 'Pause' : 'Start'}</button>
-                <button class="danger" onclick="removeAgent('${a.id}')">Remove</button>
-            </div>
+    panel.style.display = 'block';
+    list.innerHTML = keys.map(k => `
+        <div class="memory-item">
+            <span class="mk">${k}</span>
+            <span class="mv">${mem[k].value.substring(0, 120)}</span>
         </div>
     `).join('');
 }
 
-function toggleAgent(id) {
-    const agents = JSON.parse(localStorage.getItem('gb_agents') || '[]');
-    const agent = agents.find(a => a.id === id);
-    if (agent) {
-        agent.status = agent.status === 'running' ? 'stopped' : 'running';
-        localStorage.setItem('gb_agents', JSON.stringify(agents));
-        renderAgents();
+function updateStats() {
+    const runs = parseInt(localStorage.getItem('gb_agent_run_count') || '0');
+    const lastRun = localStorage.getItem('gb_agent_last_run');
+    document.getElementById('key-status').textContent = `${runs} sessions run${lastRun ? ' · Last: ' + new Date(lastRun).toLocaleString() : ''}`;
+}
+
+function updateKeyStatus() {
+    const key = getApiKey();
+    if (key) {
+        document.getElementById('api-key').value = key;
+        document.getElementById('key-status').textContent = 'Key loaded from storage';
+        document.getElementById('key-status').style.color = '#64748b';
     }
 }
 
-function removeAgent(id) {
-    let agents = JSON.parse(localStorage.getItem('gb_agents') || '[]');
-    agents = agents.filter(a => a.id !== id);
-    localStorage.setItem('gb_agents', JSON.stringify(agents));
-    renderAgents();
-}
-
-// Init
-updateConfig();
-renderAgents();
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+updateKeyStatus();
+updateStats();
+// Pre-select crypto-monitor
+selectSkill('crypto-monitor');
 </script>
 </body>
 </html>
