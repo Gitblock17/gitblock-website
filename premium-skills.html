@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premium Skills — GitBlock</title>
+<link rel="icon" href="assets/gitblock.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#e2e8f0;line-height:1.6;overflow-x:hidden}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 50% 0%,rgba(124,58,237,0.12) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(37,99,235,0.08) 0%,transparent 50%);pointer-events:none;z-index:0}
+body>*:not(script){position:relative;z-index:1}
+
+header{position:fixed;top:0;left:0;width:100%;background:rgba(10,10,15,0.94);backdrop-filter:blur(16px);border-bottom:1px solid rgba(124,58,237,0.15);z-index:1000}
+.header-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#a78bfa;font-weight:800;font-size:1.15rem}
+.logo img{width:32px;height:32px;border-radius:8px;object-fit:cover}
+nav{display:flex;gap:24px}
+nav a{text-decoration:none;color:#94a3b8;font-size:.88rem;font-weight:500;transition:color .15s}
+nav a:hover,nav a.active{color:#a78bfa}
+nav a.active{font-weight:600}
+.hamburger{display:none;background:none;border:none;font-size:1.3rem;color:#a78bfa;cursor:pointer}
+.mobile-menu{display:none;position:fixed;top:60px;left:0;width:100%;background:rgba(10,10,15,0.98);border-bottom:1px solid rgba(124,58,237,0.15);flex-direction:column;padding:16px 24px;gap:12px;z-index:999}
+.mobile-menu.open{display:flex}
+.mobile-menu a{text-decoration:none;color:#94a3b8;font-size:1rem;font-weight:500;padding:8px 0;border-bottom:1px solid rgba(124,58,237,0.08)}
+
+.hero{padding:120px 24px 60px;text-align:center;max-width:800px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(37,99,235,0.15));border:1px solid rgba(124,58,237,0.3);color:#a78bfa;font-size:.82rem;font-weight:600;padding:6px 16px;border-radius:100px;margin-bottom:20px}
+.hero h1{font-size:2.8rem;font-weight:800;line-height:1.15;margin-bottom:16px;background:linear-gradient(135deg,#a78bfa,#818cf8,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:1.1rem;color:#94a3b8;max-width:540px;margin:0 auto 32px;line-height:1.7}
+
+.gate-card{max-width:500px;margin:0 auto 60px;background:rgba(15,15,25,0.8);border:1px solid rgba(124,58,237,0.2);border-radius:20px;padding:32px;text-align:center}
+.gate-card.locked{border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.03)}
+.gate-card.unlocked{border-color:rgba(16,185,129,0.3);background:rgba(16,185,129,0.03)}
+.gate-icon{font-size:3rem;margin-bottom:16px}
+.gate-card h3{font-size:1.3rem;font-weight:700;margin-bottom:8px}
+.gate-card p{font-size:.9rem;color:#94a3b8;margin-bottom:20px}
+.gate-card .balance-display{font-size:1.6rem;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:6px}
+.gate-card .balance-label{font-size:.78rem;color:#64748b;text-transform:uppercase;letter-spacing:1px}
+
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:10px;font-size:.9rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:all .15s;font-family:'Inter',sans-serif}
+.btn-primary{background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;box-shadow:0 4px 16px rgba(124,58,237,0.3)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(124,58,237,0.4)}
+.btn-outline{background:transparent;color:#a78bfa;border:1.5px solid rgba(124,58,237,0.3)}
+.btn-outline:hover{border-color:#a78bfa}
+.btn-sm{padding:7px 16px;font-size:.8rem}
+
+section{max-width:1100px;margin:0 auto;padding:0 24px 80px}
+.section-header{text-align:center;margin-bottom:48px}
+.section-header h2{font-size:1.8rem;font-weight:700;color:#e2e8f0;margin-bottom:8px}
+.section-header p{font-size:.95rem;color:#94a3b8}
+
+.skills-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.skill-card{background:rgba(15,15,25,0.6);border:1px solid rgba(124,58,237,0.12);border-radius:16px;padding:24px;transition:all .2s;position:relative;overflow:hidden}
+.skill-card:hover{border-color:rgba(124,58,237,0.3);transform:translateY(-2px)}
+.skill-card.locked{filter:grayscale(0.5);opacity:.7}
+.skill-card.locked:hover{border-color:rgba(239,68,68,0.3);opacity:.85;filter:grayscale(0.2)}
+.skill-card .lock-badge{position:absolute;top:16px;right:16px;font-size:.8rem;background:rgba(239,68,68,0.15);color:#f87171;padding:3px 10px;border-radius:100px;font-weight:600}
+.skill-card.unlocked .lock-badge{background:rgba(16,185,129,0.15);color:#34d399}
+.skill-card .skill-icon{font-size:1.6rem;margin-bottom:12px}
+.skill-card h4{font-size:1rem;font-weight:700;color:#e2e8f0;margin-bottom:6px}
+.skill-card .skill-desc{font-size:.82rem;color:#94a3b8;line-height:1.5;margin-bottom:14px}
+.skill-card .skill-actions{display:flex;gap:8px;flex-wrap:wrap}
+.skill-card .skill-actions button{font-size:.76rem}
+.skill-card .skill-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.skill-card .tag{font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:100px;background:rgba(124,58,237,0.1);color:#a78bfa}
+
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center}
+.modal-overlay.active{display:flex}
+.modal{background:#12121a;border:1px solid rgba(124,58,237,0.2);border-radius:16px;padding:32px;max-width:700px;width:90%;max-height:80vh;overflow-y:auto}
+.modal h3{font-size:1.2rem;font-weight:700;color:#e2e8f0;margin-bottom:16px}
+.modal pre{background:#0a0a0f;border:1px solid rgba(124,58,237,0.15);border-radius:10px;padding:20px;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:#e2e8f0;white-space:pre-wrap;line-height:1.7;max-height:400px;overflow-y:auto}
+.modal .modal-actions{display:flex;gap:10px;margin-top:16px;justify-content:flex-end}
+
+.how-it-works{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:60px}
+.hw-card{text-align:center;padding:24px}
+.hw-card .hw-num{width:40px;height:40px;background:linear-gradient(135deg,#7c3aed,#2563eb);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;margin:0 auto 14px}
+.hw-card h4{font-weight:700;color:#e2e8f0;margin-bottom:6px;font-size:.95rem}
+.hw-card p{font-size:.82rem;color:#94a3b8}
+
+footer{text-align:center;padding:40px 24px;color:#64748b;font-size:.8rem;border-top:1px solid rgba(124,58,237,0.08)}
+footer a{color:#a78bfa;text-decoration:none}
+
+@media(max-width:768px){.skills-grid{grid-template-columns:1fr}.how-it-works{grid-template-columns:1fr}.hero h1{font-size:2rem}nav{display:none}.hamburger{display:block}}
+
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:10px;font-size:.84rem;font-weight:600;z-index:3000;animation:slideUp .3s ease}
+.toast.success{background:#059669;color:#fff}
+.toast.error{background:#dc2626;color:#fff}
+.toast.info{background:#2563eb;color:#fff}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<header id="header">
+<div class="header-inner">
+<a href="index.html" class="logo"><img src="assets/gitblock.jpg" alt="GitBlock"><span>GitBlock</span></a>
+<nav>
+<a href="index.html">Home</a><a href="usage.html">Docs</a><a href="playground.html">Playground</a><a href="premium-skills.html" class="active">Premium</a>
+</nav>
+<button class="hamburger" onclick="document.getElementById('mobile-menu').classList.toggle('open')"><i class="fas fa-bars"></i></button>
+</div>
+</header>
+<div class="mobile-menu" id="mobile-menu">
+<a href="index.html">Home</a><a href="usage.html">Docs</a><a href="playground.html">Playground</a><a href="premium-skills.html">Premium</a>
+</div>
+
+<div class="hero">
+<div class="hero-badge"><i class="fas fa-gem"></i> Token-Gated · Aeon Compatible</div>
+<h1>Premium Agent Skills</h1>
+<p>Exclusive autonomous agent skills for $GITBLOCK holders. Power up your Aeon instance with advanced trading, alpha detection, and market intelligence skills. Hold $GITBLOCK → unlock everything.</p>
+</div>
+
+<div class="gate-card locked" id="gate-card">
+<div class="gate-icon" id="gate-icon">🔒</div>
+<h3 id="gate-title">Connect to Unlock</h3>
+<p id="gate-desc">Verify you hold $GITBLOCK on Base to access premium skills. Any amount qualifies — you're an early holder.</p>
+<div id="gate-balance" style="display:none">
+<div class="balance-display" id="balance-amount">—</div>
+<div class="balance-label">$GITBLOCK in wallet</div>
+</div>
+<div style="margin-top:16px">
+<button class="btn btn-primary" id="btn-connect" onclick="connectWallet()"><i class="fas fa-wallet"></i> Connect Wallet</button>
+<button class="btn btn-outline" id="btn-disconnect" onclick="disconnectWallet()" style="display:none"><i class="fas fa-sign-out-alt"></i> Disconnect</button>
+</div>
+<p style="font-size:.75rem;color:#64748b;margin-top:12px" id="wallet-addr-display"></p>
+</div>
+
+<div class="how-it-works">
+<div class="hw-card"><div class="hw-num">1</div><h4>Connect Wallet</h4><p>MetaMask or any Ethereum wallet on Base chain.</p></div>
+<div class="hw-card"><div class="hw-num">2</div><h4>Verify Holdings</h4><p>On-chain check — any $GITBLOCK amount qualifies.</p></div>
+<div class="hw-card"><div class="hw-num">3</div><h4>Unlock Skills</h4><p>Copy premium SKILL.md files into your Aeon instance.</p></div>
+</div>
+
+<section>
+<div class="section-header"><h2>Premium Skills</h2><p>Six exclusive agent skills. Drop into Aeon with ./add-skill. Compatible with Aeon's full scheduling, chaining, and self-healing.</p></div>
+<div class="skills-grid" id="skills-grid"></div>
+</section>
+
+<section style="text-align:center">
+<div style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(37,99,235,0.08));border:1px solid rgba(124,58,237,0.2);border-radius:20px;padding:48px 32px">
+<h2 style="font-size:1.5rem;font-weight:700;margin-bottom:8px">Don't have $GITBLOCK yet?</h2>
+<p style="color:#94a3b8;margin-bottom:20px">Get $GITBLOCK on Base to unlock premium skills + support the decentralized AI network.</p>
+<a href="https://basescan.org/token/0xDa1Ae26f0F702DF94926042Fc1Fe1e855D376b07" target="_blank" class="btn btn-outline"><i class="fas fa-external-link-alt"></i> View on Basescan</a>
+</div>
+</section>
+
+<footer>
+<p>Premium Skills · Powered by Aeon Framework · Token-gated for $GITBLOCK holders</p>
+<p style="margin-top:4px">&copy; 2026 GitBlock — Intelligence Without Gatekeepers</p>
+</footer>
+
+<div class="modal-overlay" id="modal">
+<div class="modal">
+<h3 id="modal-title"></h3>
+<pre id="modal-content"></pre>
+<div class="modal-actions">
+<button class="btn btn-outline btn-sm" id="modal-copy" onclick="copyModalContent()"><i class="fas fa-copy"></i> Copy SKILL.md</button>
+<button class="btn btn-outline btn-sm" id="modal-download" onclick="downloadSkill()"><i class="fas fa-download"></i> Download</button>
+<button class="btn btn-sm" style="background:#334155;color:#e2e8f0" onclick="closeModal()">Close</button>
+</div>
+</div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════
+const GITBLOCK_CONTRACT = '0xDa1Ae26f0F702DF94926042Fc1Fe1e855D376b07';
+const BASE_RPC = 'https://mainnet.base.org';
+const BASE_CHAIN_ID = 8453;
+let currentAccount = null;
+let gitblockBalance = 0;
+let unlocked = false;
+
+// ══════════════════════════════════════
+// PREMIUM SKILLS
+// ══════════════════════════════════════
+const PREMIUM_SKILLS = [
+  {
+    id: 'arbitrage-scanner',
+    name: 'Arbitrage Scanner',
+    icon: '🔄',
+    desc: 'Monitors CEX/DEX price gaps across Base, Ethereum, and Solana. Alerts when spreads exceed threshold. Auto-calculates gas-adjusted profitability.',
+    tags: ['trading', 'defi', 'realtime'],
+    skill: `---
+name: arbitrage-scanner
+description: Monitor CEX/DEX price gaps for arbitrage opportunities
+schedule: "*/5 * * * *"
+category: trading
+---
+
+# Arbitrage Scanner
+
+You are an arbitrage detection agent. Scan for profitable cross-exchange price gaps.
+
+## Configuration
+- **var**: Token symbol to monitor (e.g., "ETH", "USDC", "GITBLOCK")
+
+## Execution
+1. Fetch prices from at least 3 sources:
+   - CoinGecko free API: https://api.coingecko.com/api/v3/simple/price?ids={{var}}&vs_currencies=usd
+   - DexScreener: https://api.dexscreener.com/latest/dex/search?q={{var}}
+   - 1inch quote (Base): https://api.1inch.dev/swap/v6.0/8453/quote
+
+2. Calculate max spread across sources
+3. Apply gas cost estimate (Base L2 ~$0.01-0.05 per tx)
+4. If spread > 1.5% after gas → alert with exact numbers
+5. If spread < 1.5% → log silently, save to memory
+
+## Output Format
+\`\`\`
+🔄 [TOKEN] Arbitrage Check — [TIME]
+   CoinGecko: $X.XX
+   DexScreener: $X.XX  
+   1inch Quote: $X.XX
+   Max Spread: X.X%
+   Gas-Adjusted: [PROFITABLE / NOT PROFITABLE]
+\`\`\`
+
+## Notification
+Only send notification when gas-adjusted spread > 1.5%. Silent otherwise.`
+  },
+  {
+    id: 'alpha-tracker',
+    name: 'Alpha Tracker',
+    icon: '👁️',
+    desc: 'Tracks smart money wallet movements on Base and Ethereum. Flags accumulation patterns, new position entries, and unusual activity.',
+    tags: ['alpha', 'onchain', 'intelligence'],
+    skill: `---
+name: alpha-tracker
+description: Track smart money wallet movements and accumulation patterns
+schedule: "0 * * * *"
+category: crypto
+---
+
+# Alpha Tracker
+
+You are a smart money tracking agent. Monitor known alpha wallets for actionable signals.
+
+## Configuration
+- **var**: Comma-separated wallet addresses to watch (or use curated list)
+
+## Execution
+1. Query wallet transaction history via Etherscan/BaseScan free API
+2. Check last 1 hour of transactions
+3. Flag patterns:
+   - Large buys of new tokens (>$10K)
+   - Accumulation (multiple small buys)
+   - New protocol interactions
+   - LP deposits/withdrawals
+4. Cross-reference bought tokens on DexScreener for early price action
+5. Score each signal 1-5 based on confidence
+
+## Output Format
+\`\`\`
+👁️ Alpha Signals — [TIME]
+   Wallet 0x... (score 4/5): Bought $50K of TOKEN on Base
+   Wallet 0x... (score 3/5): Deposited $25K into PROTOCOL LP
+   Wallet 0x... (score 2/5): New wallet interaction with CONTRACT
+   
+   🔥 Top Pick: [TOKEN] — early accumulation detected
+\`\`\`
+
+## Notification
+Send daily digest. Immediate alert only for score 5 signals.`
+  },
+  {
+    id: 'narrative-hunter',
+    name: 'Narrative Hunter',
+    icon: '🎯',
+    desc: 'Identifies emerging crypto narratives before they pump. Scans social media, news, and on-chain data to detect narrative shifts early.',
+    tags: ['narrative', 'social', 'early'],
+    skill: `---
+name: narrative-hunter
+description: Identify emerging crypto narratives before they go mainstream
+schedule: "30 */2 * * *"
+category: research
+---
+
+# Narrative Hunter
+
+You are a narrative detection agent. Your edge: finding narratives BEFORE CT catches on.
+
+## Configuration
+- **var**: Focus area (e.g., "AI agents", "DeFi", "memecoins", "L2s")
+
+## Execution
+1. Scan multiple sources for emerging patterns:
+   - Crypto Twitter search (via Nitter/alternative)
+   - Reddit r/cryptocurrency + r/{{var}}
+   - GitHub trending repos in crypto/web3
+   - New token launches (DexScreener new pairs)
+2. Count mentions per narrative keyword
+3. Compare to 24h baseline (from memory)
+4. Detect narrative acceleration (>3x mention growth)
+5. Score: EARLY (first signals) / BUILDING (growing) / PEAKING (saturation)
+
+## Output Format
+\`\`\`
+🎯 Narrative Pulse — [TIME]
+   🔥 BUILDING: [Narrative] — 5.2x mention growth
+   📈 EARLY: [Narrative] — 2.1x growth, first signals
+   📉 PEAKING: [Narrative] — saturation detected
+   
+   💡 Early opportunity: [Narrative] — first mover window open
+\`\`\`
+
+## Notification
+Send when any narrative hits EARLY status with 3x+ growth.`
+  },
+  {
+    id: 'whale-alert',
+    name: 'Whale Alert Pro',
+    icon: '🐋',
+    desc: 'Monitors large transactions on Base and Ethereum. AI analysis of each move: accumulation, distribution, or routing. Smarter than raw alerts.',
+    tags: ['whale', 'onchain', 'alerts'],
+    skill: `---
+name: whale-alert-pro
+description: Monitor and analyze large wallet movements with AI classification
+schedule: "*/15 * * * *"
+category: crypto
+---
+
+# Whale Alert Pro
+
+You are a whale transaction analysis agent. Classify every large move.
+
+## Configuration
+- **var**: Minimum USD threshold (default: 100000)
+
+## Execution
+1. Query Etherscan/BaseScan for transactions > ${{var}} in last 15 min
+2. For each large TX:
+   - Get sender and receiver wallet tags (exchange, DeFi, unknown)
+   - Check if tokens moved to/from known CEX wallets
+   - Classify: BUYING / SELLING / ROUTING / STAKING / UNKNOWN
+3. Cross-reference token with CoinGecko price
+4. Assess market impact potential
+5. Deduplicate (same wallet, same token within 1h)
+
+## Output Format
+\`\`\`
+🐋 Whale Moves — [TIME]
+   [SELLING] $2.1M ETH → Coinbase (wallet age: 8 months)
+   [BUYING] $850K TOKEN ← Uniswap (fresh wallet)
+   [ROUTING] $5M USDC bridge (Arbitrum → Base)
+   
+   ⚠️ Watch: ETH seller has history of timing local tops
+\`\`\`
+
+## Memory
+Track whale wallet behavior over time. Build profiles. Flag repeat patterns.`
+  },
+  {
+    id: 'yield-scanner',
+    name: 'Yield Scanner',
+    icon: '🌾',
+    desc: 'Monitors DeFi yields across Base protocols. Flags APY changes, new farm launches, and impermanent loss risks. Always watching.',
+    tags: ['defi', 'yield', 'base'],
+    skill: `---
+name: yield-scanner
+description: Monitor DeFi yields and farm opportunities across Base protocols
+schedule: "0 */4 * * *"
+category: defi
+---
+
+# Yield Scanner
+
+You are a yield optimization agent. Monitor Base DeFi for the best risk-adjusted yields.
+
+## Configuration
+- **var**: Comma-separated protocols to monitor (default: all tracked)
+
+## Execution
+1. Query yield data from:
+   - DefiLlama yields API (free)
+   - Individual protocol subgraphs
+   - DexScreener for LP pair volumes
+2. For each pool/farm track:
+   - Current APY (base + rewards)
+   - 24h APY change
+   - TVL and TVL change
+   - Impermanent loss risk (volatile pairs)
+3. Score: SAFE (stablecoin) / MODERATE (blue chip) / AGGRESSIVE (new token)
+4. Flag new farms and pools (<48h old)
+5. Compare to yesterday's snapshot from memory
+
+## Output Format
+\`\`\`
+🌾 Yield Pulse — [TIME]
+   🟢 SAFE: USDC/AERO — 12.3% APY (TVL: $45M, stable)
+   🟡 MOD: ETH/USDC — 28.7% APY (TVL: $12M, +8% 24h)
+   🔴 AGGR: GITBLOCK/ETH — 420% APY (NEW, <24h, high IL risk)
+   
+   💧 New opportunity: GITBLOCK/ETH farm — early LP rewards
+\`\`\`
+
+## Notification
+Send when: new farm detected, APY swing >20%, or high TVL pool changes tier.`
+  },
+  {
+    id: 'event-trader',
+    name: 'Event Trader',
+    icon: '📅',
+    desc: 'Tracks crypto event calendars — token unlocks, protocol upgrades, governance votes, airdrop claims. Positions you before the crowd.',
+    tags: ['events', 'calendar', 'trading'],
+    skill: `---
+name: event-trader
+description: Track crypto events and position before market-moving catalysts
+schedule: "0 6 * * *"
+category: trading
+---
+
+# Event Trader
+
+You are a crypto event monitoring agent. Know what's happening before it pumps.
+
+## Configuration
+- **var**: Focus token or protocol (default: all tracked)
+
+## Execution
+1. Scan event calendars for next 7 days:
+   - TokenUnlocks API (free tier)
+   - CoinMarketCap calendar
+   - Protocol governance forums
+   - Discord announcement channels
+2. Classify events:
+   - BULLISH: mainnet launch, major listing, partnership
+   - BEARISH: large unlock, team token sale, exploit
+   - NEUTRAL: governance vote, minor update
+3. Estimate market impact (high/medium/low)
+4. Check if market is pricing it in (compare to 7d price action)
+5. Score opportunity: mispriced events = edge
+
+## Output Format
+\`\`\`
+📅 Event Calendar — Next 7 Days
+   
+   🔴 HIGH IMPACT:
+   Mon: [TOKEN] $50M unlock (1.2% supply) — NOT priced in
+   Wed: [PROTOCOL] V2 launch on Base — 60% probability priced
+   
+   🟡 MEDIUM:
+   Thu: [DAO] Governance vote on fee switch — pending
+   Sat: [TOKEN] CEX listing rumor — conflicting signals
+   
+   💡 Best setup: [EVENT] — asymmetric risk/reward, low pre-positioning
+\`\`\`
+
+## Memory
+Track event outcomes. Learn which event types actually move price.`
+  }
+];
+
+// ══════════════════════════════════════
+// WALLET
+// ══════════════════════════════════════
+async function connectWallet() {
+  const btn = document.getElementById('btn-connect');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+
+  try {
+    if (!window.ethereum) {
+      showToast('No wallet found. Install MetaMask.', 'error');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-wallet"></i> Connect Wallet';
+      return;
+    }
+
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    currentAccount = accounts[0];
+
+    // Switch to Base
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x' + BASE_CHAIN_ID.toString(16) }]
+      });
+    } catch (e) {
+      if (e.code === 4902) {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{ chainId: '0x' + BASE_CHAIN_ID.toString(16), chainName: 'Base', rpcUrls: [BASE_RPC], nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 }, blockExplorerUrls: ['https://basescan.org'] }]
+        });
+      }
+    }
+
+    // Check balance
+    await checkBalance(currentAccount);
+
+  } catch (e) {
+    showToast(e.message || 'Connection failed', 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-wallet"></i> Connect Wallet';
+  }
+}
+
+async function checkBalance(address) {
+  const cleanAddr = address.toLowerCase().replace('0x', '');
+  const data = '0x70a08231' + '000000000000000000000000' + cleanAddr;
+
+  try {
+    const resp = await fetch(BASE_RPC, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'eth_call',
+        params: [{ to: GITBLOCK_CONTRACT, data }, 'latest'],
+        id: 1
+      })
+    });
+    const json = await resp.json();
+    const raw = parseInt(json.result || '0x0', 16);
+    gitblockBalance = raw / 1e18;
+
+    updateGate();
+  } catch (e) {
+    gitblockBalance = 0;
+    updateGate();
+    showToast('Balance check failed. Try again.', 'error');
+  }
+}
+
+function updateGate() {
+  const card = document.getElementById('gate-card');
+  const icon = document.getElementById('gate-icon');
+  const title = document.getElementById('gate-title');
+  const desc = document.getElementById('gate-desc');
+  const balanceDiv = document.getElementById('gate-balance');
+  const addrDisplay = document.getElementById('wallet-addr-display');
+  const btnConnect = document.getElementById('btn-connect');
+  const btnDisconnect = document.getElementById('btn-disconnect');
+
+  btnConnect.style.display = currentAccount ? 'none' : 'inline-flex';
+  btnConnect.disabled = false;
+  btnConnect.innerHTML = '<i class="fas fa-wallet"></i> Connect Wallet';
+  btnDisconnect.style.display = currentAccount ? 'inline-flex' : 'none';
+
+  if (currentAccount) {
+    addrDisplay.textContent = currentAccount.slice(0, 6) + '...' + currentAccount.slice(-4);
+  } else {
+    addrDisplay.textContent = '';
+  }
+
+  if (gitblockBalance > 0) {
+    unlocked = true;
+    card.className = 'gate-card unlocked';
+    icon.textContent = '🔓';
+    title.textContent = 'Premium Unlocked';
+    desc.textContent = 'You hold $GITBLOCK. All premium skills are now accessible.';
+    balanceDiv.style.display = 'block';
+    document.getElementById('balance-amount').textContent = gitblockBalance.toLocaleString() + ' GITBLOCK';
+  } else if (currentAccount) {
+    unlocked = false;
+    card.className = 'gate-card locked';
+    icon.textContent = '🔒';
+    title.textContent = 'No $GITBLOCK Found';
+    desc.textContent = 'This wallet doesn\'t hold $GITBLOCK yet. Any amount qualifies.';
+    balanceDiv.style.display = 'block';
+    document.getElementById('balance-amount').textContent = '0 GITBLOCK';
+  } else {
+    unlocked = false;
+    card.className = 'gate-card locked';
+    icon.textContent = '🔒';
+    title.textContent = 'Connect to Unlock';
+    desc.textContent = 'Verify you hold $GITBLOCK on Base to access premium skills. Any amount qualifies.';
+    balanceDiv.style.display = 'none';
+  }
+
+  renderSkills();
+}
+
+function disconnectWallet() {
+  currentAccount = null;
+  gitblockBalance = 0;
+  unlocked = false;
+  updateGate();
+  showToast('Wallet disconnected', 'info');
+}
+
+// ══════════════════════════════════════
+// SKILL DISPLAY
+// ══════════════════════════════════════
+function renderSkills() {
+  const grid = document.getElementById('skills-grid');
+  grid.innerHTML = PREMIUM_SKILLS.map(s => `
+    <div class="skill-card ${unlocked ? 'unlocked' : 'locked'}">
+      <div class="lock-badge">${unlocked ? '🔓 UNLOCKED' : '🔒 LOCKED'}</div>
+      <div class="skill-icon">${s.icon}</div>
+      <h4>${s.name}</h4>
+      <p class="skill-desc">${s.desc}</p>
+      <div class="skill-tags">${s.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+      <div class="skill-actions" style="margin-top:12px">
+        <button class="btn btn-outline btn-sm" onclick="viewSkill('${s.id}')"><i class="fas fa-eye"></i> ${unlocked ? 'View & Copy' : 'Preview'}</button>
+        ${unlocked ? `<button class="btn btn-primary btn-sm" onclick="downloadSkillById('${s.id}')"><i class="fas fa-download"></i> Download</button>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+let currentSkill = null;
+
+function viewSkill(id) {
+  currentSkill = PREMIUM_SKILLS.find(s => s.id === id);
+  if (!currentSkill) return;
+
+  document.getElementById('modal-title').textContent = currentSkill.name + ' — SKILL.md';
+  document.getElementById('modal-content').textContent = unlocked ? currentSkill.skill : currentSkill.skill.substring(0, 300) + '\n\n--- 🔒 Full skill visible after connecting wallet with $GITBLOCK ---';
+  document.getElementById('modal-copy').style.display = unlocked ? 'inline-flex' : 'none';
+  document.getElementById('modal-download').style.display = unlocked ? 'inline-flex' : 'none';
+  document.getElementById('modal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('active');
+  currentSkill = null;
+}
+
+function copyModalContent() {
+  if (!currentSkill || !unlocked) return;
+  navigator.clipboard.writeText(currentSkill.skill).then(() => showToast('SKILL.md copied to clipboard', 'success'));
+}
+
+function downloadSkill() { downloadSkillById(currentSkill?.id); }
+
+function downloadSkillById(id) {
+  if (!unlocked) return showToast('Hold $GITBLOCK to download', 'error');
+  const skill = PREMIUM_SKILLS.find(s => s.id === id);
+  if (!skill) return;
+  const blob = new Blob([skill.skill], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = skill.id + '.md'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('Downloaded: ' + skill.id + '.md', 'success');
+}
+
+function showToast(msg, type) {
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// Listen for account changes
+if (window.ethereum) {
+  window.ethereum.on('accountsChanged', (accounts) => {
+    if (accounts.length === 0) disconnectWallet();
+    else { currentAccount = accounts[0]; checkBalance(currentAccount); }
+  });
+  window.ethereum.on('chainChanged', () => {
+    if (currentAccount) checkBalance(currentAccount);
+  });
+}
+
+// Init
+renderSkills();
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal')) closeModal();
+});
+</script>
+</body>
+</html>
