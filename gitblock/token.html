@@ -130,6 +130,7 @@ const API='https://website-bernard-cold-july.trycloudflare.com';
 const params=new URLSearchParams(location.search);
 const addr=params.get('address');
 if(!addr)document.getElementById('app').innerHTML='<div class="error">No token address provided. <a href="scanner.html">Go back</a></div>';
+function esc(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 
 async function rateToken(stars){
   try{
