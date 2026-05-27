@@ -305,9 +305,14 @@ async function poll(){
     // Track seen on first load without flagging as NEW
     const isFirstLoad = seenAddrs.size === 0;
     for(const t of fresh){const a=t.address.toLowerCase();if(!seenAddrs.has(a)){seenAddrs.add(a);if(!isFirstLoad)newAddrs.add(a)}}
-    const m=new Map(tokens.map(t=>[t.address.toLowerCase(),t]));
-    for(const t of fresh){const a=t.address.toLowerCase();m.set(a,m.has(a)?{...m.get(a),...t}:t)}
-    tokens=[...m.values()];
+    // If filter active, replace; otherwise merge
+    if(age){
+      tokens=fresh;
+    }else{
+      const m=new Map(tokens.map(t=>[t.address.toLowerCase(),t]));
+      for(const t of fresh){const a=t.address.toLowerCase();m.set(a,m.has(a)?{...m.get(a),...t}:t)}
+      tokens=[...m.values()];
+    }
     // Load ratings for displayed tokens
     const addrs=tokens.slice(0,100).map(t=>t.address);
     loadRatings(addrs);
