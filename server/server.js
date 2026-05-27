@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 app.use(cors());
@@ -8,7 +9,8 @@ app.use(cors());
 // CONFIG
 // ══════════════════════════════════════════════════════════════════════
 const CACHE_TTL_MS = 15000; // 15s polling
-const MAX_TOKENS = 500;
+const MAX_TOKENS = 10000; // Track all tokens, not just recent
+const CACHE_FILE = path.join(__dirname, '..', 'token-cache.json');
 
 // All known launchpads on Base
 const LAUNCHPADS = {
@@ -80,6 +82,23 @@ const GECKO_API = 'https://api.geckoterminal.com/api/v2';
 let cache = { data: [], updated: 0 };
 let securityCache = {};
 let txCache = {};
+
+// Load persisted cache from disk on startup
+try {
+  if (require('fs').existsSync(CACHE_FILE)) {
+    const saved = JSON.parse(require('fs').readFileSync(CACHE_FILE, 'utf8'));
+    if (saved?.data?.length) {
+      cache = saved;
+      console.log(`Loaded ${cache.data.length} tokens from disk cache`);
+    }
+  }
+} catch (e) { console.log('No disk cache found, starting fresh'); }
+
+function saveCacheToDisk() {
+  try {
+    require('fs').writeFileSync(CACHE_FILE, JSON.stringify(cache), 'utf8');
+  } catch (e) { /* ignore */ }
+}
 
 // ══════════════════════════════════════════════════════════════════════
 // HELPERS
@@ -271,6 +290,19 @@ async function fetchNewPools(page = 1) {
   }));
 }
 
+async function fetchTrendingPools() {
+  const data = await fetchJSON(`${GECKO_API}/networks/base/pools?include=base_token&page=1`, 10000);
+  if (!data?.data) return [];
+  return data.data.map(p => ({
+    poolAddress: p.id?.split('_').pop() || '',
+    tokenAddress: p.relationships?.base_token?.data?.id?.split('_').pop() || '',
+    tokenName: p.attributes?.name || '',
+    tokenSymbol: '',
+    createdAt: p.attributes?.pool_created_at || null,
+    dexType: p.attributes?.dex_type || '',
+  }));
+}
+
 async function refreshCache() {
   console.log('Refreshing...');
   try {
@@ -282,6 +314,16 @@ async function refreshCache() {
       allPools.push(...pools);
     }
     console.log(`  GeckoTerminal new pools: ${allPools.length}`);
+
+    // 1b. Also fetch trending pools (established/older tokens)
+    const trendingPools = await fetchTrendingPools();
+    const existingAddrs = new Set(allPools.map(p => p.tokenAddress.toLowerCase()));
+    for (const tp of trendingPools) {
+      if (!existingAddrs.has(tp.tokenAddress.toLowerCase())) {
+        allPools.push(tp);
+      }
+    }
+    console.log(`  GeckoTerminal trending pools: ${trendingPools.length} (${allPools.length} total unique)`);
 
     // 2. Get DEX Screener pair data for these tokens (enriches with price, volume, socials)
     const tokenAddrs = [...new Set(allPools.map(p => p.tokenAddress).filter(Boolean))];
@@ -345,15 +387,18 @@ async function refreshCache() {
     }
     console.log(`  Fresh tokens: ${fresh.length}`);
 
-    // 5. Also pull from DEX Screener search as supplement
-    const searchPairs = await fetchSearchResults('base');
-    for (const p of searchPairs) {
-      const addr = (p.baseToken?.address || '').toLowerCase();
-      if (addr && !fresh.find(t => t.address.toLowerCase() === addr)) {
-        fresh.push(enrichToken(p, null));
+    // 5. Broader search: pull from DEX Screener with varied queries to catch more tokens
+    const searchQueries = ['base', 'token', 'coin', 'eth', 'usdc', 'ai', 'defi'];
+    for (const q of searchQueries) {
+      const searchPairs = await fetchSearchResults(q);
+      for (const p of searchPairs) {
+        const addr = (p.baseToken?.address || '').toLowerCase();
+        if (addr && !fresh.find(t => t.address.toLowerCase() === addr)) {
+          fresh.push(enrichToken(p, null));
+        }
       }
     }
-    console.log(`  After DEX search merge: ${fresh.length}`);
+    console.log(`  After DEX searches: ${fresh.length}`);
 
     // 6. Merge with existing cache
     const merged = new Map();
@@ -371,6 +416,7 @@ async function refreshCache() {
     all.sort((a, b) => scoreToken(b) - scoreToken(a));
 
     cache = { data: all.slice(0, MAX_TOKENS), updated: Date.now() };
+    saveCacheToDisk();
     console.log(`  Cache: ${cache.data.length} tokens`);
   } catch (e) { console.error('Refresh error:', e.message); }
 }
@@ -736,6 +782,9 @@ app.get('/v1/stats', async (req, res) => {
 // ══════════════════════════════════════════════════════════════════════
 // STARTUP
 // ══════════════════════════════════════════════════════════════════════
+
+// Serve scanner frontend
+app.use(express.static(require('path').join(__dirname, '..', 'gitblock')));
 
 const PORT = process.env.PORT || 3003;
 app.listen(PORT, () => {

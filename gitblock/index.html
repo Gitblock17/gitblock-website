@@ -285,7 +285,7 @@ function liveSearch(){
 
 async function poll(){
   const age=$('ageFilter').value;
-  let url=`${API}/v1/new-tokens?limit=500`;
+  let url=`${API}/v1/new-tokens?limit=10000`;
   if(age)url+=`&maxAge=${age}`;
   try{
     const r=await fetch(url),d=await r.json();
