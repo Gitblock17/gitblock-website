@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GitBlock Scanner — Base Token Discovery</title>
-<link rel="icon" href="favicon.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -252,6 +251,27 @@ function padClass(p){return'p'+(p==='clanker'?'c':p==='bankr'?'b':p==='zora'?'z'
 function padLabel(p){const m={clanker:'<img class="pad-icon" src="clanker.png"> Clanker',bankr:'🔵 Bankr',zora:'🟡 Zora',virtuals:'🩷 Virtuals',other:'⚪ Other'};return m[p]||'⚪ Other'}
 function logo(t,cls){if(t.image)return`<img class="${cls}" src="${t.image}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="${cls==='tl'?'tlf':'mtlf'}" style="display:none">?</div>`;return`<div class="${cls==='tl'?'tlf':'mtlf'}">?</div>`}
 
+function renderStars(addr,count,interactive){
+  const rating=getRating(addr);
+  let h='<span class="stars"';
+  if(interactive)h+=` onclick="rateToken('${addr}',event)"`;
+  h+='>';
+  for(let i=1;i<=5;i++)h+=`<i class="fa${i<=rating?'-solid':'-regular'} fa-star ${i<=rating?'active':''}" ${interactive?`data-star="${i}"`:''}></i>`;
+  h+=`</span>`;
+  if(count!=null)h+=`<span class="stars count">${count||0}</span>`;
+  return h;
+}
+
+function rateToken(addr,e){
+  const star=e.target.closest('i');
+  if(!star)return;
+  const s=parseInt(star.dataset.star);
+  if(!s)return;
+  setRating(addr,s);
+  // Refresh modal rating
+  const mr=$('modal-rating');
+  if(mr)mr.innerHTML=renderStars(addr,null,true);
+}
 
 // Live search: queries cache + DEX Screener
 let st=null;
@@ -280,9 +300,7 @@ async function poll(){
     if(!d.ok)throw new Error('API error');
     const fresh=d.data||[];
     newAddrs.clear();
-    // Track seen on first load without flagging as NEW
-    const isFirstLoad = seenAddrs.size === 0;
-    for(const t of fresh){const a=t.address.toLowerCase();if(!seenAddrs.has(a)){seenAddrs.add(a);if(!isFirstLoad)newAddrs.add(a)}}
+    for(const t of fresh){const a=t.address.toLowerCase();if(!seenAddrs.has(a)){newAddrs.add(a);seenAddrs.add(a)}}
     const m=new Map(tokens.map(t=>[t.address.toLowerCase(),t]));
     for(const t of fresh){const a=t.address.toLowerCase();m.set(a,m.has(a)?{...m.get(a),...t}:t)}
     tokens=[...m.values()];
@@ -328,14 +346,12 @@ function renderTrending(){
   // Duplicate for seamless infinite scroll
   $('trendingRow').innerHTML=`<div class="trending-scroll">${cards}${cards}</div>`;
 
-  // GitBlock ad banner (only add once)
-  if(!$('gitblock-ad')){
-    $('trendingBox').insertAdjacentHTML('beforeend',`<div id="gitblock-ad" style="margin:12px 16px 0;padding:12px 16px;background:linear-gradient(135deg,var(--ac-glow),rgba(37,99,235,0.02));border:1px solid rgba(37,99,235,0.15);border-radius:10px;display:flex;align-items:center;gap:12px;font-size:.82rem">
+  // GitBlock ad banner
+  $('trendingBox').insertAdjacentHTML('beforeend',`<div style="margin:12px 16px 0;padding:12px 16px;background:linear-gradient(135deg,var(--ac-glow),rgba(37,99,235,0.02));border:1px solid rgba(37,99,235,0.15);border-radius:10px;display:flex;align-items:center;gap:12px;font-size:.82rem">
     <img src="gitblock-logo.jpg" style="width:32px;height:32px;border-radius:8px">
     <div style="flex:1"><strong style="color:var(--ac)">GitBlock</strong> — AI-powered Base chain token scanner & analytics. Built for traders.<br><span style="color:var(--t2);font-size:.75rem">Track new launches • Detect scams • Rate tokens • Real-time charts</span></div>
     <a href="https://gitblock.org" target="_blank" style="padding:8px 16px;background:var(--ac);color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:.78rem;white-space:nowrap">Visit GitBlock</a>
   </div>`);
-  }
 }
 
 function sorted(data){const d=sortDir==='asc'?1:-1;return[...data].sort((a,b)=>{let va,vb;switch(sortField){case'price':va=parseFloat(a.priceUsd)||0;vb=parseFloat(b.priceUsd)||0;break;case'liquidity':va=parseFloat(a.liquidityUsd)||0;vb=parseFloat(b.liquidityUsd)||0;break;case'volume':va=parseFloat(a.volume24h)||0;vb=parseFloat(b.volume24h)||0;break;case'marketcap':va=parseFloat(a.marketCap||a.fdv)||0;vb=parseFloat(b.marketCap||b.fdv)||0;break;case'age':va=a.pairCreatedAt?new Date(a.pairCreatedAt).getTime():0;vb=b.pairCreatedAt?new Date(b.pairCreatedAt).getTime():0;break;default:return 0}return(va-vb)*d})}
