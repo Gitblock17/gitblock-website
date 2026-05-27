@@ -1,501 +1,506 @@
-     1|<!DOCTYPE html>
-     2|<html lang="en">
-     3|<head>
-     4|<meta charset="UTF-8">
-     5|<meta name="viewport" content="width=device-width, initial-scale=1.0">
-     6|<title>GitBlock Scanner — Base Token Discovery</title>
-     7|<link rel="icon" href="favicon.jpg">
-     8|<link rel="preconnect" href="https://fonts.googleapis.com">
-     9|<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    10|<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    11|<style>
-    12|*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-    13|:root{--bg:#fff;--srf:#f8f9fa;--brd:#e5e7eb;--txt:#111827;--t2:#6b7280;--t3:#9ca3af;--ac:#2563eb;--ac-glow:rgba(37,99,235,0.08);--gn:#059669;--rd:#dc2626;--or:#ea580c;--yl:#ca8a04;--ra:10px}
-    14|body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
-    15|body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(37,99,235,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,0.06) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
-    16|
-    17|.tb{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--brd);padding:10px 0}
-    18|.ti{max-width:1500px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-    19|.lg{font-weight:700;font-size:1.05rem;white-space:nowrap;display:flex;align-items:center;gap:7px}
-    20|.lg span{color:var(--ac)}
-    21|.ld{width:7px;height:7px;border-radius:50%;background:var(--gn);animation:pulse2 2s infinite}
-    22|@keyframes pulse2{0%,100%{opacity:1}50%{opacity:.3}}
-    23|.sb{flex:1;min-width:160px;position:relative}
-    24|.sb input{width:100%;padding:9px 12px 9px 36px;border:1px solid var(--brd);border-radius:10px;font-size:.85rem;font-family:inherit;background:var(--srf);outline:none}
-    25|.sb input:focus{border-color:var(--ac)}
-    26|.sb i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:.8rem}
-    27|.fs{padding:9px 12px;border:1px solid var(--brd);border-radius:10px;font-size:.82rem;font-family:inherit;background:var(--srf);cursor:pointer;outline:none;min-width:110px}
-    28|.fs:focus{border-color:var(--ac)}
-    29|.nc{padding:5px 10px;border-radius:7px;background:#eff6ff;color:var(--ac);font-weight:600;font-size:.78rem;animation:popIn .3s}
-    30|@keyframes popIn{from{transform:scale(.8);opacity:0}}
-    31|
-    32|.sr{max-width:1500px;margin:0 auto;padding:12px 16px;display:flex;gap:20px;font-size:.82rem;color:var(--t2);flex-wrap:wrap;align-items:center;position:relative;z-index:1}
-    33|.sr strong{color:var(--txt)}
-    34|
-    35|/* Trending */
-    36|.trending{margin:0 0 16px 0;position:relative;z-index:1}
-    37|.trending h3{font-size:.82rem;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin:0 0 10px 0;padding:0 16px}
-    38|.trending-row{display:flex;gap:10px;overflow-x:auto;padding:0 16px 8px;scroll-behavior:smooth;overflow:hidden}
-    39|.trending-scroll{display:flex;gap:10px;animation:scrollX 30s linear infinite}
-    40|.trending-scroll:hover{animation-play-state:paused}
-    41|@keyframes scrollX{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-    42|.trending-row::-webkit-scrollbar{height:4px}
-    43|.trending-row::-webkit-scrollbar-thumb{background:var(--brd);border-radius:2px}
-    44|.tcard{flex-shrink:0;width:180px;padding:12px 14px;background:var(--srf);border:1px solid var(--brd);border-radius:10px;cursor:pointer;transition:all .12s;text-decoration:none;color:var(--txt)}
-    45|.tcard:hover{border-color:var(--ac);transform:translateY(-2px)}
-    46|.tcard-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-    47|.tcard-logo{width:24px;height:24px;border-radius:50%;border:1px solid var(--brd);object-fit:cover;background:var(--srf)}
-    48|.tcard-logof{width:24px;height:24px;border-radius:50%;background:#f3f4f6;border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--t3);font-weight:600}
-    49|.tcard-name{font-weight:600;font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    50|.tcard-price{font-size:.85rem;font-weight:700}
-    51|.tcard-vol{font-size:.7rem;color:var(--t2);margin-top:2px}
-    52|.tcard-change{font-size:.72rem;font-weight:600;margin-top:2px}
-    53|
-    54|.tw{max-width:1500px;margin:0 auto;padding:0 16px 60px;overflow-x:auto;position:relative;z-index:1}
-    55|table{width:100%;border-collapse:collapse;font-size:.84rem}
-    56|thead th{text-align:left;padding:10px 12px;font-weight:600;color:var(--t2);font-size:.73rem;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid var(--brd);white-space:nowrap;cursor:pointer;user-select:none}
-    57|thead th:hover{color:var(--txt)}
-    58|tbody td{padding:12px;border-bottom:1px solid var(--brd);white-space:nowrap}
-    59|tbody tr{transition:background .12s;cursor:pointer}
-    60|tbody tr:hover{background:#f0f4ff}
-    61|tbody tr.new-row{animation:highlightNew 3s ease-out}
-    62|@keyframes highlightNew{0%{background:#dbeafe}100%{background:transparent}}
-    63|
-    64|.tc{display:flex;align-items:center;gap:8px}
-    65|.tl,.tlf{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-    66|.tl{border:1px solid var(--brd);object-fit:cover;background:var(--srf)}
-    67|.tlf{background:#f3f4f6;border:1px solid var(--brd);font-weight:600;font-size:.75rem;color:var(--t3)}
-    68|.tn{font-weight:600;color:var(--txt)}
-    69|.ts{color:var(--t2);font-size:.78rem;margin-left:3px}
-    70|
-    71|.cb{padding:2px 7px;border-radius:5px;font-weight:600;font-size:.75rem}
-    72|.cu{background:#ecfdf5;color:var(--gn)}
-    73|.cd{background:#fef2f2;color:var(--rd)}
-    74|.pb{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:5px;font-size:.7rem;font-weight:600}
-    75|.pad-icon{width:14px;height:14px;border-radius:3px;object-fit:cover}
-    76|.pc{background:#eff6ff;color:#2563eb}.pbk{background:#f5f3ff;color:#7c3aed}.pz{background:#fef3c7;color:#92400e}.pv{background:#fce7f3;color:#be185d}.po{background:#f9fafb;color:#6b7280}
-    77|.po{background:#f9fafb;color:#6b7280}
-    78|
-    79|.sl{display:flex;gap:3px}
-    80|.sl a{color:var(--t3);font-size:.8rem;text-decoration:none;padding:2px}
-    81|.sl a:hover{color:var(--ac)}
-    82|
-    83|.loading,.empty{text-align:center;padding:50px;color:var(--t2)}
-    84|.loading i,.empty i{font-size:2rem;display:block;margin-bottom:10px;color:var(--t3)}
-    85|
-    86|/* Stars */
-    87|.stars{display:inline-flex;gap:2px;cursor:pointer}
-    88|.stars i{color:#e5e7eb;font-size:.85rem;transition:color .1s}
-    89|.stars i.active{color:#f59e0b}
-    90|.stars.count{font-size:.7rem;color:var(--t2);margin-left:4px}
-    91|
-    92|/* Modal */
-    93|.mo{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.3);display:flex;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;animation:fadeIn .15s}
-    94|@keyframes fadeIn{from{opacity:0}}
-    95|.mdl{background:var(--bg);border-radius:14px;width:100%;max-width:960px;box-shadow:0 20px 60px rgba(0,0,0,.15);animation:slideUp .2s;margin:10px 0}
-    96|@keyframes slideUp{from{transform:translateY(20px);opacity:0}}
-    97|.mt{padding:20px 24px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:12px}
-    98|.mtl{width:48px;height:48px;border-radius:12px;border:1px solid var(--brd);object-fit:cover;flex-shrink:0;background:var(--srf)}
-    99|.mtlf{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#dbeafe,#ede9fe);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;color:var(--ac);flex-shrink:0}
-   100|.mtt{flex:1;min-width:0}
-   101|.mtt h3{font-size:1.15rem;font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-   102|.mtt .sy{color:var(--t2);font-size:.85rem}
-   103|.mtt .ad{font-family:monospace;font-size:.68rem;color:var(--t3);margin-top:2px;word-break:break-all}
-   104|.mx{width:32px;height:32px;border-radius:50%;border:none;background:var(--srf);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-   105|.mx:hover{background:var(--brd)}
-   106|.mst{display:flex;gap:18px;padding:14px 24px;border-bottom:1px solid var(--brd);flex-wrap:wrap}
-   107|.mst .st .lb{font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px}
-   108|.mst .st .vl{font-weight:700;font-size:1rem;margin-top:1px}
-   109|.rating-row{display:flex;align-items:center;gap:8px;padding:8px 24px;border-bottom:1px solid var(--brd);font-size:.85rem}
-   110|.rating-row .stars i{font-size:1.2rem;cursor:pointer}
-   111|.rating-row .stars i:hover{color:#f59e0b}
-   112|.rating-avg{font-weight:700;color:#f59e0b;margin-left:4px}
-   113|.rating-count{color:var(--t2);font-size:.75rem}
-   114|
-   115|.mtb{display:flex;border-bottom:1px solid var(--brd);padding:0 24px}
-   116|.mtb .tab{padding:12px 18px;font-size:.82rem;font-weight:600;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;transition:all .12s;display:flex;align-items:center;gap:5px}
-   117|.mtb .tab:hover{color:var(--txt)}
-   118|.mtb .tab.active{color:var(--ac);border-bottom-color:var(--ac)}
-   119|
-   120|.tab-chart{padding:12px 0;background:var(--bg)}
-   121|.tab-chart canvas{width:100%!important;max-height:380px}
-   122|.tab-chart .time-btns{display:flex;gap:6px;padding:8px 24px}
-   123|.tab-chart .time-btns button{padding:6px 14px;border:1px solid var(--brd);border-radius:8px;background:var(--srf);font-size:.78rem;font-family:inherit;cursor:pointer;font-weight:500}
-   124|.tab-chart .time-btns button.active{background:var(--ac);color:#fff;border-color:var(--ac)}
-   125|
-   126|.tab-sec{padding:20px 24px}
-   127|.sec-overall{display:flex;align-items:center;gap:14px;padding:16px 20px;border-radius:12px;margin-bottom:16px;font-weight:700;font-size:1.1rem}
-   128|.sec-critical{background:#fef2f2;color:var(--rd);border:1px solid #fecaca}
-   129|.sec-high{background:#fff7ed;color:var(--or);border:1px solid #fed7aa}
-   130|.sec-medium{background:#fefce8;color:var(--yl);border:1px solid #fef08a}
-   131|.sec-low{background:#ecfdf5;color:var(--gn);border:1px solid #bbf7d0}
-   132|.sec-icon{font-size:1.4rem}
-   133|.sec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
-   134|.sec-item{padding:10px 14px;border-radius:8px;background:var(--srf);border:1px solid var(--brd)}
-   135|.sec-item .lbl{font-size:.68rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px}
-   136|.sec-item .val{font-weight:600;font-size:.88rem;margin-top:2px}
-   137|.sec-item .val.danger{color:var(--rd)}
-   138|.sec-item .val.warn{color:var(--or)}
-   139|.sec-item .val.ok{color:var(--gn)}
-   140|.flags{margin-top:14px}
-   141|.flags .flag{display:inline-block;padding:4px 10px;border-radius:6px;font-size:.75rem;font-weight:600;margin:2px 4px 2px 0;background:#fef2f2;color:var(--rd)}
-   142|
-   143|.tab-txns{padding:16px 24px;max-height:450px;overflow-y:auto}
-   144|.tab-snipers{padding:16px 24px;max-height:450px;overflow-y:auto}
-   145|.sniper-card{padding:12px 16px;margin-bottom:8px;border-radius:10px;border:1px solid var(--brd);display:flex;align-items:center;gap:14px;font-size:.82rem}
-   146|.sniper-card .sn-rank{width:28px;height:28px;border-radius:50%;background:var(--ac);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;flex-shrink:0}
-   147|.sniper-card .sn-info{flex:1}
-   148|.sniper-card .sn-addr{font-family:monospace;font-weight:600;font-size:.78rem}
-   149|.sniper-card .sn-time{color:var(--t2);font-size:.75rem;margin-top:2px}
-   150|.sniper-card .sn-amt{font-weight:700;color:var(--txt)}
-   151|.sniper-card .sn-badge{padding:3px 8px;border-radius:5px;font-size:.68rem;font-weight:600;background:#eff6ff;color:var(--ac)}
-   152|
-   153|.mln{display:flex;gap:8px;padding:14px 24px;border-top:1px solid var(--brd);flex-wrap:wrap}
-   154|.mln a{padding:9px 16px;border-radius:9px;text-decoration:none;font-weight:600;font-size:.82rem;border:1px solid var(--brd);color:var(--txt);display:flex;align-items:center;gap:5px}
-   155|.mln a:hover{border-color:var(--ac);color:var(--ac)}
-   156|.mln a.ac{background:var(--ac);color:#fff;border-color:var(--ac)}
-   157|.mln a.ac:hover{background:#1d4ed8}
-   158|
-   159|@media(max-width:768px){.mst{gap:10px}.mst .st .vl{font-size:.85rem}.tc{gap:5px}}
-   160|</style>
-   161|</head>
-   162|<body>
-   163|
-   164|<div class="tb"><div class="ti">
-   165|  <div class="lg"><img src="gitblock-logo.jpg" style="width:28px;height:28px;border-radius:6px;object-fit:cover"> GitBlock <div class="ld"></div></div>
-   166|  <div class="sb"><i class="fa fa-search"></i><input type="text" id="search" placeholder="Search any token on Base..." oninput="liveSearch()"></div>
-   167|  <select class="fs" id="ageFilter" onchange="poll()">
-   168|    <option value="">Any Time</option>
-   169|    <option value="5m">≤ 5 min</option>
-   170|    <option value="15m">≤ 15 min</option>
-   171|    <option value="1h">≤ 1 hour</option>
-   172|    <option value="6h">≤ 6 hours</option>
-   173|    <option value="24h">≤ 24 hours</option>
-   174|  </select>
-   175|</div></div>
-   176|
-   177|<div class="trending" id="trendingBox" style="display:none">
-   178|  <h3>🔥 Trending</h3>
-   179|  <div class="trending-row" id="trendingRow"></div>
-   180|</div>
-   181|
-   182|<div class="sr">
-   183|  <span>Liq: <strong id="stLiq">—</strong></span>
-   184|  <span>Vol 24h: <strong id="stVol">—</strong></span>
-   185|</div>
-   186|
-   187|<div class="tw"><div id="content"><div class="loading"><i class="fa fa-spinner"></i>Loading Base tokens...</div></div></div>
-   188|<div id="modal-root"></div>
-   189|
-   190|<script>
-   191|const API='https://website-bernard-cold-july.trycloudflare.com';
-   192|let tokens=[],seenAddrs=new Set(),newAddrs=new Set(),sortField='age',sortDir='asc',groupedMode=false;
-   193|let tokenRatings={}; // { address: { avg, count } } from server
-   194|
-   195|async function loadRatings(addrs){
-   196|  if(!addrs.length)return;
-   197|  try{
-   198|    const r=await fetch(`${API}/v1/ratings?addresses=${addrs.map(encodeURIComponent).join(',')}`);
-   199|    const d=await r.json();
-   200|    if(d.ok)Object.assign(tokenRatings,d.data);
-   201|  }catch(e){}
-   202|}
-   203|
-   204|async function rateToken(addr,stars){
-   205|  try{
-   206|    const r=await fetch(`${API}/v1/rating/${addr}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({stars})});
-   207|    const d=await r.json();
-   208|    if(d.ok)tokenRatings[addr.toLowerCase()]=d.data;
-   209|    return d.ok?d.data:null;
-   210|  }catch(e){return null}
-   211|}
-   212|
-   213|function renderStars(addr){
-   214|  const r=tokenRatings[addr.toLowerCase()]||{avg:0,count:0};
-   215|  let h='<span class="stars" onclick="rateTokenAndRefresh(\''+addr+'\',event)">';
-   216|  for(let i=1;i<=5;i++)h+=`<i class="fa${i<=Math.round(r.avg)?'-solid':'-regular'} fa-star ${i<=Math.round(r.avg)?'active':''}" data-star="${i}"></i>`;
-   217|  h+=`</span>`;
-   218|  if(r.count>0)h+=`<span class="stars count">${r.avg}★ (${r.count})</span>`;
-   219|  return h;
-   220|}
-   221|
-   222|async function rateTokenAndRefresh(addr,e){
-   223|  const star=e.target.closest('i');
-   224|  if(!star)return;
-   225|  const s=parseInt(star.dataset.star);
-   226|  if(!s)return;
-   227|  await rateToken(addr,s);
-   228|  // Refresh star displays
-   229|  document.querySelectorAll(`[data-rating-addr="${addr}"]`).forEach(el=>el.innerHTML=renderStars(addr));
-   230|  // If on token page, refresh the rating row
-   231|  const mr=document.getElementById('stars-container');
-   232|  if(mr)mr.innerHTML=renderStars(addr);
-   233|}
-   234|function fmtDateTime(iso){
-   235|  if(!iso)return'—';
-   236|  const d=new Date(iso);
-   237|  const now=new Date();
-   238|  const diff=now-d;
-   239|  const s=Math.floor(diff/1000);
-   240|  if(s<60)return s+'s ago';
-   241|  if(s<3600)return Math.floor(s/60)+'m ago';
-   242|  if(s<86400)return Math.floor(s/3600)+'h ago';
-   243|  return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-   244|}
-   245|
-   246|function $(id){return document.getElementById(id)}
-   247|function fmtNum(n){if(n==null||isNaN(n))return'—';n=parseFloat(n);if(n>=1e9)return'$'+(n/1e9).toFixed(2)+'B';if(n>=1e6)return'$'+(n/1e6).toFixed(2)+'M';if(n>=1e3)return'$'+(n/1e3).toFixed(2)+'K';return'$'+n.toFixed(2)}
-   248|function fmtPrice(n){if(n==null||isNaN(n))return'—';n=parseFloat(n);if(n>=1)return'$'+n.toFixed(2);if(n>=.01)return'$'+n.toFixed(4);if(n>=.0001)return'$'+n.toFixed(6);if(n<=.000001&&n>0)return'$'+n.toExponential(4);return'$'+n.toFixed(8)}
-   249|function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-   250|function badge(pct){if(pct==null)return'<span class="cb">—</span>';const c=pct>=0?'cu':'cd';return`<span class="cb ${c}">${pct>=0?'↑':'↓'} ${Math.abs(pct).toFixed(1)}%</span>`}
-   251|function padClass(p){return'p'+(p==='clanker'?'c':p==='bankr'?'b':p==='zora'?'z':p==='virtuals'?'v':'o')}
-   252|function padLabel(p){const m={clanker:'<img class="pad-icon" src="clanker.png"> Clanker',bankr:'🔵 Bankr',zora:'🟡 Zora',virtuals:'🩷 Virtuals',other:'⚪ Other'};return m[p]||'⚪ Other'}
-   253|function logo(t,cls){if(t.image)return`<img class="${cls}" src="${t.image}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="${cls==='tl'?'tlf':'mtlf'}" style="display:none">?</div>`;return`<div class="${cls==='tl'?'tlf':'mtlf'}">?</div>`}
-   254|
-   255|
-   256|// Live search: queries cache + DEX Screener
-   257|let st=null;
-   258|function liveSearch(){
-   259|  clearTimeout(st);
-   260|  const q=$('search').value.trim();
-   261|  if(!q||q.length<2){render();return}
-   262|  st=setTimeout(async()=>{
-   263|    try{
-   264|      const r=await fetch(`${API}/v1/search?q=${encodeURIComponent(q)}`);
-   265|      const d=await r.json();
-   266|      if(d.ok&&d.data){
-   267|        for(const t of d.data){const k=t.address.toLowerCase();if(!tokens.find(x=>x.address.toLowerCase()===k))tokens.push(t)}
-   268|        $('content').innerHTML=d.data.length?buildTable(d.data):'<div class="empty"><i class="fa fa-search"></i>No results for "'+esc(q)+'"</div>';
-   269|      }
-   270|    }catch(e){}
-   271|  },300);
-   272|}
-   273|
-   274|async function poll(){
-   275|  const age=$('ageFilter').value;
-   276|  let url=`${API}/v1/new-tokens?limit=200`;
-   277|  if(age)url+=`&maxAge=${age}`;
-   278|  try{
-   279|    const r=await fetch(url),d=await r.json();
-   280|    if(!d.ok)throw new Error('API error');
-   281|    const fresh=d.data||[];
-   282|    newAddrs.clear();
-   283|    // Track seen on first load without flagging as NEW
-   284|    const isFirstLoad = seenAddrs.size === 0;
-   285|    for(const t of fresh){const a=t.address.toLowerCase();if(!seenAddrs.has(a)){seenAddrs.add(a);if(!isFirstLoad)newAddrs.add(a)}}
-   286|    const m=new Map(tokens.map(t=>[t.address.toLowerCase(),t]));
-   287|    for(const t of fresh){const a=t.address.toLowerCase();m.set(a,m.has(a)?{...m.get(a),...t}:t)}
-   288|    tokens=[...m.values()];
-   289|    // Load ratings for displayed tokens
-   290|    const addrs=tokens.slice(0,100).map(t=>t.address);
-   291|    loadRatings(addrs);
-   292|    $('stLiq').textContent=fmtNum(tokens.reduce((s,t)=>s+(parseFloat(t.liquidityUsd)||0),0));
-   293|    $('stVol').textContent=fmtNum(tokens.reduce((s,t)=>s+(parseFloat(t.volume24h)||0),0));
-   294|    if($('search').value.trim().length<2)render();
-   295|    renderTrending();
-   296|  }catch(e){console.error(e)}
-   297|}
-   298|
-   299|function renderTrending(){
-   300|  // Top 11 by 24h volume + pinned GitBlock at position 1
-   301|  const trending=[...tokens].filter(t=>parseFloat(t.volume24h)>0).sort((a,b)=>(parseFloat(b.volume24h)||0)-(parseFloat(a.volume24h)||0)).slice(0,11);
-   302|  if(!trending.length){$('trendingBox').style.display='none';return}
-   303|  $('trendingBox').style.display='block';
-   304|
-   305|  // GitBlock pinned card
-   306|  const gbCard=`<a class="tcard" href="token.html?address=0xDa1Ae26f0F702DF94926042Fc1Fe1e855D376b07" style="border:2px solid var(--ac);background:var(--ac-glow)">
-   307|    <div class="tcard-top">
-   308|      <img class="tcard-logo" src="gitblock-logo.jpg">
-   309|      <div class="tcard-name" style="color:var(--ac)">GITBLOCK ⭐</div>
-   310|    </div>
-   311|    <div class="tcard-price">Trade on Base</div>
-   312|    <div class="tcard-vol" style="color:var(--ac);font-weight:600">Official Token</div>
-   313|  </a>`;
-   314|
-   315|  const cards=gbCard+trending.map(t=>{
-   316|    const chg=parseFloat(t.priceChange24h)||0;
-   317|    const chgCls=chg>=0?'cu':'cd';
-   318|    const chgSign=chg>=0?'↑':'↓';
-   319|    return`<a class="tcard" href="token.html?address=${t.address}">
-   320|      <div class="tcard-top">${t.image?`<img class="tcard-logo" src="${t.image}">`:`<div class="tcard-logof">?</div>`}
-   321|      <div class="tcard-name">${esc(t.symbol)}</div></div>
-   322|      <div class="tcard-price">${fmtPrice(t.priceUsd)}</div>
-   323|      <div class="tcard-vol">Vol: ${fmtNum(t.volume24h)}</div>
-   324|      <div class="tcard-change"><span class="cb ${chgCls}">${chgSign} ${Math.abs(chg).toFixed(1)}%</span></div>
-   325|    </a>`;
-   326|  }).join('');
-   327|
-   328|  // Duplicate for seamless infinite scroll
-   329|  $('trendingRow').innerHTML=`<div class="trending-scroll">${cards}${cards}</div>`;
-   330|
-   331|}
-   332|
-   333|function sorted(data){const d=sortDir==='asc'?1:-1;return[...data].sort((a,b)=>{let va,vb;switch(sortField){case'price':va=parseFloat(a.priceUsd)||0;vb=parseFloat(b.priceUsd)||0;break;case'liquidity':va=parseFloat(a.liquidityUsd)||0;vb=parseFloat(b.liquidityUsd)||0;break;case'volume':va=parseFloat(a.volume24h)||0;vb=parseFloat(b.volume24h)||0;break;case'marketcap':va=parseFloat(a.marketCap||a.fdv)||0;vb=parseFloat(b.marketCap||b.fdv)||0;break;case'age':va=a.pairCreatedAt?new Date(a.pairCreatedAt).getTime():0;vb=b.pairCreatedAt?new Date(b.pairCreatedAt).getTime():0;break;default:return 0}return(va-vb)*d})}
-   334|function filtered(){let f=[...tokens];const q=$('search').value.toLowerCase().trim();if(q)f=f.filter(t=>t.name.toLowerCase().includes(q)||t.symbol.toLowerCase().includes(q)||t.address.toLowerCase().includes(q));return f}
-   335|function render(){if(groupedMode){renderGrouped();return}let f=filtered();f=sorted(f).slice(0,100);const age=$('ageFilter').value;if(age){const ms={5:3e5,15:9e5,60:36e5,360:216e5,1440:864e5};const max=ms[parseInt(age)]||864e5;f=f.filter(t=>t.pairCreatedAt&&(Date.now()-new Date(t.pairCreatedAt).getTime())<max)}$('content').innerHTML=f.length?buildTable(f)+'<div style="text-align:center;padding:16px;color:var(--t2);font-size:.78rem">Showing '+f.length+' tokens. Search for more ↓</div>':'<div class="empty"><i class="fa fa-inbox"></i>No tokens found</div>'}
-   336|function toggleGrouped(){groupedMode=!groupedMode;$('groupBtn').textContent=groupedMode?'📋 List View':'📋 Group by Launchpad';render()}
-   337|function renderGrouped(){const groups={};for(const t of tokens){const pad=t.launchpadName||t.launchpad||'Unknown';if(!groups[pad])groups[pad]={name:pad,tokens:[]};groups[pad].tokens.push(t)}const sorted=[...Object.values(groups)].sort((a,b)=>b.tokens.length-a.tokens.length);let h='';for(const g of sorted){h+=`<div style="margin-bottom:32px"><h3 style="padding:12px 0;font-size:1rem;display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--brd);margin-bottom:12px"><span class="pb ${g.tokens[0]?padClass(g.tokens[0].launchpad):'pu'}">${g.name}</span><span style="font-size:.8rem;color:var(--t2);font-weight:400">${g.tokens.length} tokens</span></h3>${buildTable(g.tokens.slice(0,20))}</div>`}$('content').innerHTML=h||'<div class="empty"><i class="fa fa-inbox"></i>No tokens found</div>'}
-   338|function sortBy(f){if(sortField===f)sortDir=sortDir==='asc'?'desc':'asc';else{sortField=f;sortDir=f==='age'?'asc':'desc'}render()}
-   339|function th(l,f){const a=f&&f===sortField?(sortDir==='asc'?' ▲':' ▼'):'';return f?`<th onclick="sortBy('${f}')">${l}<span style="font-size:.6rem">${a}</span></th>`:`<th>${l}</th>`}
-   340|
-   341|function buildTable(data){
-   342|  let h='<table><thead><tr>'+th('#')+th('Token')+th('Rating')+th('Price','price')+th('Launched','age')+th('Liquidity','liquidity')+th('Volume 24h','volume')+th('Market Cap','marketcap')+th('Links')+'</tr></thead><tbody>';
-   343|  data.forEach((t,i)=>{
-   344|    const isNew=newAddrs.has(t.address.toLowerCase());
-   345|    const mc=t.marketCap||t.fdv;
-   346|    const launched=t.pairCreatedAt?fmtDateTime(t.pairCreatedAt):'—';
-   347|    h+=`<tr class="${isNew?'new-row':''}" onclick="location.href='token.html?address=${t.address}'">`;
-   348|    h+=`<td style="color:var(--t3)">${isNew?'<span style="color:var(--ac);font-weight:700">NEW</span>':i+1}</td>`;
-   349|    h+=`<td><div class="tc">${logo(t,'tl')}<div><div class="tn">${esc(t.name)}<span class="ts">${esc(t.symbol)}</span></div></div></div></td>`;
-   350|    h+=`<td data-rating-addr="${t.address}">${renderStars(t.address)}</td>`;
-   351|    h+=`<td><div>${fmtPrice(t.priceUsd)}</div><div style="font-size:.7rem;margin-top:1px">${badge(t.priceChange24h)}</div></td>`;
-   352|    h+=`<td style="font-size:.78rem">${launched}</td>`;
-   353|    h+=`<td>${fmtNum(t.liquidityUsd)}</td><td>${fmtNum(t.volume24h)}</td><td>${fmtNum(mc)}</td>`;
-   354|    h+=`<td><div class="sl">`;
-   355|    if(t.twitter)h+=`<a href="${t.twitter}" target="_blank" onclick="event.stopPropagation()" title="X"><i class="fa-brands fa-x-twitter"></i></a>`;
-   356|    if(t.telegram)h+=`<a href="${t.telegram}" target="_blank" onclick="event.stopPropagation()" title="TG"><i class="fa-brands fa-telegram"></i></a>`;
-   357|    if(t.website)h+=`<a href="${t.website}" target="_blank" onclick="event.stopPropagation()" title="Web"><i class="fa fa-globe"></i></a>`;
-   358|    h+=`<a href="${t.url}" target="_blank" onclick="event.stopPropagation()" title="DEXS"><i class="fa fa-chart-line"></i></a>`;
-   359|    h+=`<a href="${t.basescanUrl}" target="_blank" onclick="event.stopPropagation()" title="Scan"><i class="fa fa-search"></i></a>`;
-   360|    h+='</div></td></tr>';
-   361|  });
-   362|  return h+'</tbody></table>';
-   363|}
-   364|
-   365|// ── Detail Modal ──
-   366|let modalToken=null;
-   367|
-   368|async function showDetail(addr){
-   369|  $('modal-root').innerHTML='<div class="mo"><div class="mdl"><div class="loading"><i class="fa fa-spinner"></i>Loading...</div></div></div>';
-   370|  try{
-   371|    const r=await fetch(`${API}/v1/token/${addr}`);
-   372|    const d=await r.json();
-   373|    if(!d.ok){$('modal-root').innerHTML='';alert('Token not found');return}
-   374|    modalToken=d.data;
-   375|    buildModal();
-   376|  }catch(e){$('modal-root').innerHTML='';alert('Error: '+e.message)}
-   377|}
-   378|
-   379|function buildModal(){
-   380|  const t=modalToken;
-   381|  const mc=t.marketCap||t.fdv;
-   382|  const sec=t.security;
-   383|  const pd=t.pairDetail||{};
-   384|  const risk=sec?.riskLevel||'low';
-   385|  const riskLabel={critical:'CRITICAL – Likely Scam',high:'HIGH RISK',medium:'MEDIUM RISK',low:'LOW RISK'}[risk];
-   386|  const riskIcon={critical:'🚨',high:'⚠️',medium:'⚡',low:'✅'}[risk];
-   387|  const launched=t.pairCreatedAt?fmtDateTime(t.pairCreatedAt):'—';
-   388|
-   389|  $('modal-root').innerHTML=`
-   390|<div class="mo" onclick="if(event.target===this)closeModal()"><div class="mdl">
-   391|  <div class="mt">
-   392|    ${logo(t,'mtl')}
-   393|    <div class="mtt">
-   394|      <h3>${esc(t.name)} <span class="sy">${esc(t.symbol)}</span>
-   395|        <span class="pb ${padClass(t.launchpad)}" style="margin-left:4px">${padLabel(t.launchpad)}</span>
-   396|      </h3>
-   397|      <div class="ad">${t.address}</div>
-   398|    </div>
-   399|    <button class="mx" onclick="closeModal()">✕</button>
-   400|  </div>
-   401|  <div class="mst">
-   402|    <div class="st"><div class="lb">Price</div><div class="vl">${fmtPrice(t.priceUsd)} ${badge(t.priceChange24h)}</div></div>
-   403|    <div class="st"><div class="lb">Market Cap</div><div class="vl">${fmtNum(mc)}</div></div>
-   404|    <div class="st"><div class="lb">Liquidity</div><div class="vl">${fmtNum(t.liquidityUsd)}</div></div>
-   405|    <div class="st"><div class="lb">Volume 24h</div><div class="vl">${fmtNum(t.volume24h)}</div></div>
-   406|    <div class="st"><div class="lb">Launched</div><div class="vl" style="font-size:.85rem">${launched}</div></div>
-   407|    <div class="st"><div class="lb">DEX</div><div class="vl" style="text-transform:capitalize">${t.dex||'—'}</div></div>
-   408|    ${sec?.creatorAddress?`<div class="st"><div class="lb">Creator</div><div class="vl" style="font-family:monospace;font-size:.75rem">${sec.creatorAddress.slice(0,8)}...<a href="https://basescan.org/address/${sec.creatorAddress}" target="_blank" style="color:var(--ac);font-size:.7rem;text-decoration:none">↗</a></div></div>`:''}
-   409|    ${t.description?`<div class="st" style="flex-basis:100%"><div class="lb">Description</div><div class="vl" style="font-size:.8rem;font-weight:400">${esc(t.description).substring(0,200)}</div></div>`:''}
-   410|  </div>
-   411|  <div class="rating-row">
-   412|    <span style="color:var(--t2)">Rate:</span>
-   413|    <span id="modal-rating">${renderStars(t.address,null,true)}</span>
-   414|  </div>
-   415|  <div class="mtb">
-   416|    <div class="tab active" onclick="switchTab('chart',this)">📈 Chart</div>
-   417|    <div class="tab" onclick="switchTab('security',this)">🛡️ Security</div>
-   418|    <div class="tab" onclick="switchTab('transactions',this)">🔄 Trades</div>
-   419|    <div class="tab" onclick="switchTab('snipers',this)">👤 Info</div>
-   420|  </div>
-   421|  <div id="tab-chart" class="tab-chart">
-   422|    <div id="lw-chart" style="width:100%;height:420px;overflow:hidden;position:relative;border-radius:0 0 12px 12px"></div>
-   423|  </div>
-   424|  <div id="tab-security" class="tab-sec" style="display:none">
-   425|    ${sec?`
-   426|      <div class="sec-overall sec-${risk}"><span class="sec-icon">${riskIcon}</span> ${riskLabel}</div>
-   427|      <div class="sec-grid">
-   428|        <div class="sec-item"><div class="lbl">Honeypot</div><div class="val ${sec.isHoneypot?'danger':'ok'}">${sec.isHoneypot?'YES – CANNOT SELL':'No'}</div></div>
-   429|        <div class="sec-item"><div class="lbl">Buy Tax</div><div class="val ${parseFloat(sec.buyTax)>5?'danger':parseFloat(sec.buyTax)>0?'warn':'ok'}">${sec.buyTax}%</div></div>
-   430|        <div class="sec-item"><div class="lbl">Sell Tax</div><div class="val ${parseFloat(sec.sellTax)>5?'danger':parseFloat(sec.sellTax)>0?'warn':'ok'}">${sec.sellTax}%</div></div>
-   431|        <div class="sec-item"><div class="lbl">Ownership</div><div class="val ${sec.isRenounced?'ok':'warn'}">${sec.isRenounced?'Renounced':'Not Renounced'}</div></div>
-   432|        <div class="sec-item"><div class="lbl">Open Source</div><div class="val ${sec.isOpenSource?'ok':'warn'}">${sec.isOpenSource?'Yes':'No'}</div></div>
-   433|        <div class="sec-item"><div class="lbl">Proxy</div><div class="val ${sec.isProxy?'warn':'ok'}">${sec.isProxy?'Yes':'No'}</div></div>
-   434|        <div class="sec-item"><div class="lbl">Can Mint</div><div class="val ${sec.canMint?'danger':'ok'}">${sec.canMint?'YES':'No'}</div></div>
-   435|        <div class="sec-item"><div class="lbl">Holders</div><div class="val">${sec.holderCount}</div></div>
-   436|      </div>
-   437|      ${sec.riskFlags.length?`<div class="flags">${sec.riskFlags.map(f=>`<span class="flag">⚠ ${f}</span>`).join('')}</div>`:''}
-   438|    `:'<div style="text-align:center;padding:20px;color:var(--t2)">Loading security analysis...</div>'}
-   439|  </div>
-   440|  <div id="tab-transactions" class="tab-txns" style="display:none">
-   441|    ${buildTxnsHTML(t)}
-   442|  </div>
-   443|  <div id="tab-snipers" class="tab-snipers" style="display:none">
-   444|    ${buildSnipersHTML(t)}
-   445|  </div>
-   446|  <div class="mln">
-   447|    <a href="https://dexscreener.com/base/${t.pairAddress}" target="_blank" class="ac"><i class="fa fa-chart-line"></i> DEX Screener</a>
-   448|    <a href="${t.basescanUrl}" target="_blank"><i class="fa fa-search"></i> BaseScan</a>
-   449|    ${t.twitter?`<a href="${t.twitter}" target="_blank"><i class="fa-brands fa-x-twitter"></i> Twitter</a>`:''}
-   450|    ${t.telegram?`<a href="${t.telegram}" target="_blank"><i class="fa-brands fa-telegram"></i> Telegram</a>`:''}
-   451|    ${t.website?`<a href="${t.website}" target="_blank"><i class="fa fa-globe"></i> Website</a>`:''}
-   452|  </div>
-   453|</div></div>`;
-   454|
-   455|  setTimeout(()=>loadChart(),300);
-   456|}
-   457|
-   458|function buildTxnsHTML(t){
-   459|  const pd=t.pairDetail||{};
-   460|  const buy24=pd.txns24hBuys||t.buys24h||0,sell24=pd.txns24hSells||t.sells24h||0;
-   461|  const buy1h=pd.txns1hBuys||0,sell1h=pd.txns1hSells||0;
-   462|  const vol1h=pd.volume1h||t.volume1h||0;
-   463|  return`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px">
-   464|    <div style="padding:14px;background:var(--srf);border-radius:10px;text-align:center"><div style="font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px">24h Buys</div><div style="font-size:1.5rem;font-weight:700;color:var(--gn)">${buy24}</div></div>
-   465|    <div style="padding:14px;background:var(--srf);border-radius:10px;text-align:center"><div style="font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px">24h Sells</div><div style="font-size:1.5rem;font-weight:700;color:var(--rd)">${sell24}</div></div>
-   466|    <div style="padding:14px;background:var(--srf);border-radius:10px;text-align:center"><div style="font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px">Buy/Sell Ratio</div><div style="font-size:1.5rem;font-weight:700;color:${buy24>sell24?'var(--gn)':'var(--rd)'}">${sell24>0?(buy24/sell24).toFixed(2):'∞'}</div></div>
-   467|    <div style="padding:14px;background:var(--srf);border-radius:10px;text-align:center"><div style="font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px">Volume 1h</div><div style="font-size:1.2rem;font-weight:700">${fmtNum(vol1h)}</div></div>
-   468|    <div style="padding:14px;background:var(--srf);border-radius:10px;text-align:center"><div style="font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px">Last Hour</div><div style="font-size:1rem;font-weight:700;color:var(--gn)">${buy1h} buys</div><div style="font-size:.85rem;color:var(--rd)">${sell1h} sells</div></div>
-   469|  </div>
-   470|  <div style="text-align:center;padding:12px;font-size:.8rem;color:var(--t2)"><i class="fa fa-info-circle"></i> Individual txns via <a href="https://dexscreener.com/base/${t.pairAddress}" target="_blank" style="color:var(--ac);font-weight:600">DEX Screener →</a></div>`;
-   471|}
-   472|
-   473|function buildSnipersHTML(t){
-   474|  const sec=t.security||{};
-   475|  return`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px">
-   476|    <div style="padding:14px;background:var(--srf);border-radius:10px"><div style="font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px">Creator</div><div style="font-size:.82rem;font-family:monospace;font-weight:600;margin-top:4px;word-break:break-all">${sec.creatorAddress||'Unknown'}</div>${sec.creatorAddress?`<a href="https://basescan.org/address/${sec.creatorAddress}" target="_blank" style="font-size:.7rem;color:var(--ac);text-decoration:none">View on BaseScan ↗</a>`:''}</div>
-   477|    <div style="padding:14px;background:var(--srf);border-radius:10px"><div style="font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px">Owner</div><div style="font-size:.82rem;font-family:monospace;font-weight:600;margin-top:4px;word-break:break-all">${sec.ownerAddress||'Unknown'}</div><div style="font-size:.75rem;margin-top:4px;color:${sec.isRenounced?'var(--gn)':'var(--or)'}">${sec.isRenounced?'✅ Renounced':'⚠️ Not Renounced'}</div></div>
-   478|    <div style="padding:14px;background:var(--srf);border-radius:10px"><div style="font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px">Holder Count</div><div style="font-size:1.5rem;font-weight:700">${sec.holderCount||'—'}</div></div>
-   479|    <div style="padding:14px;background:var(--srf);border-radius:10px"><div style="font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px">Total Supply</div><div style="font-size:1rem;font-weight:700;margin-top:4px;word-break:break-all">${parseFloat(sec.totalSupply||0).toLocaleString()}</div></div>
-   480|  </div>`;
-   481|}
-   482|
-   483|function switchTab(name,el){
-   484|  document.querySelectorAll('.mtb .tab').forEach(t=>t.classList.remove('active'));
-   485|  el.classList.add('active');
-   486|  ['chart','security','transactions','snipers'].forEach(n=>{$(`tab-${n}`).style.display=n===name?'':'none'});
-   487|  if(name==='chart')setTimeout(()=>loadChart(),100);
-   488|}
-   489|
-   490|async function loadChart(){
-   491|  if(!modalToken)return;
-   492|  const t=modalToken;
-   493|  const pair=t.pairAddress||t.address;
-   494|  const el=$('lw-chart');
-   495|  if(!el)return;
-   496|  // DEX Screener embed — clip the bottom "Tracked by" footer
-   497|  el.innerHTML=`<iframe src="https://dexscreener.com/base/${pair}?embed=1&theme=light&info=0" style="width:100%;height:470px;border:none;position:absolute;top:0;left:0" loading="lazy"></iframe>`;
-   498|}
-   499|
-   500|function closeModal(){$('modal-root').innerHTML='';modalToken=null}
-   501|
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitBlock Scanner — Base Token Discovery</title>
+<link rel="icon" href="favicon.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#fff;--srf:#f8f9fa;--brd:#e5e7eb;--txt:#111827;--t2:#6b7280;--t3:#9ca3af;--ac:#2563eb;--ac-glow:rgba(37,99,235,0.08);--gn:#059669;--rd:#dc2626;--or:#ea580c;--yl:#ca8a04;--ra:10px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(37,99,235,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,0.06) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+
+.tb{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--brd);padding:10px 0}
+.ti{max-width:1500px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.lg{font-weight:700;font-size:1.05rem;white-space:nowrap;display:flex;align-items:center;gap:7px}
+.lg span{color:var(--ac)}
+.ld{width:7px;height:7px;border-radius:50%;background:var(--gn);animation:pulse2 2s infinite}
+@keyframes pulse2{0%,100%{opacity:1}50%{opacity:.3}}
+.sb{flex:1;min-width:160px;position:relative}
+.sb input{width:100%;padding:9px 12px 9px 36px;border:1px solid var(--brd);border-radius:10px;font-size:.85rem;font-family:inherit;background:var(--srf);outline:none}
+.sb input:focus{border-color:var(--ac)}
+.sb i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:.8rem}
+.fs{padding:9px 12px;border:1px solid var(--brd);border-radius:10px;font-size:.82rem;font-family:inherit;background:var(--srf);cursor:pointer;outline:none;min-width:110px}
+.fs:focus{border-color:var(--ac)}
+.nc{padding:5px 10px;border-radius:7px;background:#eff6ff;color:var(--ac);font-weight:600;font-size:.78rem;animation:popIn .3s}
+@keyframes popIn{from{transform:scale(.8);opacity:0}}
+
+.sr{max-width:1500px;margin:0 auto;padding:12px 16px;display:flex;gap:20px;font-size:.82rem;color:var(--t2);flex-wrap:wrap;align-items:center;position:relative;z-index:1}
+.sr strong{color:var(--txt)}
+
+/* Trending */
+.trending{margin:0 0 16px 0;position:relative;z-index:1}
+.trending h3{font-size:.82rem;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin:0 0 10px 0;padding:0 16px}
+.trending-row{display:flex;gap:10px;overflow-x:auto;padding:0 16px 8px;scroll-behavior:smooth;overflow:hidden}
+.trending-scroll{display:flex;gap:10px;animation:scrollX 30s linear infinite}
+.trending-scroll:hover{animation-play-state:paused}
+@keyframes scrollX{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.trending-row::-webkit-scrollbar{height:4px}
+.trending-row::-webkit-scrollbar-thumb{background:var(--brd);border-radius:2px}
+.tcard{flex-shrink:0;width:180px;padding:12px 14px;background:var(--srf);border:1px solid var(--brd);border-radius:10px;cursor:pointer;transition:all .12s;text-decoration:none;color:var(--txt)}
+.tcard:hover{border-color:var(--ac);transform:translateY(-2px)}
+.tcard-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.tcard-logo{width:24px;height:24px;border-radius:50%;border:1px solid var(--brd);object-fit:cover;background:var(--srf)}
+.tcard-logof{width:24px;height:24px;border-radius:50%;background:#f3f4f6;border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--t3);font-weight:600}
+.tcard-name{font-weight:600;font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tcard-price{font-size:.85rem;font-weight:700}
+.tcard-vol{font-size:.7rem;color:var(--t2);margin-top:2px}
+.tcard-change{font-size:.72rem;font-weight:600;margin-top:2px}
+
+.tw{max-width:1500px;margin:0 auto;padding:0 16px 60px;overflow-x:auto;position:relative;z-index:1}
+table{width:100%;border-collapse:collapse;font-size:.84rem}
+thead th{text-align:left;padding:10px 12px;font-weight:600;color:var(--t2);font-size:.73rem;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid var(--brd);white-space:nowrap;cursor:pointer;user-select:none}
+thead th:hover{color:var(--txt)}
+tbody td{padding:12px;border-bottom:1px solid var(--brd);white-space:nowrap}
+tbody tr{transition:background .12s;cursor:pointer}
+tbody tr:hover{background:#f0f4ff}
+tbody tr.new-row{animation:highlightNew 3s ease-out}
+@keyframes highlightNew{0%{background:#dbeafe}100%{background:transparent}}
+
+.tc{display:flex;align-items:center;gap:8px}
+.tl,.tlf{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.tl{border:1px solid var(--brd);object-fit:cover;background:var(--srf)}
+.tlf{background:#f3f4f6;border:1px solid var(--brd);font-weight:600;font-size:.75rem;color:var(--t3)}
+.tn{font-weight:600;color:var(--txt)}
+.ts{color:var(--t2);font-size:.78rem;margin-left:3px}
+
+.cb{padding:2px 7px;border-radius:5px;font-weight:600;font-size:.75rem}
+.cu{background:#ecfdf5;color:var(--gn)}
+.cd{background:#fef2f2;color:var(--rd)}
+.pb{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:5px;font-size:.7rem;font-weight:600}
+.pad-icon{width:14px;height:14px;border-radius:3px;object-fit:cover}
+.pc{background:#eff6ff;color:#2563eb}.pbk{background:#f5f3ff;color:#7c3aed}.pz{background:#fef3c7;color:#92400e}.pv{background:#fce7f3;color:#be185d}.po{background:#f9fafb;color:#6b7280}
+.po{background:#f9fafb;color:#6b7280}
+
+.sl{display:flex;gap:3px}
+.sl a{color:var(--t3);font-size:.8rem;text-decoration:none;padding:2px}
+.sl a:hover{color:var(--ac)}
+
+.loading,.empty{text-align:center;padding:50px;color:var(--t2)}
+.loading i,.empty i{font-size:2rem;display:block;margin-bottom:10px;color:var(--t3)}
+
+/* Stars */
+.stars{display:inline-flex;gap:2px;cursor:pointer}
+.stars i{color:#e5e7eb;font-size:.85rem;transition:color .1s}
+.stars i.active{color:#f59e0b}
+.stars.count{font-size:.7rem;color:var(--t2);margin-left:4px}
+
+/* Modal */
+.mo{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.3);display:flex;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;animation:fadeIn .15s}
+@keyframes fadeIn{from{opacity:0}}
+.mdl{background:var(--bg);border-radius:14px;width:100%;max-width:960px;box-shadow:0 20px 60px rgba(0,0,0,.15);animation:slideUp .2s;margin:10px 0}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}}
+.mt{padding:20px 24px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:12px}
+.mtl{width:48px;height:48px;border-radius:12px;border:1px solid var(--brd);object-fit:cover;flex-shrink:0;background:var(--srf)}
+.mtlf{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#dbeafe,#ede9fe);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;color:var(--ac);flex-shrink:0}
+.mtt{flex:1;min-width:0}
+.mtt h3{font-size:1.15rem;font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mtt .sy{color:var(--t2);font-size:.85rem}
+.mtt .ad{font-family:monospace;font-size:.68rem;color:var(--t3);margin-top:2px;word-break:break-all}
+.mx{width:32px;height:32px;border-radius:50%;border:none;background:var(--srf);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mx:hover{background:var(--brd)}
+.mst{display:flex;gap:18px;padding:14px 24px;border-bottom:1px solid var(--brd);flex-wrap:wrap}
+.mst .st .lb{font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px}
+.mst .st .vl{font-weight:700;font-size:1rem;margin-top:1px}
+.rating-row{display:flex;align-items:center;gap:8px;padding:8px 24px;border-bottom:1px solid var(--brd);font-size:.85rem}
+.rating-row .stars i{font-size:1.2rem;cursor:pointer}
+.rating-row .stars i:hover{color:#f59e0b}
+.rating-avg{font-weight:700;color:#f59e0b;margin-left:4px}
+.rating-count{color:var(--t2);font-size:.75rem}
+
+.mtb{display:flex;border-bottom:1px solid var(--brd);padding:0 24px}
+.mtb .tab{padding:12px 18px;font-size:.82rem;font-weight:600;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;transition:all .12s;display:flex;align-items:center;gap:5px}
+.mtb .tab:hover{color:var(--txt)}
+.mtb .tab.active{color:var(--ac);border-bottom-color:var(--ac)}
+
+.tab-chart{padding:12px 0;background:var(--bg)}
+.tab-chart canvas{width:100%!important;max-height:380px}
+.tab-chart .time-btns{display:flex;gap:6px;padding:8px 24px}
+.tab-chart .time-btns button{padding:6px 14px;border:1px solid var(--brd);border-radius:8px;background:var(--srf);font-size:.78rem;font-family:inherit;cursor:pointer;font-weight:500}
+.tab-chart .time-btns button.active{background:var(--ac);color:#fff;border-color:var(--ac)}
+
+.tab-sec{padding:20px 24px}
+.sec-overall{display:flex;align-items:center;gap:14px;padding:16px 20px;border-radius:12px;margin-bottom:16px;font-weight:700;font-size:1.1rem}
+.sec-critical{background:#fef2f2;color:var(--rd);border:1px solid #fecaca}
+.sec-high{background:#fff7ed;color:var(--or);border:1px solid #fed7aa}
+.sec-medium{background:#fefce8;color:var(--yl);border:1px solid #fef08a}
+.sec-low{background:#ecfdf5;color:var(--gn);border:1px solid #bbf7d0}
+.sec-icon{font-size:1.4rem}
+.sec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.sec-item{padding:10px 14px;border-radius:8px;background:var(--srf);border:1px solid var(--brd)}
+.sec-item .lbl{font-size:.68rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px}
+.sec-item .val{font-weight:600;font-size:.88rem;margin-top:2px}
+.sec-item .val.danger{color:var(--rd)}
+.sec-item .val.warn{color:var(--or)}
+.sec-item .val.ok{color:var(--gn)}
+.flags{margin-top:14px}
+.flags .flag{display:inline-block;padding:4px 10px;border-radius:6px;font-size:.75rem;font-weight:600;margin:2px 4px 2px 0;background:#fef2f2;color:var(--rd)}
+
+.tab-txns{padding:16px 24px;max-height:450px;overflow-y:auto}
+.tab-snipers{padding:16px 24px;max-height:450px;overflow-y:auto}
+.sniper-card{padding:12px 16px;margin-bottom:8px;border-radius:10px;border:1px solid var(--brd);display:flex;align-items:center;gap:14px;font-size:.82rem}
+.sniper-card .sn-rank{width:28px;height:28px;border-radius:50%;background:var(--ac);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;flex-shrink:0}
+.sniper-card .sn-info{flex:1}
+.sniper-card .sn-addr{font-family:monospace;font-weight:600;font-size:.78rem}
+.sniper-card .sn-time{color:var(--t2);font-size:.75rem;margin-top:2px}
+.sniper-card .sn-amt{font-weight:700;color:var(--txt)}
+.sniper-card .sn-badge{padding:3px 8px;border-radius:5px;font-size:.68rem;font-weight:600;background:#eff6ff;color:var(--ac)}
+
+.mln{display:flex;gap:8px;padding:14px 24px;border-top:1px solid var(--brd);flex-wrap:wrap}
+.mln a{padding:9px 16px;border-radius:9px;text-decoration:none;font-weight:600;font-size:.82rem;border:1px solid var(--brd);color:var(--txt);display:flex;align-items:center;gap:5px}
+.mln a:hover{border-color:var(--ac);color:var(--ac)}
+.mln a.ac{background:var(--ac);color:#fff;border-color:var(--ac)}
+.mln a.ac:hover{background:#1d4ed8}
+
+@media(max-width:768px){.mst{gap:10px}.mst .st .vl{font-size:.85rem}.tc{gap:5px}}
+</style>
+</head>
+<body>
+
+<div class="tb"><div class="ti">
+  <div class="lg"><img src="gitblock-logo.jpg" style="width:28px;height:28px;border-radius:6px;object-fit:cover"> GitBlock <div class="ld"></div></div>
+  <div class="sb"><i class="fa fa-search"></i><input type="text" id="search" placeholder="Search any token on Base..." oninput="liveSearch()"></div>
+  <select class="fs" id="ageFilter" onchange="poll()">
+    <option value="">Any Time</option>
+    <option value="5m">≤ 5 min</option>
+    <option value="15m">≤ 15 min</option>
+    <option value="1h">≤ 1 hour</option>
+    <option value="6h">≤ 6 hours</option>
+    <option value="24h">≤ 24 hours</option>
+  </select>
+</div></div>
+
+<div class="trending" id="trendingBox" style="display:none">
+  <h3>🔥 Trending</h3>
+  <div class="trending-row" id="trendingRow"></div>
+</div>
+
+<div class="sr">
+  <span>Liq: <strong id="stLiq">—</strong></span>
+  <span>Vol 24h: <strong id="stVol">—</strong></span>
+</div>
+
+<div class="tw"><div id="content"><div class="loading"><i class="fa fa-spinner"></i>Loading Base tokens...</div></div></div>
+<div id="modal-root"></div>
+
+<script>
+const API='https://website-bernard-cold-july.trycloudflare.com';
+let tokens=[],seenAddrs=new Set(),newAddrs=new Set(),sortField='age',sortDir='asc',groupedMode=false;
+let tokenRatings={}; // { address: { avg, count } } from server
+
+async function loadRatings(addrs){
+  if(!addrs.length)return;
+  try{
+    const r=await fetch(`${API}/v1/ratings?addresses=${addrs.map(encodeURIComponent).join(',')}`);
+    const d=await r.json();
+    if(d.ok)Object.assign(tokenRatings,d.data);
+  }catch(e){}
+}
+
+async function rateToken(addr,stars){
+  try{
+    const r=await fetch(`${API}/v1/rating/${addr}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({stars})});
+    const d=await r.json();
+    if(d.ok)tokenRatings[addr.toLowerCase()]=d.data;
+    return d.ok?d.data:null;
+  }catch(e){return null}
+}
+
+function renderStars(addr){
+  const r=tokenRatings[addr.toLowerCase()]||{avg:0,count:0};
+  let h='<span class="stars" onclick="rateTokenAndRefresh(\''+addr+'\',event)">';
+  for(let i=1;i<=5;i++)h+=`<i class="fa${i<=Math.round(r.avg)?'-solid':'-regular'} fa-star ${i<=Math.round(r.avg)?'active':''}" data-star="${i}"></i>`;
+  h+=`</span>`;
+  if(r.count>0)h+=`<span class="stars count">${r.avg}★ (${r.count})</span>`;
+  return h;
+}
+
+async function rateTokenAndRefresh(addr,e){
+  const star=e.target.closest('i');
+  if(!star)return;
+  const s=parseInt(star.dataset.star);
+  if(!s)return;
+  await rateToken(addr,s);
+  // Refresh star displays
+  document.querySelectorAll(`[data-rating-addr="${addr}"]`).forEach(el=>el.innerHTML=renderStars(addr));
+  // If on token page, refresh the rating row
+  const mr=document.getElementById('stars-container');
+  if(mr)mr.innerHTML=renderStars(addr);
+}
+function fmtDateTime(iso){
+  if(!iso)return'—';
+  const d=new Date(iso);
+  const now=new Date();
+  const diff=now-d;
+  const s=Math.floor(diff/1000);
+  if(s<60)return s+'s ago';
+  if(s<3600)return Math.floor(s/60)+'m ago';
+  if(s<86400)return Math.floor(s/3600)+'h ago';
+  return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+}
+
+function $(id){return document.getElementById(id)}
+function fmtNum(n){if(n==null||isNaN(n))return'—';n=parseFloat(n);if(n>=1e9)return'$'+(n/1e9).toFixed(2)+'B';if(n>=1e6)return'$'+(n/1e6).toFixed(2)+'M';if(n>=1e3)return'$'+(n/1e3).toFixed(2)+'K';return'$'+n.toFixed(2)}
+function fmtPrice(n){if(n==null||isNaN(n))return'—';n=parseFloat(n);if(n>=1)return'$'+n.toFixed(2);if(n>=.01)return'$'+n.toFixed(4);if(n>=.0001)return'$'+n.toFixed(6);if(n<=.000001&&n>0)return'$'+n.toExponential(4);return'$'+n.toFixed(8)}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function badge(pct){if(pct==null)return'<span class="cb">—</span>';const c=pct>=0?'cu':'cd';return`<span class="cb ${c}">${pct>=0?'↑':'↓'} ${Math.abs(pct).toFixed(1)}%</span>`}
+function padClass(p){return'p'+(p==='clanker'?'c':p==='bankr'?'b':p==='zora'?'z':p==='virtuals'?'v':'o')}
+function padLabel(p){const m={clanker:'<img class="pad-icon" src="clanker.png"> Clanker',bankr:'🔵 Bankr',zora:'🟡 Zora',virtuals:'🩷 Virtuals',other:'⚪ Other'};return m[p]||'⚪ Other'}
+function logo(t,cls){if(t.image)return`<img class="${cls}" src="${t.image}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="${cls==='tl'?'tlf':'mtlf'}" style="display:none">?</div>`;return`<div class="${cls==='tl'?'tlf':'mtlf'}">?</div>`}
+
+
+// Live search: queries cache + DEX Screener
+let st=null;
+function liveSearch(){
+  clearTimeout(st);
+  const q=$('search').value.trim();
+  if(!q||q.length<2){render();return}
+  st=setTimeout(async()=>{
+    try{
+      const r=await fetch(`${API}/v1/search?q=${encodeURIComponent(q)}`);
+      const d=await r.json();
+      if(d.ok&&d.data){
+        for(const t of d.data){const k=t.address.toLowerCase();if(!tokens.find(x=>x.address.toLowerCase()===k))tokens.push(t)}
+        $('content').innerHTML=d.data.length?buildTable(d.data):'<div class="empty"><i class="fa fa-search"></i>No results for "'+esc(q)+'"</div>';
+      }
+    }catch(e){}
+  },300);
+}
+
+async function poll(){
+  const age=$('ageFilter').value;
+  let url=`${API}/v1/new-tokens?limit=200`;
+  if(age)url+=`&maxAge=${age}`;
+  try{
+    const r=await fetch(url),d=await r.json();
+    if(!d.ok)throw new Error('API error');
+    const fresh=d.data||[];
+    newAddrs.clear();
+    // Track seen on first load without flagging as NEW
+    const isFirstLoad = seenAddrs.size === 0;
+    for(const t of fresh){const a=t.address.toLowerCase();if(!seenAddrs.has(a)){seenAddrs.add(a);if(!isFirstLoad)newAddrs.add(a)}}
+    const m=new Map(tokens.map(t=>[t.address.toLowerCase(),t]));
+    for(const t of fresh){const a=t.address.toLowerCase();m.set(a,m.has(a)?{...m.get(a),...t}:t)}
+    tokens=[...m.values()];
+    // Load ratings for displayed tokens
+    const addrs=tokens.slice(0,100).map(t=>t.address);
+    loadRatings(addrs);
+    $('stLiq').textContent=fmtNum(tokens.reduce((s,t)=>s+(parseFloat(t.liquidityUsd)||0),0));
+    $('stVol').textContent=fmtNum(tokens.reduce((s,t)=>s+(parseFloat(t.volume24h)||0),0));
+    if($('search').value.trim().length<2)render();
+    renderTrending();
+  }catch(e){console.error(e)}
+}
+
+function renderTrending(){
+  // Top 11 by 24h volume + pinned GitBlock at position 1
+  const trending=[...tokens].filter(t=>parseFloat(t.volume24h)>0).sort((a,b)=>(parseFloat(b.volume24h)||0)-(parseFloat(a.volume24h)||0)).slice(0,11);
+  if(!trending.length){$('trendingBox').style.display='none';return}
+  $('trendingBox').style.display='block';
+
+  // GitBlock pinned card
+  const gbCard=`<a class="tcard" href="token.html?address=0xDa1Ae26f0F702DF94926042Fc1Fe1e855D376b07" style="border:2px solid var(--ac);background:var(--ac-glow)">
+    <div class="tcard-top">
+      <img class="tcard-logo" src="gitblock-logo.jpg">
+      <div class="tcard-name" style="color:var(--ac)">GITBLOCK ⭐</div>
+    </div>
+    <div class="tcard-price">Trade on Base</div>
+    <div class="tcard-vol" style="color:var(--ac);font-weight:600">Official Token</div>
+  </a>`;
+
+  const cards=gbCard+trending.map(t=>{
+    const chg=parseFloat(t.priceChange24h)||0;
+    const chgCls=chg>=0?'cu':'cd';
+    const chgSign=chg>=0?'↑':'↓';
+    return`<a class="tcard" href="token.html?address=${t.address}">
+      <div class="tcard-top">${t.image?`<img class="tcard-logo" src="${t.image}">`:`<div class="tcard-logof">?</div>`}
+      <div class="tcard-name">${esc(t.symbol)}</div></div>
+      <div class="tcard-price">${fmtPrice(t.priceUsd)}</div>
+      <div class="tcard-vol">Vol: ${fmtNum(t.volume24h)}</div>
+      <div class="tcard-change"><span class="cb ${chgCls}">${chgSign} ${Math.abs(chg).toFixed(1)}%</span></div>
+    </a>`;
+  }).join('');
+
+  // Duplicate for seamless infinite scroll
+  $('trendingRow').innerHTML=`<div class="trending-scroll">${cards}${cards}</div>`;
+
+}
+
+function sorted(data){const d=sortDir==='asc'?1:-1;return[...data].sort((a,b)=>{let va,vb;switch(sortField){case'price':va=parseFloat(a.priceUsd)||0;vb=parseFloat(b.priceUsd)||0;break;case'liquidity':va=parseFloat(a.liquidityUsd)||0;vb=parseFloat(b.liquidityUsd)||0;break;case'volume':va=parseFloat(a.volume24h)||0;vb=parseFloat(b.volume24h)||0;break;case'marketcap':va=parseFloat(a.marketCap||a.fdv)||0;vb=parseFloat(b.marketCap||b.fdv)||0;break;case'age':va=a.pairCreatedAt?new Date(a.pairCreatedAt).getTime():0;vb=b.pairCreatedAt?new Date(b.pairCreatedAt).getTime():0;break;default:return 0}return(va-vb)*d})}
+function filtered(){let f=[...tokens];const q=$('search').value.toLowerCase().trim();if(q)f=f.filter(t=>t.name.toLowerCase().includes(q)||t.symbol.toLowerCase().includes(q)||t.address.toLowerCase().includes(q));return f}
+function render(){if(groupedMode){renderGrouped();return}let f=filtered();f=sorted(f).slice(0,100);const age=$('ageFilter').value;if(age){const ms={5:3e5,15:9e5,60:36e5,360:216e5,1440:864e5};const max=ms[parseInt(age)]||864e5;f=f.filter(t=>t.pairCreatedAt&&(Date.now()-new Date(t.pairCreatedAt).getTime())<max)}$('content').innerHTML=f.length?buildTable(f)+'<div style="text-align:center;padding:16px;color:var(--t2);font-size:.78rem">Showing '+f.length+' tokens. Search for more ↓</div>':'<div class="empty"><i class="fa fa-inbox"></i>No tokens found</div>'}
+function toggleGrouped(){groupedMode=!groupedMode;$('groupBtn').textContent=groupedMode?'📋 List View':'📋 Group by Launchpad';render()}
+function renderGrouped(){const groups={};for(const t of tokens){const pad=t.launchpadName||t.launchpad||'Unknown';if(!groups[pad])groups[pad]={name:pad,tokens:[]};groups[pad].tokens.push(t)}const sorted=[...Object.values(groups)].sort((a,b)=>b.tokens.length-a.tokens.length);let h='';for(const g of sorted){h+=`<div style="margin-bottom:32px"><h3 style="padding:12px 0;font-size:1rem;display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--brd);margin-bottom:12px"><span class="pb ${g.tokens[0]?padClass(g.tokens[0].launchpad):'pu'}">${g.name}</span><span style="font-size:.8rem;color:var(--t2);font-weight:400">${g.tokens.length} tokens</span></h3>${buildTable(g.tokens.slice(0,20))}</div>`}$('content').innerHTML=h||'<div class="empty"><i class="fa fa-inbox"></i>No tokens found</div>'}
+function sortBy(f){if(sortField===f)sortDir=sortDir==='asc'?'desc':'asc';else{sortField=f;sortDir=f==='age'?'asc':'desc'}render()}
+function th(l,f){const a=f&&f===sortField?(sortDir==='asc'?' ▲':' ▼'):'';return f?`<th onclick="sortBy('${f}')">${l}<span style="font-size:.6rem">${a}</span></th>`:`<th>${l}</th>`}
+
+function buildTable(data){
+  let h='<table><thead><tr>'+th('#')+th('Token')+th('Rating')+th('Price','price')+th('Launched','age')+th('Liquidity','liquidity')+th('Volume 24h','volume')+th('Market Cap','marketcap')+th('Links')+'</tr></thead><tbody>';
+  data.forEach((t,i)=>{
+    const isNew=newAddrs.has(t.address.toLowerCase());
+    const mc=t.marketCap||t.fdv;
+    const launched=t.pairCreatedAt?fmtDateTime(t.pairCreatedAt):'—';
+    h+=`<tr class="${isNew?'new-row':''}" onclick="location.href='token.html?address=${t.address}'">`;
+    h+=`<td style="color:var(--t3)">${isNew?'<span style="color:var(--ac);font-weight:700">NEW</span>':i+1}</td>`;
+    h+=`<td><div class="tc">${logo(t,'tl')}<div><div class="tn">${esc(t.name)}<span class="ts">${esc(t.symbol)}</span></div></div></div></td>`;
+    h+=`<td data-rating-addr="${t.address}">${renderStars(t.address)}</td>`;
+    h+=`<td><div>${fmtPrice(t.priceUsd)}</div><div style="font-size:.7rem;margin-top:1px">${badge(t.priceChange24h)}</div></td>`;
+    h+=`<td style="font-size:.78rem">${launched}</td>`;
+    h+=`<td>${fmtNum(t.liquidityUsd)}</td><td>${fmtNum(t.volume24h)}</td><td>${fmtNum(mc)}</td>`;
+    h+=`<td><div class="sl">`;
+    if(t.twitter)h+=`<a href="${t.twitter}" target="_blank" onclick="event.stopPropagation()" title="X"><i class="fa-brands fa-x-twitter"></i></a>`;
+    if(t.telegram)h+=`<a href="${t.telegram}" target="_blank" onclick="event.stopPropagation()" title="TG"><i class="fa-brands fa-telegram"></i></a>`;
+    if(t.website)h+=`<a href="${t.website}" target="_blank" onclick="event.stopPropagation()" title="Web"><i class="fa fa-globe"></i></a>`;
+    h+=`<a href="${t.url}" target="_blank" onclick="event.stopPropagation()" title="DEXS"><i class="fa fa-chart-line"></i></a>`;
+    h+=`<a href="${t.basescanUrl}" target="_blank" onclick="event.stopPropagation()" title="Scan"><i class="fa fa-search"></i></a>`;
+    h+='</div></td></tr>';
+  });
+  return h+'</tbody></table>';
+}
+
+// ── Detail Modal ──
+let modalToken=null;
+
+async function showDetail(addr){
+  $('modal-root').innerHTML='<div class="mo"><div class="mdl"><div class="loading"><i class="fa fa-spinner"></i>Loading...</div></div></div>';
+  try{
+    const r=await fetch(`${API}/v1/token/${addr}`);
+    const d=await r.json();
+    if(!d.ok){$('modal-root').innerHTML='';alert('Token not found');return}
+    modalToken=d.data;
+    buildModal();
+  }catch(e){$('modal-root').innerHTML='';alert('Error: '+e.message)}
+}
+
+function buildModal(){
+  const t=modalToken;
+  const mc=t.marketCap||t.fdv;
+  const sec=t.security;
+  const pd=t.pairDetail||{};
+  const risk=sec?.riskLevel||'low';
+  const riskLabel={critical:'CRITICAL – Likely Scam',high:'HIGH RISK',medium:'MEDIUM RISK',low:'LOW RISK'}[risk];
+  const riskIcon={critical:'🚨',high:'⚠️',medium:'⚡',low:'✅'}[risk];
+  const launched=t.pairCreatedAt?fmtDateTime(t.pairCreatedAt):'—';
+
+  $('modal-root').innerHTML=`
+<div class="mo" onclick="if(event.target===this)closeModal()"><div class="mdl">
+  <div class="mt">
+    ${logo(t,'mtl')}
+    <div class="mtt">
+      <h3>${esc(t.name)} <span class="sy">${esc(t.symbol)}</span>
+        <span class="pb ${padClass(t.launchpad)}" style="margin-left:4px">${padLabel(t.launchpad)}</span>
+      </h3>
+      <div class="ad">${t.address}</div>
+    </div>
+    <button class="mx" onclick="closeModal()">✕</button>
+  </div>
+  <div class="mst">
+    <div class="st"><div class="lb">Price</div><div class="vl">${fmtPrice(t.priceUsd)} ${badge(t.priceChange24h)}</div></div>
+    <div class="st"><div class="lb">Market Cap</div><div class="vl">${fmtNum(mc)}</div></div>
+    <div class="st"><div class="lb">Liquidity</div><div class="vl">${fmtNum(t.liquidityUsd)}</div></div>
+    <div class="st"><div class="lb">Volume 24h</div><div class="vl">${fmtNum(t.volume24h)}</div></div>
+    <div class="st"><div class="lb">Launched</div><div class="vl" style="font-size:.85rem">${launched}</div></div>
+    <div class="st"><div class="lb">DEX</div><div class="vl" style="text-transform:capitalize">${t.dex||'—'}</div></div>
+    ${sec?.creatorAddress?`<div class="st"><div class="lb">Creator</div><div class="vl" style="font-family:monospace;font-size:.75rem">${sec.creatorAddress.slice(0,8)}...<a href="https://basescan.org/address/${sec.creatorAddress}" target="_blank" style="color:var(--ac);font-size:.7rem;text-decoration:none">↗</a></div></div>`:''}
+    ${t.description?`<div class="st" style="flex-basis:100%"><div class="lb">Description</div><div class="vl" style="font-size:.8rem;font-weight:400">${esc(t.description).substring(0,200)}</div></div>`:''}
+  </div>
+  <div class="rating-row">
+    <span style="color:var(--t2)">Rate:</span>
+    <span id="modal-rating">${renderStars(t.address,null,true)}</span>
+  </div>
+  <div class="mtb">
+    <div class="tab active" onclick="switchTab('chart',this)">📈 Chart</div>
+    <div class="tab" onclick="switchTab('security',this)">🛡️ Security</div>
+    <div class="tab" onclick="switchTab('transactions',this)">🔄 Trades</div>
+    <div class="tab" onclick="switchTab('snipers',this)">👤 Info</div>
+  </div>
+  <div id="tab-chart" class="tab-chart">
+    <div id="lw-chart" style="width:100%;height:420px;overflow:hidden;position:relative;border-radius:0 0 12px 12px"></div>
+  </div>
+  <div id="tab-security" class="tab-sec" style="display:none">
+    ${sec?`
+      <div class="sec-overall sec-${risk}"><span class="sec-icon">${riskIcon}</span> ${riskLabel}</div>
+      <div class="sec-grid">
+        <div class="sec-item"><div class="lbl">Honeypot</div><div class="val ${sec.isHoneypot?'danger':'ok'}">${sec.isHoneypot?'YES – CANNOT SELL':'No'}</div></div>
+        <div class="sec-item"><div class="lbl">Buy Tax</div><div class="val ${parseFloat(sec.buyTax)>5?'danger':parseFloat(sec.buyTax)>0?'warn':'ok'}">${sec.buyTax}%</div></div>
+        <div class="sec-item"><div class="lbl">Sell Tax</div><div class="val ${parseFloat(sec.sellTax)>5?'danger':parseFloat(sec.sellTax)>0?'warn':'ok'}">${sec.sellTax}%</div></div>
+        <div class="sec-item"><div class="lbl">Ownership</div><div class="val ${sec.isRenounced?'ok':'warn'}">${sec.isRenounced?'Renounced':'Not Renounced'}</div></div>
+        <div class="sec-item"><div class="lbl">Open Source</div><div class="val ${sec.isOpenSource?'ok':'warn'}">${sec.isOpenSource?'Yes':'No'}</div></div>
+        <div class="sec-item"><div class="lbl">Proxy</div><div class="val ${sec.isProxy?'warn':'ok'}">${sec.isProxy?'Yes':'No'}</div></div>
+        <div class="sec-item"><div class="lbl">Can Mint</div><div class="val ${sec.canMint?'danger':'ok'}">${sec.canMint?'YES':'No'}</div></div>
+        <div class="sec-item"><div class="lbl">Holders</div><div class="val">${sec.holderCount}</div></div>
+      </div>
+      ${sec.riskFlags.length?`<div class="flags">${sec.riskFlags.map(f=>`<span class="flag">⚠ ${f}</span>`).join('')}</div>`:''}
+    `:'<div style="text-align:center;padding:20px;color:var(--t2)">Loading security analysis...</div>'}
+  </div>
+  <div id="tab-transactions" class="tab-txns" style="display:none">
+    ${buildTxnsHTML(t)}
+  </div>
+  <div id="tab-snipers" class="tab-snipers" style="display:none">
+    ${buildSnipersHTML(t)}
+  </div>
+  <div class="mln">
+    <a href="https://dexscreener.com/base/${t.pairAddress}" target="_blank" class="ac"><i class="fa fa-chart-line"></i> DEX Screener</a>
+    <a href="${t.basescanUrl}" target="_blank"><i class="fa fa-search"></i> BaseScan</a>
+    ${t.twitter?`<a href="${t.twitter}" target="_blank"><i class="fa-brands fa-x-twitter"></i> Twitter</a>`:''}
+    ${t.telegram?`<a href="${t.telegram}" target="_blank"><i class="fa-brands fa-telegram"></i> Telegram</a>`:''}
+    ${t.website?`<a href="${t.website}" target="_blank"><i class="fa fa-globe"></i> Website</a>`:''}
+  </div>
+</div></div>`;
+
+  setTimeout(()=>loadChart(),300);
+}
+
+function buildTxnsHTML(t){
+  const pd=t.pairDetail||{};
+  const buy24=pd.txns24hBuys||t.buys24h||0,sell24=pd.txns24hSells||t.sells24h||0;
+  const buy1h=pd.txns1hBuys||0,sell1h=pd.txns1hSells||0;
+  const vol1h=pd.volume1h||t.volume1h||0;
+  return`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px">
+    <div style="padding:14px;background:var(--srf);border-radius:10px;text-align:center"><div style="font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px">24h Buys</div><div style="font-size:1.5rem;font-weight:700;color:var(--gn)">${buy24}</div></div>
+    <div style="padding:14px;background:var(--srf);border-radius:10px;text-align:center"><div style="font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px">24h Sells</div><div style="font-size:1.5rem;font-weight:700;color:var(--rd)">${sell24}</div></div>
+    <div style="padding:14px;background:var(--srf);border-radius:10px;text-align:center"><div style="font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px">Buy/Sell Ratio</div><div style="font-size:1.5rem;font-weight:700;color:${buy24>sell24?'var(--gn)':'var(--rd)'}">${sell24>0?(buy24/sell24).toFixed(2):'∞'}</div></div>
+    <div style="padding:14px;background:var(--srf);border-radius:10px;text-align:center"><div style="font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px">Volume 1h</div><div style="font-size:1.2rem;font-weight:700">${fmtNum(vol1h)}</div></div>
+    <div style="padding:14px;background:var(--srf);border-radius:10px;text-align:center"><div style="font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px">Last Hour</div><div style="font-size:1rem;font-weight:700;color:var(--gn)">${buy1h} buys</div><div style="font-size:.85rem;color:var(--rd)">${sell1h} sells</div></div>
+  </div>
+  <div style="text-align:center;padding:12px;font-size:.8rem;color:var(--t2)"><i class="fa fa-info-circle"></i> Individual txns via <a href="https://dexscreener.com/base/${t.pairAddress}" target="_blank" style="color:var(--ac);font-weight:600">DEX Screener →</a></div>`;
+}
+
+function buildSnipersHTML(t){
+  const sec=t.security||{};
+  return`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px">
+    <div style="padding:14px;background:var(--srf);border-radius:10px"><div style="font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px">Creator</div><div style="font-size:.82rem;font-family:monospace;font-weight:600;margin-top:4px;word-break:break-all">${sec.creatorAddress||'Unknown'}</div>${sec.creatorAddress?`<a href="https://basescan.org/address/${sec.creatorAddress}" target="_blank" style="font-size:.7rem;color:var(--ac);text-decoration:none">View on BaseScan ↗</a>`:''}</div>
+    <div style="padding:14px;background:var(--srf);border-radius:10px"><div style="font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px">Owner</div><div style="font-size:.82rem;font-family:monospace;font-weight:600;margin-top:4px;word-break:break-all">${sec.ownerAddress||'Unknown'}</div><div style="font-size:.75rem;margin-top:4px;color:${sec.isRenounced?'var(--gn)':'var(--or)'}">${sec.isRenounced?'✅ Renounced':'⚠️ Not Renounced'}</div></div>
+    <div style="padding:14px;background:var(--srf);border-radius:10px"><div style="font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px">Holder Count</div><div style="font-size:1.5rem;font-weight:700">${sec.holderCount||'—'}</div></div>
+    <div style="padding:14px;background:var(--srf);border-radius:10px"><div style="font-size:.7rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px">Total Supply</div><div style="font-size:1rem;font-weight:700;margin-top:4px;word-break:break-all">${parseFloat(sec.totalSupply||0).toLocaleString()}</div></div>
+  </div>`;
+}
+
+function switchTab(name,el){
+  document.querySelectorAll('.mtb .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['chart','security','transactions','snipers'].forEach(n=>{$(`tab-${n}`).style.display=n===name?'':'none'});
+  if(name==='chart')setTimeout(()=>loadChart(),100);
+}
+
+async function loadChart(){
+  if(!modalToken)return;
+  const t=modalToken;
+  const pair=t.pairAddress||t.address;
+  const el=$('lw-chart');
+  if(!el)return;
+  // DEX Screener embed — clip the bottom "Tracked by" footer
+  el.innerHTML=`<iframe src="https://dexscreener.com/base/${pair}?embed=1&theme=light&info=0" style="width:100%;height:470px;border:none;position:absolute;top:0;left:0" loading="lazy"></iframe>`;
+}
+
+function closeModal(){$('modal-root').innerHTML='';modalToken=null}
+
+poll();setInterval(poll,15000);
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</body>
+</html>
