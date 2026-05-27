@@ -36,15 +36,9 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear
 .loading{text-align:center;padding:60px 20px;color:var(--t2)}
 .loading .flip-container{perspective:800px;width:80px;height:80px;margin:0 auto 20px}
 .loading .flipper{position:relative;width:100%;height:100%;transform-style:preserve-3d;animation:flip3d 1.6s ease-in-out infinite}
-.loading .flipper img{width:80px;height:80px;border-radius:16px;position:absolute;backface-visibility:hidden}
-.loading .flipper .back{transform:rotateY(180deg);background:linear-gradient(135deg,rgba(37,99,235,0.15),rgba(59,130,246,0.05));border:1px solid rgba(37,99,235,0.25);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:2rem}
+.loading .flipper img{width:80px;height:80px;border-radius:16px}
 @keyframes flip3d{0%{transform:rotateY(0deg)}50%{transform:rotateY(180deg)}100%{transform:rotateY(360deg)}}
-.loading p{margin-top:12px;font-size:.9rem}
-.loading .dots{display:flex;gap:5px;justify-content:center;margin-top:8px}
-.loading .dots span{width:6px;height:6px;border-radius:50%;background:var(--ac);animation:bounceDot 1.2s infinite}
-.loading .dots span:nth-child(2){animation-delay:.2s}
-.loading .dots span:nth-child(3){animation-delay:.4s}
-@keyframes bounceDot{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+.loading p{margin-top:16px;font-size:.9rem}
 
 .empty{text-align:center;padding:50px;color:var(--t2)}
 .empty i{font-size:2rem;display:block;margin-bottom:10px;color:var(--t3)}
@@ -202,11 +196,9 @@ thead th{text-align:left;padding:12px 14px;font-weight:600;color:var(--t2);font-
   <div class="flip-container">
     <div class="flipper">
       <img src="gitblock-logo.jpg" alt="GitBlock">
-      <div class="back">⚡</div>
     </div>
   </div>
   <p>Loading Base tokens...</p>
-  <div class="dots"><span></span><span></span><span></span></div>
 </div></div></div>
 <div id="modal-root"></div>
 
@@ -302,8 +294,10 @@ async function poll(){
     newAddrs.clear();
     const isFirstLoad=seenAddrs.size===0;
     for(const t of fresh){const a=t.address.toLowerCase();if(!seenAddrs.has(a)){seenAddrs.add(a);if(!isFirstLoad)newAddrs.add(a)}}
-    if(age){tokens=fresh}
-    else{const m=new Map(tokens.map(t=>[t.address.toLowerCase(),t]));for(const t of fresh){const a=t.address.toLowerCase();m.set(a,m.has(a)?{...m.get(a),...t}:t)}tokens=[...m.values()]}
+    // Always merge — age filtering happens client-side in render()
+    const m=new Map(tokens.map(t=>[t.address.toLowerCase(),t]));
+    for(const t of fresh){const a=t.address.toLowerCase();m.set(a,m.has(a)?{...m.get(a),...t}:t)}
+    tokens=[...m.values()];
     const addrs=tokens.slice(0,100).map(t=>t.address);
     loadRatings(addrs);
     $('stLiq').textContent=fmtNum(tokens.reduce((s,t)=>s+(parseFloat(t.liquidityUsd)||0),0));
@@ -369,7 +363,7 @@ function buildTable(data){
 let modalToken=null;
 
 async function showDetail(addr){
-  $('modal-root').innerHTML='<div class="mo"><div class="mdl"><div class="loading"><div class="flip-container"><div class="flipper"><img src="gitblock-logo.jpg" alt="GitBlock"><div class="back">⚡</div></div></div><p>Loading token...</p></div></div></div>';
+  $('modal-root').innerHTML='<div class="mo"><div class="mdl"><div class="loading"><div class="flip-container"><div class="flipper"><img src="gitblock-logo.jpg" alt="GitBlock"></div></div><p>Loading token...</p></div></div></div>';
   try{
     const r=await fetch(`${API}/v1/token/${addr}`);
     const d=await r.json();

@@ -4,29 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GitBlock Scanner — Token Details</title>
-<link rel="icon" href="favicon.jpg">
+<link rel="icon" href="gitblock-logo.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#fff;--srf:#f8f9fa;--brd:#e5e7eb;--txt:#111827;--t2:#6b7280;--t3:#9ca3af;--ac:#2563eb;--gn:#059669;--rd:#dc2626;--or:#ea580c;--yl:#ca8a04}
+:root{--bg:#06060e;--srf:rgba(10,10,24,0.9);--brd:rgba(37,99,235,0.14);--txt:#e2e8f0;--t2:#94a3b8;--t3:#64748b;--ac:#3b82f6;--ac2:#60a5fa;--gn:#22c55e;--rd:#ef4444;--or:#ea580c;--yl:#ca8a04}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
-body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(37,99,235,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,0.06) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(37,99,235,0.04)1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,0.04)1px,transparent 1px);background-size:40px 40px;pointer-events:none}
 
-.tb{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--brd);padding:10px 0}
+.tb{position:sticky;top:0;z-index:100;background:rgba(6,6,14,0.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--brd);padding:10px 0}
 .ti{max-width:1300px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:12px}
-.lg{font-weight:700;font-size:1rem;white-space:nowrap;display:flex;align-items:center;gap:7px;text-decoration:none;color:var(--txt)}
-.lg span{color:var(--ac)}
+.lg{font-weight:700;font-size:1rem;white-space:nowrap;display:flex;align-items:center;gap:7px;text-decoration:none;color:var(--ac2)}
 .bk{padding:8px 14px;border:1px solid var(--brd);border-radius:8px;background:var(--srf);cursor:pointer;font-size:.82rem;font-family:inherit;text-decoration:none;color:var(--t2);font-weight:500}
-.bk:hover{color:var(--ac);border-color:var(--ac)}
+.bk:hover{color:var(--ac2);border-color:var(--ac)}
 
-/* Hero */
-.main{max-width:1300px;margin:0 auto;padding:24px 20px}
+.main{max-width:1300px;margin:0 auto;padding:24px 20px;position:relative;z-index:1}
 .hero{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;margin-bottom:24px}
 .ti-left{display:flex;align-items:center;gap:14px;flex:1;min-width:300px}
 .ti-logo{width:56px;height:56px;border-radius:14px;border:1px solid var(--brd);object-fit:cover;flex-shrink:0;background:var(--srf)}
-.ti-logof{width:56px;height:56px;border-radius:14px;background:#f3f4f6;border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:1.1rem;color:var(--t3);flex-shrink:0}
+.ti-logof{width:56px;height:56px;border-radius:14px;background:rgba(37,99,235,0.1);border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:1.1rem;color:var(--t3);flex-shrink:0}
 .ti-info{flex:1;min-width:0}
 .ti-info h1{font-size:1.6rem;font-weight:800;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .ti-info h1 .sym{color:var(--t2);font-size:1rem;font-weight:500}
@@ -37,7 +36,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear
 
 .pb{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;font-size:.72rem;font-weight:600}
 .pad-icon{width:14px;height:14px;border-radius:3px;object-fit:cover}
-.pc{background:#eff6ff;color:#2563eb}.pbk{background:#f5f3ff;color:#7c3aed}.pz{background:#fef3c7;color:#92400e}.pv{background:#fce7f3;color:#be185d}.po{background:#f9fafb;color:#6b7280}
+.pc{background:rgba(37,99,235,0.12);color:#60a5fa}.pbk{background:rgba(139,92,246,0.12);color:#a78bfa}.pz{background:rgba(234,179,8,0.12);color:#facc15}.pv{background:rgba(236,72,153,0.12);color:#f472b6}.po{background:rgba(107,114,128,0.12);color:#9ca3af}
 
 .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px}
 .stat-card{padding:14px 16px;background:var(--srf);border:1px solid var(--brd);border-radius:10px}
@@ -46,13 +45,11 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear
 .stat-card .vl.sm{font-size:.85rem}
 
 .chg{padding:2px 7px;border-radius:5px;font-weight:600;font-size:.75rem;display:inline-block}
-.chg-up{background:#ecfdf5;color:var(--gn)}.chg-down{background:#fef2f2;color:var(--rd)}
+.chg-up{background:rgba(34,197,94,0.12);color:var(--gn)}.chg-down{background:rgba(239,68,68,0.12);color:var(--rd)}
 
-/* Chart — fullscreen DEX Screener */
 .chart-box{border:none;margin:0 -20px 24px;height:calc(100vh - 60px);position:relative}
 .chart-box iframe{width:100%;height:100%;border:none;position:absolute;top:0;left:0}
 
-/* Tabs */
 .tabs{display:flex;border-bottom:2px solid var(--brd);margin-bottom:20px;gap:0}
 .tab{padding:12px 22px;font-size:.88rem;font-weight:600;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .12s}
 .tab:hover{color:var(--txt)}
@@ -61,51 +58,54 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear
 .tab-content{display:none}
 .tab-content.active{display:block}
 
-/* Security */
 .sec-banner{display:flex;align-items:center;gap:12px;padding:18px 22px;border-radius:12px;margin-bottom:18px;font-weight:700;font-size:1.1rem}
-.sec-critical{background:#fef2f2;color:var(--rd);border:1px solid #fecaca}
-.sec-high{background:#fff7ed;color:var(--or);border:1px solid #fed7aa}
-.sec-medium{background:#fefce8;color:var(--yl);border:1px solid #fef08a}
-.sec-low{background:#ecfdf5;color:var(--gn);border:1px solid #bbf7d0}
+.sec-critical{background:rgba(239,68,68,0.1);color:var(--rd);border:1px solid rgba(239,68,68,0.2)}
+.sec-high{background:rgba(234,88,12,0.1);color:var(--or);border:1px solid rgba(234,88,12,0.2)}
+.sec-medium{background:rgba(202,138,4,0.1);color:var(--yl);border:1px solid rgba(202,138,4,0.2)}
+.sec-low{background:rgba(34,197,94,0.1);color:var(--gn);border:1px solid rgba(34,197,94,0.2)}
 .sec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
 .sec-item{padding:12px 14px;background:var(--srf);border:1px solid var(--brd);border-radius:8px}
 .sec-item .lbl{font-size:.68rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px}
 .sec-item .vl{font-weight:600;font-size:.88rem;margin-top:3px}
 .vl-danger{color:var(--rd)}.vl-warn{color:var(--or)}.vl-ok{color:var(--gn)}
 .flags{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px}
-.flag{padding:4px 10px;border-radius:6px;font-size:.75rem;font-weight:600;background:#fef2f2;color:var(--rd)}
+.flag{padding:4px 10px;border-radius:6px;font-size:.75rem;font-weight:600;background:rgba(239,68,68,0.12);color:var(--rd)}
 
-/* Txns */
 .txn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
 .txn-card{padding:16px;background:var(--srf);border:1px solid var(--brd);border-radius:10px;text-align:center}
 .txn-card .num{font-size:1.8rem;font-weight:700}
 .txn-card .num.buy{color:var(--gn)}.txn-card .num.sell{color:var(--rd)}
 .txn-card .lbl{font-size:.72rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;margin-top:4px}
 
-/* Sniper info */
 .sniper-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .sniper-card{padding:14px 16px;background:var(--srf);border:1px solid var(--brd);border-radius:10px}
 .sniper-card .lbl{font-size:.68rem;color:var(--t2);text-transform:uppercase;letter-spacing:.4px}
 .sniper-card .vl{font-size:.85rem;font-family:monospace;margin-top:4px;word-break:break-all;font-weight:600}
 
-/* Links */
 .links{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px;padding-top:20px;border-top:1px solid var(--brd)}
 .links a{padding:10px 20px;border-radius:10px;text-decoration:none;font-weight:600;font-size:.85rem;border:1px solid var(--brd);color:var(--txt);display:flex;align-items:center;gap:6px;transition:all .12s}
-.links a:hover{border-color:var(--ac);color:var(--ac)}
+.links a:hover{border-color:var(--ac);color:var(--ac2)}
 .links a.prim{background:var(--ac);color:#fff;border-color:var(--ac)}
-.links a.prim:hover{background:#1d4ed8}
+.links a.prim:hover{background:#2563eb}
 
 .desc{color:var(--t2);font-size:.9rem;line-height:1.6;margin-top:8px}
 
 .loading{text-align:center;padding:80px;color:var(--t2);font-size:1.1rem}
-.loading i{font-size:2rem;display:block;margin-bottom:12px;color:var(--t3)}
+.loading .flip-container{perspective:800px;width:64px;height:64px;margin:0 auto 16px}
+.loading .flipper{width:100%;height:100%;animation:flip3d 1.6s ease-in-out infinite}
+.loading .flipper img{width:64px;height:64px;border-radius:14px}
+@keyframes flip3d{0%{transform:rotateY(0deg)}50%{transform:rotateY(180deg)}100%{transform:rotateY(360deg)}}
 .error{text-align:center;padding:80px;color:var(--rd)}
 
 .stars{display:inline-flex;gap:2px;cursor:pointer}
-.stars i{color:#e5e7eb;font-size:1rem;transition:color .1s}
+.stars i{color:rgba(255,255,255,0.1);font-size:1rem;transition:color .1s}
 .stars i.active{color:#f59e0b}
 .rating-row{display:flex;align-items:center;gap:8px;font-size:.85rem;margin-bottom:12px}
 .rating-row span{color:var(--t2)}
+
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--brd);border-radius:3px}
 
 @media(max-width:768px){
   .stats-row{grid-template-columns:repeat(2,1fr)}
@@ -118,36 +118,37 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear
 <body>
 
 <div class="tb"><div class="ti">
-  <a href="scanner.html" class="lg"><img src="gitblock-logo.jpg" style="width:24px;height:24px;border-radius:6px;object-fit:cover"> GitBlock</a>
-  <a href="scanner.html" class="bk">← Back to Scanner</a>
+  <a href="index.html" class="lg"><img src="gitblock-logo.jpg" style="width:24px;height:24px;border-radius:6px;object-fit:cover"> GitBlock</a>
+  <a href="index.html" class="bk">← Back to Scanner</a>
 </div></div>
 
 <div class="main" id="app">
-  <div class="loading"><i class="fa fa-spinner"></i>Loading token details...</div>
+  <div class="loading">
+    <div class="flip-container"><div class="flipper"><img src="gitblock-logo.jpg" alt="GitBlock"></div></div>
+    Loading token details...
+  </div>
 </div>
 
 <script>
 const API='https://website-bernard-cold-july.trycloudflare.com';
 const params=new URLSearchParams(location.search);
 const addr=params.get('address');
-if(!addr)document.getElementById('app').innerHTML='<div class="error">No token address provided. <a href="scanner.html">Go back</a></div>';
+if(!addr)document.getElementById('app').innerHTML='<div class="error">No token address provided. <a href="index.html">Go back</a></div>';
 function esc(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 
 async function rateToken(stars){
   try{
     const r=await fetch(`${API}/v1/rating/${addr}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({stars})});
     const d=await r.json();
-    if(d.ok){
-      document.getElementById('stars-container').innerHTML=renderStars(d.data.avg,d.data.count);
-    }
+    if(d.ok)document.getElementById('stars-container').innerHTML=renderStars(d.data.avg,d.data.count);
   }catch(e){}
 }
 
 function renderStars(avg,count){
-  let h='<span class="stars" onclick="rateToken(event)">';
+  let h='<span class="stars" onclick="rateTokenEvent(event)">';
   for(let i=1;i<=5;i++)h+=`<i class="fa${i<=Math.round(avg)?'-solid':'-regular'} fa-star ${i<=Math.round(avg)?'active':''}" data-star="${i}"></i>`;
   h+=`</span>`;
-  if(count>0)h+=`<span style="color:var(--t2);font-size:.8rem;margin-left:6px">${avg}★ (${count} rating${count!==1?'s':''})</span>`;
+  if(count>0)h+=`<span style="color:var(--t2);font-size:.8rem;margin-left:6px">${avg}★ (${count})</span>`;
   return h;
 }
 
@@ -174,16 +175,7 @@ function fmtDateTime(iso){
   return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 }
 
-function renderStars(avg,count){
-  let h='<span class="stars" onclick="rateTokenEvent(event)">';
-  for(let i=1;i<=5;i++)h+=`<i class="fa${i<=Math.round(avg)?'-solid':'-regular'} fa-star ${i<=Math.round(avg)?'active':''}" data-star="${i}"></i>`;
-  h+=`</span>`;
-  if(count>0)h+=`<span style="color:var(--t2);font-size:.8rem;margin-left:6px">${avg}★ (${count})</span>`;
-  return h;
-}
-
 async function loadAndRender(){
-  // Fetch rating from server
   let avg=0,count=0;
   try{
     const r=await fetch(`${API}/v1/rating/${addr}`);
@@ -191,7 +183,6 @@ async function loadAndRender(){
     if(d.ok){avg=d.data.avg;count=d.data.count}
   }catch(e){}
   document.getElementById('stars-container').innerHTML=renderStars(avg,count);
-
 }
 
 async function load(){
@@ -248,19 +239,16 @@ function render(t){
   ${sec.holderCount?`<div class="stat-card"><div class="lbl">Holders</div><div class="vl">${sec.holderCount}</div></div>`:''}
 </div>
 
-<!-- Chart -->
 <div class="chart-box">
-  <iframe src="https://dexscreener.com/base/${t.pairAddress||t.address}?embed=1&theme=light&info=0" loading="lazy"></iframe>
+  <iframe src="https://dexscreener.com/base/${t.pairAddress||t.address}?embed=1&theme=dark&info=0" loading="lazy"></iframe>
 </div>
 
-<!-- Tabs -->
 <div class="tabs">
   <div class="tab active" onclick="switchTab('security',this)">🛡️ Security</div>
   <div class="tab" onclick="switchTab('transactions',this)">🔄 Transactions</div>
   <div class="tab" onclick="switchTab('info',this)">👤 Token Info</div>
 </div>
 
-<!-- Security -->
 <div id="tab-security" class="tab-content active">
   <div class="sec-banner sec-${risk}"><span>${riskIcon}</span> ${riskLabel}</div>
   <div class="sec-grid">
@@ -276,7 +264,6 @@ function render(t){
   ${sec.riskFlags&&sec.riskFlags.length?`<div class="flags">${sec.riskFlags.map(f=>`<span class="flag">⚠ ${f}</span>`).join('')}</div>`:''}
 </div>
 
-<!-- Transactions -->
 <div id="tab-transactions" class="tab-content">
   <div class="txn-grid">
     <div class="txn-card"><div class="num buy">${buy24}</div><div class="lbl">24h Buys</div></div>
@@ -287,14 +274,13 @@ function render(t){
     <div class="txn-card"><div class="num sell" style="font-size:1.2rem">${sell1h}</div><div class="lbl">Sells (1h)</div></div>
   </div>
   <div style="text-align:center;padding:12px;font-size:.82rem;color:var(--t2)">
-    Full transaction history on <a href="https://dexscreener.com/base/${t.pairAddress}" target="_blank" style="color:var(--ac);font-weight:600">DEX Screener →</a>
+    Full transaction history on <a href="https://dexscreener.com/base/${t.pairAddress}" target="_blank" style="color:var(--ac2);font-weight:600">DEX Screener →</a>
   </div>
 </div>
 
-<!-- Token Info -->
 <div id="tab-info" class="tab-content">
   <div class="sniper-grid">
-    ${sec.creatorAddress?`<div class="sniper-card"><div class="lbl">Creator</div><div class="vl">${sec.creatorAddress}</div><a href="https://basescan.org/address/${sec.creatorAddress}" target="_blank" style="font-size:.75rem;color:var(--ac);text-decoration:none;margin-top:6px;display:inline-block">View on BaseScan ↗</a></div>`:''}
+    ${sec.creatorAddress?`<div class="sniper-card"><div class="lbl">Creator</div><div class="vl">${sec.creatorAddress}</div><a href="https://basescan.org/address/${sec.creatorAddress}" target="_blank" style="font-size:.75rem;color:var(--ac2);text-decoration:none;margin-top:6px;display:inline-block">View on BaseScan ↗</a></div>`:''}
     ${sec.ownerAddress?`<div class="sniper-card"><div class="lbl">Owner</div><div class="vl">${sec.ownerAddress}</div><div style="font-size:.78rem;margin-top:6px;color:${sec.isRenounced?'var(--gn)':'var(--or)'}">${sec.isRenounced?'✅ Renounced':'⚠️ Not Renounced'}</div></div>`:''}
     <div class="sniper-card"><div class="lbl">Total Supply</div><div class="vl" style="font-size:.9rem">${parseFloat(sec.totalSupply||0).toLocaleString()}</div></div>
     ${sec.lpTotalSupply?`<div class="sniper-card"><div class="lbl">LP Supply</div><div class="vl">${parseFloat(sec.lpTotalSupply).toLocaleString()}</div></div>`:''}
@@ -302,7 +288,6 @@ function render(t){
   </div>
 </div>
 
-<!-- Links -->
 <div class="links">
   <a href="https://dexscreener.com/base/${t.pairAddress||t.address}" target="_blank" class="prim"><i class="fa fa-chart-line"></i> DEX Screener</a>
   <a href="${t.basescanUrl}" target="_blank"><i class="fa fa-search"></i> BaseScan</a>
@@ -321,6 +306,5 @@ function switchTab(name,el){
 
 load();
 </script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </body>
 </html>
