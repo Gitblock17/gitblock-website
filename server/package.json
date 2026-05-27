@@ -1,0 +1,13 @@
+{
+  "name": "base-token-detector",
+  "version": "1.0.0",
+  "description": "Detect new tokens launching on Base chain via Bankr, Clanker, and other launchpads",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "cors": "^2.8.5"
+  }
+}

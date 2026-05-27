@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: base-token-detector
+    env: node
+    region: oregon
+    buildCommand: cd server && npm install
+    startCommand: cd server && node server.js
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: "3000"
