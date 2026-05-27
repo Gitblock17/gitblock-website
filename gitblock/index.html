@@ -51,14 +51,25 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear
 .tcard-vol{font-size:.7rem;color:var(--t2);margin-top:2px}
 .tcard-change{font-size:.72rem;font-weight:600;margin-top:2px}
 
+/* GitBlock Ad */
+.gb-ad{max-width:1500px;margin:0 auto 12px;padding:0 16px;position:relative;z-index:1}
+.gb-ad-inner{display:flex;align-items:center;gap:14px;padding:14px 18px;background:linear-gradient(135deg,rgba(37,99,235,0.06),rgba(37,99,235,0.02));border:1px solid rgba(37,99,235,0.15);border-radius:12px;transition:all .2s}
+.gb-ad-inner:hover{border-color:rgba(37,99,235,0.3);background:linear-gradient(135deg,rgba(37,99,235,0.08),rgba(37,99,235,0.03))}
+.gb-ad-logo{width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0}
+.gb-ad-text{flex:1;font-size:.82rem;color:var(--t2)}
+.gb-ad-text strong{color:var(--ac);font-size:.85rem}
+.gb-ad-text span{display:block;font-size:.72rem;color:var(--t3);margin-top:2px}
+.gb-ad-btn{flex-shrink:0;padding:8px 16px;background:var(--ac);color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:.75rem;transition:all .15s;white-space:nowrap}
+.gb-ad-btn:hover{background:var(--blue-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,0.25)}
+
+/* Polish */
+
 .tw{max-width:1500px;margin:0 auto;padding:0 16px 60px;overflow-x:auto;position:relative;z-index:1}
 table{width:100%;border-collapse:collapse;font-size:.84rem}
-thead th{text-align:left;padding:10px 12px;font-weight:600;color:var(--t2);font-size:.73rem;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid var(--brd);white-space:nowrap;cursor:pointer;user-select:none}
-thead th:hover{color:var(--txt)}
 tbody td{padding:12px;border-bottom:1px solid var(--brd);white-space:nowrap}
-tbody tr{transition:background .12s;cursor:pointer}
-tbody tr:hover{background:#f0f4ff}
-tbody tr.new-row{animation:highlightNew 3s ease-out}
+tbody tr{transition:background .15s,transform .1s;cursor:pointer}
+tbody tr:hover{background:#f0f4ff;transform:scale(1.001)}
+thead th{text-align:left;padding:12px 14px;font-weight:600;color:var(--t2);font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--ac);white-space:nowrap;cursor:pointer;user-select:none;background:linear-gradient(to bottom,var(--srf),transparent)}
 @keyframes highlightNew{0%{background:#dbeafe}100%{background:transparent}}
 
 .tc{display:flex;align-items:center;gap:8px}
@@ -177,6 +188,17 @@ tbody tr.new-row{animation:highlightNew 3s ease-out}
 <div class="trending" id="trendingBox" style="display:none">
   <h3>🔥 Trending</h3>
   <div class="trending-row" id="trendingRow"></div>
+</div>
+
+<div class="gb-ad">
+  <div class="gb-ad-inner">
+    <img src="gitblock-logo.jpg" class="gb-ad-logo">
+    <div class="gb-ad-text">
+      <strong>GitBlock</strong> — Real-time Base token scanner
+      <span>Track launches · Detect scams · Rate tokens · Live charts</span>
+    </div>
+    <a href="https://gitblock.org" target="_blank" class="gb-ad-btn">Powered by GitBlock ↗</a>
+  </div>
 </div>
 
 <div class="sr">
