@@ -285,7 +285,7 @@ function liveSearch(){
 
 async function poll(){
   const age=$('ageFilter').value;
-  let url=`${API}/v1/new-tokens?limit=200`;
+  let url=`${API}/v1/new-tokens?limit=500`;
   if(age)url+=`&maxAge=${age}`;
   try{
     const r=await fetch(url),d=await r.json();
@@ -330,7 +330,7 @@ function renderTrending(){
 
 function sorted(data){const d=sortDir==='asc'?1:-1;return[...data].sort((a,b)=>{let va,vb;switch(sortField){case'price':va=parseFloat(a.priceUsd)||0;vb=parseFloat(b.priceUsd)||0;break;case'liquidity':va=parseFloat(a.liquidityUsd)||0;vb=parseFloat(b.liquidityUsd)||0;break;case'volume':va=parseFloat(a.volume24h)||0;vb=parseFloat(b.volume24h)||0;break;case'marketcap':va=parseFloat(a.marketCap||a.fdv)||0;vb=parseFloat(b.marketCap||b.fdv)||0;break;case'age':va=a.pairCreatedAt?new Date(a.pairCreatedAt).getTime():0;vb=b.pairCreatedAt?new Date(b.pairCreatedAt).getTime():0;break;default:return 0}return(va-vb)*d})}
 function filtered(){let f=[...tokens];const q=$('search').value.toLowerCase().trim();if(q)f=f.filter(t=>t.name.toLowerCase().includes(q)||t.symbol.toLowerCase().includes(q)||t.address.toLowerCase().includes(q));return f}
-function render(){if(groupedMode){renderGrouped();return}let f=filtered();f=sorted(f).slice(0,100);const age=$('ageFilter').value;if(age){const ms={'5m':3e5,'15m':9e5,'1h':36e5,'6h':216e5,'24h':864e5};const max=ms[age]||864e5;f=f.filter(t=>t.pairCreatedAt&&(Date.now()-new Date(t.pairCreatedAt).getTime())<max)}$('content').innerHTML=f.length?buildTable(f)+'<div style="text-align:center;padding:16px;color:var(--t2);font-size:.78rem">Showing '+f.length+' tokens. Search for more ↓</div>':'<div class="empty"><i class="fa fa-inbox"></i>No tokens found</div>'}
+function render(){if(groupedMode){renderGrouped();return}let f=filtered();f=sorted(f).slice(0,500);const age=$('ageFilter').value;if(age){const ms={'5m':3e5,'15m':9e5,'1h':36e5,'6h':216e5,'24h':864e5};const max=ms[age]||864e5;f=f.filter(t=>t.pairCreatedAt&&(Date.now()-new Date(t.pairCreatedAt).getTime())<max)}$('content').innerHTML=f.length?buildTable(f)+'<div style="text-align:center;padding:16px;color:var(--t2);font-size:.78rem">Showing '+f.length+' tokens. Search for more ↓</div>':'<div class="empty"><i class="fa fa-inbox"></i>No tokens found</div>'}
 function renderGrouped(){const groups={};for(const t of tokens){const pad=t.launchpadName||t.launchpad||'Unknown';if(!groups[pad])groups[pad]={name:pad,tokens:[]};groups[pad].tokens.push(t)}const sorted=[...Object.values(groups)].sort((a,b)=>b.tokens.length-a.tokens.length);let h='';for(const g of sorted){h+=`<div style="margin-bottom:32px"><h3 style="padding:12px 0;font-size:1rem;display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--brd);margin-bottom:12px"><span class="pb ${g.tokens[0]?padClass(g.tokens[0].launchpad):'po'}">${g.name}</span><span style="font-size:.8rem;color:var(--t2);font-weight:400">${g.tokens.length} tokens</span></h3>${buildTable(g.tokens.slice(0,20))}</div>`}$('content').innerHTML=h||'<div class="empty"><i class="fa fa-inbox"></i>No tokens found</div>'}
 function sortBy(f){if(sortField===f)sortDir=sortDir==='asc'?'desc':'asc';else{sortField=f;sortDir=f==='age'?'asc':'desc'}render()}
 function th(l,f){const a=f&&f===sortField?(sortDir==='asc'?' ▲':' ▼'):'';return f?`<th onclick="sortBy('${f}')">${l}<span style="font-size:.6rem">${a}</span></th>`:`<th>${l}</th>`}
