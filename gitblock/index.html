@@ -206,6 +206,8 @@ thead th{text-align:left;padding:12px 14px;font-weight:600;color:var(--t2);font-
 const API='https://magical-measure-produced-herself.trycloudflare.com';
 let tokens=[],seenAddrs=new Set(),newAddrs=new Set(),sortField='age',sortDir='asc',groupedMode=false;
 let tokenRatings={};
+// Device ID for one-rating-per-device
+const deviceId=localStorage.getItem('gb_device')||(v=>{localStorage.setItem('gb_device',v);return v})(crypto.randomUUID());
 
 async function loadRatings(addrs){
   if(!addrs.length)return;
@@ -218,7 +220,7 @@ async function loadRatings(addrs){
 
 async function rateToken(addr,stars){
   try{
-    const r=await fetch(`${API}/v1/rating/${addr}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({stars})});
+    const r=await fetch(`${API}/v1/rating/${addr}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({stars,deviceId})});
     const d=await r.json();
     if(d.ok)tokenRatings[addr.toLowerCase()]=d.data;
     return d.ok?d.data:null;

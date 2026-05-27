@@ -400,10 +400,25 @@ async function refreshCache() {
     }
     console.log(`  After DEX searches: ${fresh.length}`);
 
-    // 5b. Add Base token profiles not yet in cache (includes older tokens with logos)
+    // 5b. Add Base token profiles — enrich existing tokens with logos, add new ones
     const allProfiles = await fetchTokenProfiles();
     const freshAddrs = new Set(fresh.map(t => t.address.toLowerCase()));
     const cachedAddrs = new Set(cache.data.map(t => t.address.toLowerCase()));
+    // Build lookup for quick profile access
+    const profileMap2 = new Map();
+    for (const p of allProfiles) profileMap2.set((p.tokenAddress || '').toLowerCase(), p);
+    // Enrich existing fresh tokens with profile data (logos, socials)
+    for (const t of fresh) {
+      const addr = t.address.toLowerCase();
+      const profile = profileMap2.get(addr);
+      if (profile && !t.image) {
+        t.image = profile.imageUrl || profile.icon ||
+          (profile.links || []).find(l => (l.type || '').toLowerCase() === 'image')?.url || null;
+        if (!t.description && profile.description) t.description = profile.description;
+        if (!t.website && profile.url) t.website = profile.url;
+      }
+    }
+    // Add profiles not yet in fresh or cache
     const newProfiles = allProfiles.filter(p => {
       const a = (p.tokenAddress || '').toLowerCase();
       return a && !freshAddrs.has(a) && !cachedAddrs.has(a);
@@ -436,7 +451,15 @@ async function refreshCache() {
     for (const t of fresh) {
       const key = t.address.toLowerCase();
       if (merged.has(key)) {
-        merged.set(key, { ...merged.get(key), ...t });
+        const existing = merged.get(key);
+        // Merge but preserve image and social data from existing if new data lacks them
+        const merged_token = { ...existing, ...t };
+        if (!merged_token.image && existing.image) merged_token.image = existing.image;
+        if (!merged_token.description && existing.description) merged_token.description = existing.description;
+        if (!merged_token.twitter && existing.twitter) merged_token.twitter = existing.twitter;
+        if (!merged_token.telegram && existing.telegram) merged_token.telegram = existing.telegram;
+        if (!merged_token.website && existing.website) merged_token.website = existing.website;
+        merged.set(key, merged_token);
       } else {
         merged.set(key, t);
       }
@@ -673,27 +696,35 @@ app.get('/v1/launchpads', (req, res) => {
 });
 
 // ══════════════════════════════════════════════════════════════════════
-// RATINGS (in-memory, per-token aggregate)
+// RATINGS (in-memory, per-device, per-token)
 // ══════════════════════════════════════════════════════════════════════
-// { address: { total: number, count: number } }
+// { address: { devices: { deviceId: stars } } }
 const ratings = {};
+
+function calcRating(r) {
+  if (!r || !r.devices) return { avg: 0, count: 0 };
+  const stars = Object.values(r.devices);
+  const count = stars.length;
+  if (count === 0) return { avg: 0, count: 0 };
+  const total = stars.reduce((s, v) => s + v, 0);
+  return { avg: parseFloat((total / count).toFixed(1)), count };
+}
 
 app.get('/v1/rating/:address', (req, res) => {
   const key = req.params.address.toLowerCase();
-  const r = ratings[key];
-  if (!r || r.count === 0) return res.json({ ok: true, data: { avg: 0, count: 0 } });
-  res.json({ ok: true, data: { avg: parseFloat((r.total / r.count).toFixed(1)), count: r.count } });
+  res.json({ ok: true, data: calcRating(ratings[key]) });
 });
 
 app.post('/v1/rating/:address', express.json(), (req, res) => {
   const key = req.params.address.toLowerCase();
   const stars = parseInt(req.body.stars);
+  const deviceId = (req.body.deviceId || '').trim();
   if (!stars || stars < 1 || stars > 5) return res.json({ ok: false, error: 'Stars must be 1-5' });
-  if (!ratings[key]) ratings[key] = { total: 0, count: 0 };
-  ratings[key].total += stars;
-  ratings[key].count += 1;
-  const r = ratings[key];
-  res.json({ ok: true, data: { avg: parseFloat((r.total / r.count).toFixed(1)), count: r.count } });
+  if (!deviceId) return res.json({ ok: false, error: 'Device ID required' });
+  if (!ratings[key]) ratings[key] = { devices: {} };
+  // One rating per device — update if device already rated
+  ratings[key].devices[deviceId] = stars;
+  res.json({ ok: true, data: calcRating(ratings[key]) });
 });
 
 // Bulk ratings for multiple tokens
@@ -701,8 +732,7 @@ app.get('/v1/ratings', (req, res) => {
   const addrs = (req.query.addresses || '').split(',').map(a => a.trim().toLowerCase()).filter(Boolean);
   const result = {};
   for (const addr of addrs) {
-    const r = ratings[addr];
-    result[addr] = r && r.count > 0 ? { avg: parseFloat((r.total / r.count).toFixed(1)), count: r.count } : { avg: 0, count: 0 };
+    result[addr] = calcRating(ratings[addr]);
   }
   res.json({ ok: true, data: result });
 });

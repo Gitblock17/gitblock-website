@@ -135,10 +135,12 @@ const params=new URLSearchParams(location.search);
 const addr=params.get('address');
 if(!addr)document.getElementById('app').innerHTML='<div class="error">No token address provided. <a href="index.html">Go back</a></div>';
 function esc(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+// Device ID for one-rating-per-device
+const deviceId=localStorage.getItem('gb_device')||(v=>{localStorage.setItem('gb_device',v);return v})(crypto.randomUUID());
 
 async function rateToken(stars){
   try{
-    const r=await fetch(`${API}/v1/rating/${addr}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({stars})});
+    const r=await fetch(`${API}/v1/rating/${addr}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({stars,deviceId})});
     const d=await r.json();
     if(d.ok)document.getElementById('stars-container').innerHTML=renderStars(d.data.avg,d.data.count);
   }catch(e){}
