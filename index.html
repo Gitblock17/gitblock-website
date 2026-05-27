@@ -1,1652 +1,294 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitBlock — Intelligence Without Gatekeepers</title>
-    <link rel="icon" href="assets/gitblock.jpg">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #ffffff;
-            color: #1e293b;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-image:
-                linear-gradient(rgba(37, 99, 235, 0.07) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(37, 99, 235, 0.07) 1px, transparent 1px);
-            background-size: 60px 60px;
-            pointer-events: none;
-            z-index: 0;
-        }
-        body > *:not(script) { position: relative; z-index: 1; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitBlock — Base Token Scanner & Analytics</title>
+<link rel="icon" href="assets/gitblock.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#ffffff;--blue:#2563eb;--blue-light:#3b82f6;--blue-dark:#1d4ed8;--blue-glow:rgba(37,99,235,0.08);--card:rgba(37,99,235,0.04);--border:rgba(37,99,235,0.12);--text:#1e293b;--text-secondary:#64748b;--radius:16px;--max:1200px;--success:#22c55e;--warning:#eab308}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(37,99,235,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,0.06) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
+a{text-decoration:none;color:inherit}
+img{max-width:100%;height:auto}
+.container{max-width:var(--max);margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.gradient-text{background:linear-gradient(135deg,#2563eb 0%,#3b82f6 50%,#60a5fa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.section-title{text-align:center;margin-bottom:60px}
+.section-title h2{font-size:clamp(2rem,4vw,2.75rem);margin-bottom:16px;font-weight:700;color:var(--text)}
+.section-title p{color:var(--text-secondary);font-size:1.1rem;max-width:600px;margin:0 auto}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
 
-        /* Reveal animations */
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
-        }
-        .reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
+.header{position:fixed;top:0;left:0;right:0;z-index:1000;padding:16px 0;background:rgba(255,255,255,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);transition:padding .3s}
+.header.scrolled{padding:10px 0}
+.header .container{display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-size:1.4rem;font-weight:700;color:var(--blue)}
+.logo img{width:36px;height:36px;border-radius:8px}
+.nav{display:flex;align-items:center;gap:32px}
+.nav a{font-size:.95rem;color:var(--text-secondary);transition:color .2s;font-weight:500}
+.nav a:hover{color:var(--blue)}
+.hamburger{display:none;background:none;border:none;color:var(--blue);font-size:1.5rem;cursor:pointer}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--blue);color:#fff;border:1px solid var(--blue);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-primary:hover{transform:translateY(-2px);background:var(--blue-dark);box-shadow:0 0 20px rgba(37,99,235,0.3)}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:transparent;color:var(--blue);border:1px solid var(--border);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-ghost:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:0 0 20px rgba(37,99,235,0.1)}
+.btn-sm{padding:10px 20px;font-size:.85rem}
+.mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);flex-direction:column;align-items:center;justify-content:center;gap:28px;z-index:999}
+.mobile-menu.open{display:flex}
+.mobile-menu a{font-size:1.3rem;color:var(--text);font-weight:500}
+.mobile-close{position:absolute;top:20px;right:24px;background:none;border:none;color:var(--text);font-size:2rem;cursor:pointer}
+@media(max-width:768px){.nav{display:none}.hamburger{display:block}}
 
-        /* Header */
-        header {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(37, 99, 235, 0.1);
-            z-index: 1000;
-            transition: box-shadow 0.3s ease;
-        }
-        header.scrolled {
-            box-shadow: 0 2px 20px rgba(37, 99, 235, 0.08);
-        }
-        .header-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 64px;
-        }
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: #2563eb;
-            font-weight: 800;
-            font-size: 1.25rem;
-        }
-        .logo i { font-size: 1.4rem; }
-        nav { display: flex; align-items: center; gap: 28px; }
-        nav a {
-            text-decoration: none;
-            color: #475569;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-        nav a:hover { color: #2563eb; }
-        .hamburger {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.4rem;
-            color: #2563eb;
-            cursor: pointer;
-        }
-        .mobile-menu {
-            display: none;
-            position: fixed;
-            top: 64px; left: 0;
-            width: 100%;
-            background: rgba(255,255,255,0.98);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(37,99,235,0.1);
-            padding: 16px 24px;
-            flex-direction: column;
-            gap: 16px;
-            z-index: 999;
-        }
-        .mobile-menu.open { display: flex; }
-        .mobile-menu a {
-            text-decoration: none;
-            color: #475569;
-            font-size: 1rem;
-            font-weight: 500;
-            padding: 8px 0;
-        }
-        .mobile-menu a:hover { color: #2563eb; }
+.hero{position:relative;padding:180px 0 120px;text-align:center;min-height:100vh;display:flex;align-items:center;overflow:hidden}
+.hero::before{content:'';position:absolute;top:50%;left:50%;width:600px;height:600px;background:radial-gradient(circle,rgba(37,99,235,0.08) 0%,transparent 70%);transform:translate(-50%,-50%);pointer-events:none}
+.hero-content{position:relative;z-index:2;max-width:800px;margin:0 auto}
+.hero-subtitle{display:inline-block;padding:8px 18px;border:1px solid var(--border);border-radius:50px;font-size:.75rem;font-weight:600;letter-spacing:.1em;color:var(--blue);margin-bottom:24px;text-transform:uppercase}
+.hero h1{font-size:clamp(2.5rem,6vw,4rem);font-weight:800;line-height:1.15;margin-bottom:24px;color:var(--text)}
+.hero-desc{font-size:1.15rem;color:var(--text-secondary);max-width:600px;margin:0 auto 36px;line-height:1.7}
+.hero-buttons{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.stats-row{display:flex;justify-content:center;gap:60px;margin-top:64px;flex-wrap:wrap}
+.stat{text-align:center}.stat-number{font-size:2.2rem;font-weight:800;color:var(--blue)}.stat-label{font-size:.82rem;color:var(--text-secondary);margin-top:4px}
+@media(max-width:768px){.hero{padding:140px 0 80px}.stats-row{gap:30px}.stat-number{font-size:1.6rem}}
 
-        /* Sections */
-        section { padding: 100px 24px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        .section-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #2563eb;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-        }
-        .section-title {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #0f172a;
-            margin-bottom: 16px;
-        }
-        .section-desc {
-            font-size: 1.05rem;
-            color: #64748b;
-            max-width: 600px;
-            margin-bottom: 48px;
-        }
+.features,.how-it-works{padding:100px 0;position:relative;z-index:2}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;transition:all .3s}
+.card:hover{transform:translateY(-4px);border-color:rgba(37,99,235,0.2);box-shadow:0 12px 40px rgba(37,99,235,0.06)}
+.feature-icon{width:48px;height:48px;border-radius:12px;background:var(--blue-glow);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:20px}
+.card h3{font-size:1.1rem;font-weight:700;margin-bottom:10px}.card p{color:var(--text-secondary);font-size:.92rem}
 
-        /* Hero */
-        #home {
-            padding-top: 160px;
-            padding-bottom: 80px;
-            text-align: center;
-        }
-        #home h1 {
-            font-size: clamp(2.4rem, 5.5vw, 4rem);
-            font-weight: 800;
-            color: #0f172a;
-            line-height: 1.1;
-            margin-bottom: 20px;
-        }
-        #home h1 span { color: #2563eb; }
-        #home .hero-desc {
-            font-size: 1.15rem;
-            color: #64748b;
-            max-width: 560px;
-            margin: 0 auto 32px;
-        }
-        .hero-actions {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 64px;
-        }
-        .btn-primary {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 14px 32px;
-            background: #2563eb;
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-        }
-        .btn-primary:hover {
-            background: #1d4ed8;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(37,99,235,0.3);
-        }
-        .btn-secondary {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 14px 32px;
-            background: transparent;
-            color: #2563eb;
-            border: 2px solid #2563eb;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background 0.2s, transform 0.2s;
-        }
-        .btn-secondary:hover {
-            background: rgba(37,99,235,0.05);
-            transform: translateY(-2px);
-        }
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .stat-item { text-align: center; }
-        .stat-item .number {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #2563eb;
-        }
-        .stat-item .label {
-            font-size: 0.85rem;
-            color: #64748b;
-            margin-top: 4px;
-        }
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:32px}
+.step-card{text-align:center;position:relative}.step-num{width:56px;height:56px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;margin:0 auto 16px}
+.step-card h3{font-weight:700;margin-bottom:8px}.step-card p{color:var(--text-secondary);font-size:.9rem}
+.step-arrow{display:none}
 
-        /* Cards grid */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-        }
-        .card {
-            background: #ffffff;
-            border: 1px solid rgba(37,99,235,0.1);
-            border-radius: 14px;
-            padding: 32px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 40px rgba(37,99,235,0.1);
-        }
-        .card-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: rgba(37,99,235,0.08);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 16px;
-            color: #2563eb;
-            font-size: 1.2rem;
-        }
-        .card h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 8px;
-        }
-        .card p {
-            font-size: 0.92rem;
-            color: #64748b;
-            line-height: 1.6;
-        }
+.faq{padding:100px 0;position:relative;z-index:2}.faq-list{max-width:800px;margin:0 auto}
+.faq-item{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;background:var(--bg)}
+.faq-item:hover{border-color:rgba(37,99,235,0.25)}
+.faq-question{padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;cursor:pointer}
+.faq-question h3{font-size:1rem;font-weight:600;color:var(--text)}
+.faq-question i{color:var(--blue);transition:transform .3s;font-size:.85rem}
+.faq-item.open .faq-question i{transform:rotate(180deg)}
+.faq-answer{padding:0 24px;max-height:0;overflow:hidden;transition:padding .3s,max-height .3s}
+.faq-item.open .faq-answer{padding:0 24px 20px;max-height:400px}
+.faq-answer p{color:var(--text-secondary);font-size:.9rem;line-height:1.7}
 
-        /* How it works */
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 32px;
-        }
-        .step {
-            text-align: center;
-            position: relative;
-        }
-        .step-number {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: #2563eb;
-            color: #fff;
-            font-size: 1.3rem;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
-        }
-        .step h3 {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 8px;
-        }
-        .step p {
-            font-size: 0.9rem;
-            color: #64748b;
-        }
-
-        /* API Guide */
-        .wallet-box {
-            background: #f8fafc;
-            border: 1px solid rgba(37,99,235,0.12);
-            border-radius: 14px;
-            padding: 32px;
-            margin-bottom: 32px;
-            text-align: center;
-        }
-        .wallet-box h3 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: #0f172a;
-        }
-        .wallet-box p {
-            color: #64748b;
-            margin-bottom: 20px;
-            font-size: 0.95rem;
-        }
-        .wallet-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .wallet-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border: 1px solid rgba(37,99,235,0.2);
-            border-radius: 10px;
-            background: #fff;
-            color: #0f172a;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .wallet-btn:hover {
-            border-color: #2563eb;
-            background: rgba(37,99,235,0.04);
-        }
-        .wallet-btn i { color: #2563eb; font-size: 1.1rem; }
-        .wallet-btn:active {
-            transform: scale(0.97);
-        }
-
-        .connected-section { display: none; }
-        .connected-section.active { display: block; }
-
-        .api-key-box {
-            background: #0f172a;
-            border-radius: 10px;
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .api-key-box code {
-            color: #4ade80;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            font-size: 0.9rem;
-            word-break: break-all;
-        }
-        .api-key-box button, .copy-btn-small {
-            padding: 8px 16px;
-            background: #2563eb;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-        .api-key-box button:hover, .copy-btn-small:hover {
-            background: #1d4ed8;
-        }
-
-        .llm-models-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 12px;
-            margin-bottom: 32px;
-        }
-        .llm-card {
-            background: #f8fafc;
-            border: 2px solid transparent;
-            border-radius: 10px;
-            padding: 14px 16px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-        }
-        .llm-card:hover {
-            border-color: rgba(37,99,235,0.3);
-        }
-        .llm-card.selected {
-            border-color: #2563eb;
-            background: rgba(37,99,235,0.04);
-        }
-        .llm-card .model-name {
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: #0f172a;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-        }
-        .llm-card .model-size {
-            font-size: 0.72rem;
-            color: #64748b;
-            margin-top: 2px;
-        }
-
-        .cli-section {
-            background: #0f172a;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 32px;
-        }
-        .cli-section h4 {
-            color: #fff;
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-        .cli-cmd {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            padding: 10px 16px;
-            margin-bottom: 8px;
-            gap: 12px;
-        }
-        .cli-cmd code {
-            color: #4ade80;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            font-size: 0.82rem;
-            word-break: break-all;
-            flex: 1;
-        }
-        .cli-cmd button {
-            padding: 4px 12px;
-            background: rgba(37,99,235,0.3);
-            color: #93c5fd;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-        .cli-cmd button:hover { background: rgba(37,99,235,0.5); }
-
-        .agent-tabs {
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-            margin-bottom: 0;
-            background: #1e293b;
-            border-radius: 10px 10px 0 0;
-            padding: 8px 8px 0;
-        }
-        .agent-tab {
-            padding: 8px 16px;
-            background: transparent;
-            color: #94a3b8;
-            border: none;
-            border-radius: 8px 8px 0 0;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .agent-tab.active {
-            background: #0f172a;
-            color: #fff;
-        }
-        .agent-tab:hover { color: #fff; }
-        .agent-code-area {
-            background: #0f172a;
-            border-radius: 0 0 12px 12px;
-            padding: 20px;
-            margin-bottom: 32px;
-        }
-        .agent-code-area pre {
-            color: #e2e8f0;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            font-size: 0.82rem;
-            line-height: 1.7;
-            overflow-x: auto;
-            white-space: pre;
-        }
-        .agent-code-panel { display: none; }
-        .agent-code-panel.active { display: block; }
-
-        .quick-start {
-            background: #f8fafc;
-            border: 1px solid rgba(37,99,235,0.1);
-            border-radius: 14px;
-            padding: 32px;
-            margin-bottom: 32px;
-        }
-        .quick-start h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: #0f172a;
-        }
-        .quick-step {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 16px;
-            align-items: flex-start;
-        }
-        .quick-step-num {
-            min-width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #2563eb;
-            color: #fff;
-            font-size: 0.8rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .quick-step-text {
-            font-size: 0.92rem;
-            color: #475569;
-        }
-        .quick-step-text strong { color: #0f172a; }
-
-        .api-steps-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-        }
-        .api-step {
-            background: #f8fafc;
-            border: 1px solid rgba(37,99,235,0.1);
-            border-radius: 12px;
-            padding: 24px;
-        }
-        .api-step-letter {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #2563eb;
-            margin-bottom: 8px;
-        }
-        .api-step h4 {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 6px;
-        }
-        .api-step p {
-            font-size: 0.88rem;
-            color: #64748b;
-        }
-
-        /* Code usage */
-        .code-cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-            gap: 24px;
-        }
-        .code-card {
-            background: #0f172a;
-            border-radius: 12px;
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .code-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 40px rgba(37,99,235,0.15);
-        }
-        .code-card-header {
-            padding: 14px 20px;
-            background: rgba(255,255,255,0.05);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .code-card-header span {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #94a3b8;
-        }
-        .code-card-header i {
-            color: #2563eb;
-        }
-        .code-card pre {
-            padding: 20px;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            font-size: 0.82rem;
-            line-height: 1.7;
-            color: #e2e8f0;
-            overflow-x: auto;
-            white-space: pre;
-        }
-
-        /* Models */
-        .models-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 20px;
-        }
-        .model-card {
-            background: #fff;
-            border: 1px solid rgba(37,99,235,0.1);
-            border-radius: 14px;
-            padding: 28px;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .model-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 40px rgba(37,99,235,0.1);
-        }
-        .model-card .model-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            background: rgba(37,99,235,0.08);
-            color: #2563eb;
-            font-size: 0.7rem;
-            font-weight: 700;
-            border-radius: 6px;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-        }
-        .model-card h3 {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 6px;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-        }
-        .model-card .model-params {
-            font-size: 0.85rem;
-            color: #64748b;
-            margin-bottom: 12px;
-        }
-        .model-card .model-desc {
-            font-size: 0.88rem;
-            color: #475569;
-            line-height: 1.5;
-        }
-
-        /* Benefits */
-        .benefits-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-        }
-        .benefit-card {
-            background: #fff;
-            border: 1px solid rgba(37,99,235,0.1);
-            border-radius: 14px;
-            padding: 32px;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .benefit-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 40px rgba(37,99,235,0.1);
-        }
-        .benefit-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: rgba(37,99,235,0.08);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 16px;
-            color: #2563eb;
-            font-size: 1.2rem;
-        }
-        .benefit-card h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 8px;
-        }
-        .benefit-card p {
-            font-size: 0.92rem;
-            color: #64748b;
-            line-height: 1.6;
-        }
-
-        /* FAQ */
-        .faq-list { max-width: 760px; margin: 0 auto; }
-        .faq-item {
-            border: 1px solid rgba(37,99,235,0.1);
-            border-radius: 12px;
-            margin-bottom: 12px;
-            overflow: hidden;
-            background: #fff;
-            transition: box-shadow 0.3s;
-        }
-        .faq-item:hover {
-            box-shadow: 0 4px 20px rgba(37,99,235,0.06);
-        }
-        .faq-question {
-            width: 100%;
-            background: none;
-            border: none;
-            padding: 20px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #0f172a;
-            text-align: left;
-            font-family: 'Inter', sans-serif;
-        }
-        .faq-question i {
-            color: #2563eb;
-            transition: transform 0.3s;
-            font-size: 0.85rem;
-        }
-        .faq-item.open .faq-question i {
-            transform: rotate(180deg);
-        }
-        .faq-answer {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-        .faq-item.open .faq-answer {
-            max-height: 300px;
-        }
-        .faq-answer-inner {
-            padding: 0 24px 20px;
-            font-size: 0.92rem;
-            color: #64748b;
-            line-height: 1.7;
-        }
-
-        /* Footer */
-        footer {
-            background: #0f172a;
-            padding: 64px 24px 32px;
-            color: #94a3b8;
-        }
-        .footer-grid {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 40px;
-            margin-bottom: 48px;
-        }
-        .footer-col h4 {
-            color: #fff;
-            font-size: 0.95rem;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-        .footer-col a {
-            display: block;
-            color: #94a3b8;
-            text-decoration: none;
-            font-size: 0.88rem;
-            margin-bottom: 10px;
-            transition: color 0.2s;
-        }
-        .footer-col a:hover { color: #2563eb; }
-        .footer-col p {
-            font-size: 0.88rem;
-            line-height: 1.6;
-        }
-        .footer-socials {
-            display: flex;
-            gap: 16px;
-            margin-top: 8px;
-        }
-        .footer-socials a {
-            display: inline-flex !important;
-            width: 36px;
-            height: 36px;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.05);
-            color: #94a3b8 !important;
-            font-size: 1rem;
-            margin-bottom: 0 !important;
-            transition: background 0.2s, color 0.2s;
-        }
-        .footer-socials a:hover {
-            background: #2563eb;
-            color: #fff !important;
-        }
-        .footer-bottom {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding-top: 24px;
-            border-top: 1px solid rgba(255,255,255,0.06);
-            text-align: center;
-            font-size: 0.82rem;
-        }
-
-        /* Toast */
-        .toast-container {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .toast {
-            padding: 14px 20px;
-            border-radius: 10px;
-            font-size: 0.88rem;
-            font-weight: 500;
-            color: #fff;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s;
-            max-width: 360px;
-        }
-        .toast.success { background: #059669; }
-        .toast.error { background: #dc2626; }
-        .toast.info { background: #2563eb; }
-        @keyframes toastIn {
-            from { opacity: 0; transform: translateX(40px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes toastOut {
-            from { opacity: 1; transform: translateX(0); }
-            to { opacity: 0; transform: translateX(40px); }
-        }
-
-        /* Address display */
-        .address-display {
-            background: #0f172a;
-            border-radius: 10px;
-            padding: 14px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .address-display code {
-            color: #fbbf24;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            font-size: 0.88rem;
-        }
-        .address-display button {
-            padding: 6px 14px;
-            background: rgba(37,99,235,0.3);
-            color: #93c5fd;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.78rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .address-display button:hover { background: rgba(37,99,235,0.5); }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            nav { display: none; }
-            .hamburger { display: block; }
-            .stats-row { grid-template-columns: repeat(2, 1fr); }
-            .cards-grid { grid-template-columns: 1fr; }
-            .code-cards-grid { grid-template-columns: 1fr; }
-            .models-grid { grid-template-columns: 1fr; }
-            .footer-grid { grid-template-columns: repeat(2, 1fr); }
-            .section-title { font-size: 1.6rem; }
-            #home { padding-top: 120px; }
-            .llm-models-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-    </style>
+.footer{padding:60px 0 30px;border-top:1px solid var(--border);position:relative;z-index:2}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+.footer-brand p{color:var(--text-secondary);font-size:.85rem;margin-top:12px;line-height:1.6;max-width:300px}
+.footer-col h4{font-size:.8rem;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px}
+.footer-col a{display:block;color:var(--text-secondary);font-size:.85rem;margin-bottom:10px;transition:color .2s}
+.footer-col a:hover{color:var(--blue)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1px solid var(--border);font-size:.8rem;color:var(--text-secondary)}
+.footer-socials{display:flex;gap:16px}.footer-socials a{color:var(--text-secondary);font-size:1.1rem;transition:color .2s}.footer-socials a:hover{color:var(--blue)}
+@media(max-width:768px){.footer-grid{grid-template-columns:1fr 1fr}.footer-bottom{flex-direction:column;gap:12px}}
+</style>
 </head>
 <body>
 
-<!-- Header -->
-<header id="main-header">
-    <div class="header-inner">
-        <a href="#home" class="logo">
-            <img src="assets/gitblock.jpg" alt="GitBlock" style="width:36px;height:36px;border-radius:8px;object-fit:cover;">
-            <span>GitBlock</span>
-        </a>
-        <nav>
-            <a href="#features">Features</a>
-            <a href="#how-it-works">How It Works</a>
-            <a href="#api">API</a>
-            <a href="aeon">Integration</a>
-            <a href="console">Console</a>
-            <a href="world">World</a>
-            <a href="#models">Models</a>
-            <a href="#benefits">Benefits</a>
-            <a href="#faq">FAQ</a>
-        </nav>
-        <button class="hamburger" id="hamburger" onclick="document.getElementById('mobile-menu').classList.toggle('open')">
-            <i class="fas fa-bars"></i>
-        </button>
-    </div>
+<header class="header" id="header">
+<div class="container">
+    <a href="#" class="logo"><img src="assets/gitblock.jpg" alt="GitBlock"> GitBlock</a>
+    <nav class="nav">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="console.html">Console</a>
+        <a href="world.html">World</a>
+        <a href="https://jepspows.github.io/base-token-detector/scanner.html" class="btn-primary btn-sm">Launch Scanner</a>
+    </nav>
+    <button class="hamburger" onclick="document.querySelector('.mobile-menu').classList.add('open')"><i class="fas fa-bars"></i></button>
+</div>
 </header>
-<div class="mobile-menu" id="mobile-menu">
-    <a href="#features" onclick="document.getElementById('mobile-menu').classList.remove('open')">Features</a>
-    <a href="#how-it-works" onclick="document.getElementById('mobile-menu').classList.remove('open')">How It Works</a>
-    <a href="#api" onclick="document.getElementById('mobile-menu').classList.remove('open')">API</a>
-    <a href="node" onclick="document.getElementById('mobile-menu').classList.remove('open')">Run a Node</a>
-    <a href="aeon" onclick="document.getElementById('mobile-menu').classList.remove('open')">Integration</a>
-    <a href="console" onclick="document.getElementById('mobile-menu').classList.remove('open')">Console</a>
-    <a href="world" onclick="document.getElementById('mobile-menu').classList.remove('open')">World</a>
-    <a href="#models" onclick="document.getElementById('mobile-menu').classList.remove('open')">Models</a>
-    <a href="#benefits" onclick="document.getElementById('mobile-menu').classList.remove('open')">Benefits</a>
-    <a href="#faq" onclick="document.getElementById('mobile-menu').classList.remove('open')">FAQ</a>
+
+<div class="mobile-menu">
+    <button class="mobile-close" onclick="document.querySelector('.mobile-menu').classList.remove('open')">&times;</button>
+    <a href="#features" onclick="this.parentElement.classList.remove('open')">Features</a>
+    <a href="#how-it-works" onclick="this.parentElement.classList.remove('open')">How It Works</a>
+    <a href="console.html" onclick="this.parentElement.classList.remove('open')">Console</a>
+    <a href="world.html" onclick="this.parentElement.classList.remove('open')">World</a>
+    <a href="https://jepspows.github.io/base-token-detector/scanner.html" onclick="this.parentElement.classList.remove('open')">Launch Scanner</a>
 </div>
 
-<!-- Section 1: Hero -->
-<section id="home">
-    <div class="container">
-        <h1 class="reveal">Intelligence Without <span>Gatekeepers</span></h1>
-        <p class="hero-desc reveal">Free AI inference with OpenAI-compatible endpoints. Run a node to get your free API key. No accounts. No credit cards. Just compute.</p>
-        <div class="hero-actions reveal">
-            <button class="btn-primary" onclick="document.getElementById('api').scrollIntoView({behavior:'smooth'})">
-                <i class="fas fa-wallet"></i> Get Free API Key
-            </button>
-            <a href="aeon" class="btn-secondary">
-                <i class="fas fa-plug"></i> Aeon Integration
-            </a>
+<!-- HERO -->
+<section class="hero" id="home">
+<div class="container">
+    <div class="hero-content">
+        <div class="hero-subtitle">BASE CHAIN TOKEN ANALYTICS</div>
+        <h1><span class="gradient-text">Every Token on Base, Tracked</span></h1>
+        <p class="hero-desc">Real-time token discovery and analytics for Base chain. Track new launches from Bankr, Clanker, and every launchpad. Live prices, liquidity, security scores, and community ratings — all in one place.</p>
+        <div class="hero-buttons">
+            <a href="https://jepspows.github.io/base-token-detector/scanner.html" class="btn-primary"><i class="fas fa-chart-line"></i> Launch Scanner</a>
+            <a href="https://github.com/jepspows/base-token-detector" class="btn-ghost"><i class="fab fa-github"></i> Open Source</a>
         </div>
-        <div class="stats-row reveal">
-            <div class="stat-item">
-                <div class="number">8</div>
-                <div class="label">AI Models</div>
-            </div>
-            <div class="stat-item">
-                <div class="number">100%</div>
-                <div class="label">Free</div>
-            </div>
-            <div class="stat-item">
-                <div class="number">OpenAI</div>
-                <div class="label">Compatible</div>
-            </div>
-            <div class="stat-item">
-                <div class="number">Phase 3</div>
-                <div class="label">Decentralized</div>
-            </div>
+        <div class="stats-row">
+            <div class="stat"><div class="stat-number">100+</div><div class="stat-label">Tokens Tracked</div></div>
+            <div class="stat"><div class="stat-number">15s</div><div class="stat-label">Refresh Rate</div></div>
+            <div class="stat"><div class="stat-number">5</div><div class="stat-label">Launchpads</div></div>
+            <div class="stat"><div class="stat-number">Real-Time</div><div class="stat-label">Scam Detection</div></div>
         </div>
     </div>
+</div>
 </section>
 
-<!-- Section 2: Features -->
-<section id="features">
-    <div class="container">
-        <div class="section-label reveal">Features</div>
-        <h2 class="section-title reveal">Built for Developers</h2>
-        <p class="section-desc reveal">Everything you need to run AI inference without intermediaries.</p>
-        <div class="cards-grid">
-            <div class="card reveal">
-                <div class="card-icon"><i class="fas fa-dollar-sign"></i></div>
-                <h3>Zero-Cost Inference</h3>
-                <p>No pay-per-token billing. No subscription fees. The network is sustained by contributors, not your wallet.</p>
-            </div>
-            <div class="card reveal">
-                <div class="card-icon"><i class="fas fa-globe"></i></div>
-                <h3>Drop-In Compatible</h3>
-                <p>Works with any OpenAI-compatible client. Just change the base URL. No SDK changes needed.</p>
-            </div>
-            <div class="card reveal">
-                <div class="card-icon"><i class="fas fa-plug"></i></div>
-                <h3>Drop-In API</h3>
-                <p>OpenAI-compatible endpoints. Switch from any provider with a one-line base URL change.</p>
-            </div>
-            <div class="card reveal">
-                <div class="card-icon"><i class="fas fa-shield-halved"></i></div>
-                <h3>Encrypted In Transit</h3>
-                <p>All requests use HTTPS encryption. Your prompts and responses are protected in transit.</p>
-            </div>
-            <div class="card reveal">
-                <div class="card-icon"><i class="fas fa-bolt"></i></div>
-                <h3>Fast Responses</h3>
-                <p>Optimized inference pipeline with streaming support. Token-by-token delivery starts immediately.</p>
-            </div>
-            <div class="card reveal">
-                <div class="card-icon"><i class="fas fa-robot"></i></div>
-                <h3>Autonomous Agents</h3>
-                <p>121 autonomous skills. Self-healing. Zero infrastructure. Now integrated with GitBlock. <a href="aeon" style="color:#2563eb;">Learn more →</a></p>
-            </div>
-            <div class="card reveal">
-                <div class="card-icon"><i class="fas fa-code-branch"></i></div>
-                <h3>Open Source</h3>
-                <p>Every line of code is auditable. Fork it. Run your own network. Contribute back. It's all on GitHub.</p>
-            </div>
+<!-- FEATURES -->
+<section class="features" id="features">
+<div class="container">
+    <div class="section-title reveal">
+        <h2>Built for Token Discovery</h2>
+        <p>Real-time Base chain analytics with scam detection and community ratings</p>
+    </div>
+    <div class="features-grid">
+        <div class="card reveal">
+            <div class="feature-icon"><i class="fas fa-rocket"></i></div>
+            <h3>Real-Time Launch Detection</h3>
+            <p>Detect new tokens on Base the moment they launch. Bankr, Clanker, Zora, Virtuals — every launchpad tracked with 15-second refresh.</p>
+        </div>
+        <div class="card reveal">
+            <div class="feature-icon"><i class="fas fa-shield-halved"></i></div>
+            <h3>Scam & Honeypot Detection</h3>
+            <p>GoPlus-powered security analysis on every token. Honeypot checks, buy/sell tax, ownership verification, and risk scoring.</p>
+        </div>
+        <div class="card reveal">
+            <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+            <h3>Live Charts & Data</h3>
+            <p>Full DEX Screener charts embedded for every token. Real-time price, liquidity, market cap, and transaction analytics.</p>
+        </div>
+        <div class="card reveal">
+            <div class="feature-icon"><i class="fas fa-star"></i></div>
+            <h3>Community Ratings</h3>
+            <p>Rate every token. Community averages determine which tokens are trending. Transparent, shared ratings — not algorithms.</p>
+        </div>
+        <div class="card reveal">
+            <div class="feature-icon"><i class="fas fa-search"></i></div>
+            <h3>Search Any Token</h3>
+            <p>Can't find a token? Search by name, symbol, or contract address. Direct DEX Screener integration finds every token on Base.</p>
+        </div>
+        <div class="card reveal">
+            <div class="feature-icon"><i class="fas fa-code-branch"></i></div>
+            <h3>Fully Open Source</h3>
+            <p>Everything — scanner, API server, landing page — is MIT licensed. Fork it, deploy your own, build on top. No restrictions.</p>
         </div>
     </div>
+</div>
 </section>
 
-<!-- Section 3: How It Works -->
-<section id="how-it-works">
-    <div class="container">
-        <div class="section-label reveal">How It Works</div>
-        <h2 class="section-title reveal">Four Steps to Free Inference</h2>
-        <p class="section-desc reveal">From prompt to response in seconds, with zero cost.</p>
-        <div class="steps-grid">
-            <div class="step reveal">
-                <div class="step-number">1</div>
-                <h3>Send Prompt</h3>
-                <p>Submit your request through the OpenAI-compatible API with your unique key.</p>
-            </div>
-            <div class="step reveal">
-                <div class="step-number">2</div>
-                <h3>Authenticate</h3>
-                <p>Your gb_ API key is validated to ensure authorized access to the inference API.</p>
-            </div>
-            <div class="step reveal">
-                <div class="step-number">3</div>
-                <h3>Inference</h3>
-                <p>The selected model processes your prompt and generates a response using optimized inference.</p>
-            </div>
-            <div class="step reveal">
-                <div class="step-number">4</div>
-                <h3>Stream Response</h3>
-                <p>Output is streamed token-by-token back to your client via the OpenAI-compatible API.</p>
-            </div>
+<!-- HOW IT WORKS -->
+<section class="how-it-works" id="how-it-works">
+<div class="container">
+    <div class="section-title reveal">
+        <h2>How It Works</h2>
+        <p>From chain to screen in under 15 seconds</p>
+    </div>
+    <div class="steps-grid">
+        <div class="step-card reveal">
+            <div class="step-num">1</div>
+            <h3>Scan Base Chain</h3>
+            <p>Poll GeckoTerminal and DEX Screener APIs every 15 seconds for new token launches and trading pairs on Base L2.</p>
+        </div>
+        <div class="step-card reveal">
+            <div class="step-num">2</div>
+            <h3>Detect & Enrich</h3>
+            <p>Identify the launchpad (Bankr, Clanker, etc.), pull social links, logos, prices, liquidity, and run GoPlus security scans.</p>
+        </div>
+        <div class="step-card reveal">
+            <div class="step-num">3</div>
+            <h3>Rate & Rank</h3>
+            <p>Community members rate tokens. Averages power the trending board and help surface quality projects over scams.</p>
+        </div>
+        <div class="step-card reveal">
+            <div class="step-num">4</div>
+            <h3>Trade with Confidence</h3>
+            <p>Click any token for full DEX Screener charts, transaction history, security reports, and direct links to trade.</p>
         </div>
     </div>
+</div>
 </section>
 
-<!-- Section 4: API Guide -->
-<section id="api">
-    <div class="container">
-        <div class="section-label reveal">API Access</div>
-        <h2 class="section-title reveal">Get Your Free API Key</h2>
-        <p class="section-desc reveal">Run a node to get your free API key. Contribute GPU power to the network and earn $GITBLOCK.</p>
-
-        <!-- Wallet Connect Box -->
-        <div class="wallet-box reveal" id="wallet-connect-box" style="text-align:center">
-            <h3 style="text-align:center"><i class="fas fa-server" style="color:#059669;margin-right:8px;"></i>Run a Node</h3>
-            <p style="text-align:center">Run a GitBlock node to get your free API key and earn $GITBLOCK.</p>
-            <div class="wallet-buttons" style="display:flex;justify-content:center;flex-direction:column;align-items:center">
-                <a href="node" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:20px;background:rgba(16,185,129,0.04);border-radius:12px;border:1px solid rgba(16,185,129,0.2);text-decoration:none;transition:all .15s" onmouseover="this.style.background='rgba(16,185,129,0.08)';this.style.borderColor='rgba(16,185,129,0.35)'" onmouseout="this.style.background='rgba(16,185,129,0.04)';this.style.borderColor='rgba(16,185,129,0.2)'">
-                    <i class="fas fa-server" style="color:#059669;font-size:1.2rem"></i>
-                    <span style="color:#059669;font-weight:600;font-size:.95rem">Run a Node → Get Free API Key</span>
-                </a>
-                <p style="font-size:.8rem;color:#94a3b8;margin-top:10px">Contribute your GPU to the network. Earn $GITBLOCK. Get unlimited free API access as a node operator.</p>
-            </div>
+<!-- FAQ -->
+<section class="faq" id="faq">
+<div class="container">
+    <div class="section-title reveal">
+        <h2>Questions & Answers</h2>
+        <p>Everything you need to know about the GitBlock scanner</p>
+    </div>
+    <div class="faq-list">
+        <div class="faq-item reveal" onclick="this.classList.toggle('open')">
+            <div class="faq-question"><h3>Is this actually free?</h3><i class="fas fa-chevron-down"></i></div>
+            <div class="faq-answer"><p>Yes — completely free. No wallet connect, no subscriptions. The scanner runs on open APIs (DEX Screener, GeckoTerminal, GoPlus) and is open source. You can even run your own instance.</p></div>
         </div>
-
-        <!-- Connected Section -->
-        <div class="connected-section" id="connected-section" style="text-align:center">
-            <!-- Address -->
-            <div class="address-display reveal" style="justify-content:center">
-                <span>Connected: <code id="wallet-address">—</code></span>
-                <span id="wallet-type-badge" style="display:inline-flex;align-items:center;padding:4px 12px;background:rgba(37,99,235,0.15);color:#2563eb;font-size:0.78rem;font-weight:600;border-radius:6px;"></span>
-                <button onclick="copyAddress()"><i class="fas fa-copy"></i> Copy</button>
-            </div>
-
-            <!-- API Key -->
-            <div class="api-key-box reveal" style="justify-content:center">
-                <span style="color:#94a3b8;font-size:0.85rem;font-weight:600;">API Key:</span>
-                <code id="api-key-display">—</code>
-                <div style="display:flex;gap:8px;">
-                    <button onclick="copyApiKey()"><i class="fas fa-copy"></i> Copy</button>
-                    <button onclick="regenerateApiKey()" style="background:#7c3aed;"><i class="fas fa-rotate"></i> Regenerate</button>
-                </div>
-            </div>
-
-            <!-- Active Model Display -->
-            <div class="active-model-display reveal" id="active-model-display" style="background:linear-gradient(135deg,rgba(37,99,235,0.08),rgba(124,58,237,0.08));border:1px solid rgba(37,99,235,0.2);border-radius:12px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-                <div>
-                    <div style="font-size:0.75rem;font-weight:600;color:#2563eb;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;">Active Model</div>
-                    <div style="font-size:1.1rem;font-weight:700;color:#0f172a;font-family:'SF Mono','Fira Code',monospace;" id="active-model-name">30+ models available</div>
-                    <div style="font-size:0.82rem;color:#64748b;margin-top:2px;" id="active-model-meta">8 providers · OpenAI, Anthropic, Google, Meta, xAI, DeepSeek, MiMo, Mistral</div>
-                </div>
-                <div style="display:flex;gap:8px;align-items:center;">
-                    <span style="display:inline-block;padding:4px 12px;background:#059669;color:#fff;font-size:0.75rem;font-weight:700;border-radius:6px;">READY</span>
-                    <button onclick="copyModelName()" style="padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:Inter,sans-serif"><i class="fas fa-copy"></i> Copy Model</button>
-                </div>
-            </div>
-
-            <!-- Model Selection — now in Console (centered) -->
-            <div style="text-align:center;padding:20px;margin:16px 0;background:rgba(37,99,235,0.03);border-radius:12px;border:1px solid rgba(37,99,235,0.08)">
-                <p style="font-size:.9rem;color:#64748b;margin-bottom:10px">Choose from 30+ models across 8 providers including OpenAI, Anthropic, Google, Meta, DeepSeek, xAI, and more.</p>
-                <a href="console" class="btn btn-primary" style="display:inline-flex"><i class="fas fa-terminal"></i> Open Console → Pick Your Model</a>
-            </div>
-
-            <!-- CLI Commands -->
-            <div class="cli-section reveal" style="text-align:center">
-                <h4><i class="fas fa-terminal" style="margin-right:8px;"></i>Quick Commands</h4>
-                <div class="cli-cmd">
-                    <code id="cli-curl">curl -X POST https://api.xiaomimimo.com/v1/chat/completions ...</code>
-                    <button onclick="copyCliCmd('cli-curl')">Copy</button>
-                </div>
-                <div class="cli-cmd">
-                    <code id="cli-export">export MIMO_API_KEY=your_key</code>
-                    <button onclick="copyCliCmd('cli-export')">Copy</button>
-                </div>
-                <div class="cli-cmd">
-                    <code id="cli-base">export MIMO_BASE_URL=https://api.xiaomimimo.com/v1</code>
-                    <button onclick="copyCliCmd('cli-base')">Copy</button>
-                </div>
-            </div>
-
-            <!-- Agent Code Tabs -->
-            <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:16px;color:#0f172a;" class="reveal">Integration Examples</h3>
-            <div class="reveal">
-                <div class="agent-tabs">
-                    <button class="agent-tab active" onclick="showAgentTab('tab-python',this)">Python SDK</button>
-                    <button class="agent-tab" onclick="showAgentTab('tab-openai',this)">OpenAI SDK</button>
-                    <button class="agent-tab" onclick="showAgentTab('tab-langchain',this)">LangChain</button>
-                    <button class="agent-tab" onclick="showAgentTab('tab-curl',this)">cURL</button>
-                    <button class="agent-tab" onclick="showAgentTab('tab-js',this)">JavaScript</button>
-                    <button class="agent-tab" onclick="showAgentTab('tab-hermes',this)">Hermes Agent</button>
-                </div>
-                <div class="agent-code-area">
-                    <div class="agent-code-panel active" id="tab-python">
-<pre>import requests
-
-response = requests.post(
-    "https://api.xiaomimimo.com/v1/chat/completions",
-    headers={
-        "Authorization": "Bearer YOUR_MIMO_API_KEY",
-        "Content-Type": "application/json"
-    },
-    json={
-        "model": "mimo-v2.5-pro",
-        "messages": [{"role": "user", "content": "Hello!"}]
-    }
-)
-print(response.json()["choices"][0]["message"]["content"])</pre>
-                    </div>
-                    <div class="agent-code-panel" id="tab-openai">
-<pre>from openai import OpenAI
-
-client = OpenAI(
-    api_key="YOUR_MIMO_API_KEY",
-    base_url="https://api.xiaomimimo.com/v1"
-)
-
-response = client.chat.completions.create(
-    model="mimo-v2.5-pro",
-    messages=[{"role": "user", "content": "Hello!"}]
-)
-print(response.choices[0].message.content)</pre>
-                    </div>
-                    <div class="agent-code-panel" id="tab-langchain">
-<pre>from langchain_openai import ChatOpenAI
-
-llm = ChatOpenAI(
-    api_key="YOUR_MIMO_API_KEY",
-    base_url="https://api.xiaomimimo.com/v1",
-    model="mimo-v2.5-pro"
-)
-
-result = llm.invoke("Hello!")
-print(result.content)</pre>
-                    </div>
-                    <div class="agent-code-panel" id="tab-curl">
-<pre>curl -X POST https://api.xiaomimimo.com/v1/chat/completions \
-  -H "Authorization: Bearer YOUR_MIMO_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "mimo-v2.5-pro",
-    "messages": [{"role": "user", "content": "Hello!"}]
-  }'</pre>
-                    </div>
-                    <div class="agent-code-panel" id="tab-js">
-<pre>const response = await fetch("https://api.xiaomimimo.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-        "Authorization": "Bearer YOUR_MIMO_API_KEY",
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-        model: "mimo-v2.5-pro",
-        messages: [{ role: "user", content: "Hello!" }]
-    })
-});
-const data = await response.json();
-console.log(data.choices[0].message.content);</pre>
-                    </div>
-                    <div class="agent-code-panel" id="tab-hermes">
-<pre># In your hermes-agent config (config.yaml):
-providers:
-  mimo:
-    type: openai
-    api_key: YOUR_MIMO_API_KEY
-    base_url: https://api.xiaomimimo.com/v1
-    model: mimo-v2.5-pro
-
-# Or via environment variables:
-export HERMES_PROVIDER=openai
-export OPENAI_API_KEY=YOUR_MIMO_API_KEY
-export OPENAI_BASE_URL=https://api.xiaomimimo.com/v1</pre>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Start -->
-            <div class="quick-start reveal">
-                <h3><i class="fas fa-rocket" style="color:#2563eb;margin-right:8px;"></i>Quick Start</h3>
-                <div class="quick-step">
-                    <div class="quick-step-num">1</div>
-                    <div class="quick-step-text"><strong>Connect your wallet</strong> above to generate a free API key.</div>
-                </div>
-                <div class="quick-step">
-                    <div class="quick-step-num">2</div>
-                    <div class="quick-step-text"><strong>Copy your API key</strong> and set it as an environment variable.</div>
-                </div>
-                <div class="quick-step">
-                    <div class="quick-step-num">3</div>
-                    <div class="quick-step-text"><strong>Choose a model</strong> from the grid above and note its name.</div>
-                </div>
-                <div class="quick-step">
-                    <div class="quick-step-num">4</div>
-                    <div class="quick-step-text"><strong>Make your first request</strong> using any of the code examples below.</div>
-                </div>
-            </div>
+        <div class="faq-item reveal" onclick="this.classList.toggle('open')">
+            <div class="faq-question"><h3>How fast are new tokens detected?</h3><i class="fas fa-chevron-down"></i></div>
+            <div class="faq-answer"><p>The server polls every 15 seconds. New tokens typically appear within 1-2 minutes of their first trade on Base. The trending section updates in real-time.</p></div>
         </div>
-
-        <!-- API Install Steps (always visible) -->
-        <div class="api-steps-grid reveal">
-            <div class="api-step">
-                <div class="api-step-letter">A</div>
-                <h4>Install the SDK</h4>
-                <p>Use pip install openai or npm install openai to get started with the official SDK.</p>
-            </div>
-            <div class="api-step">
-                <div class="api-step-letter">B</div>
-                <h4>Set Your Key</h4>
-                <p>Export GITBLOCK_API_KEY as an environment variable or pass it directly to the client.</p>
-            </div>
-            <div class="api-step">
-                <div class="api-step-letter">C</div>
-                <h4>Point to GitBlock</h4>
-                <p>Set the base URL to https://api.xiaomimimo.com/v1 — that's the only change from OpenAI.</p>
-            </div>
-            <div class="api-step">
-                <div class="api-step-letter">D</div>
-                <h4>Start Building</h4>
-                <p>Send chat completions, embeddings, and more. Full OpenAI API compatibility.</p>
-            </div>
+        <div class="faq-item reveal" onclick="this.classList.toggle('open')">
+            <div class="faq-question"><h3>How does scam detection work?</h3><i class="fas fa-chevron-down"></i></div>
+            <div class="faq-answer"><p>We use GoPlus Security API which checks every token for: honeypot code, buy/sell taxes, ownership renunciation, mint capabilities, proxy contracts, and blacklists. Results are color-coded from low to critical risk.</p></div>
+        </div>
+        <div class="faq-item reveal" onclick="this.classList.toggle('open')">
+            <div class="faq-question"><h3>Who launched this token?</h3><i class="fas fa-chevron-down"></i></div>
+            <div class="faq-answer"><p>We detect launchpads using on-chain creator addresses and DEX patterns. Bankr uses Clanker's smart contracts so they appear similar on-chain — we use heuristics and metadata to tell them apart.</p></div>
+        </div>
+        <div class="faq-item reveal" onclick="this.classList.toggle('open')">
+            <div class="faq-question"><h3>Can I run my own instance?</h3><i class="fas fa-chevron-down"></i></div>
+            <div class="faq-answer"><p>Absolutely. The entire project is MIT licensed on GitHub. Clone the repo, run <code>npm install && node server.js</code>, and open scanner.html. Deploy to Render or your own VPS in minutes.</p></div>
         </div>
     </div>
+</div>
 </section>
 
-<!-- Section 6: Models -->
-<section id="models">
-    <div class="container">
-        <div class="section-label reveal">Models</div>
-        <h2 class="section-title reveal">Available Models</h2>
-        <p class="section-desc reveal">8 providers · 30+ models · One API. Bring your own key from any provider.</p>
-        <div class="models-grid">
-            <div class="model-card reveal">
-                <div class="model-badge">OpenAI</div>
-                <h3>GPT-4o</h3>
-                <div class="model-params">128K context · Multimodal</div>
-                <p class="model-desc">Flagship OpenAI model. Top reasoning, vision, and coding. The gold standard for complex tasks.</p>
-            </div>
-            <div class="model-card reveal">
-                <div class="model-badge">Anthropic</div>
-                <h3>Claude Sonnet 4</h3>
-                <div class="model-params">200K context · Reasoning</div>
-                <p class="model-desc">Best balance of speed and intelligence. Excellent at coding, analysis, and long-form content.</p>
-            </div>
-            <div class="model-card reveal">
-                <div class="model-badge">Google</div>
-                <h3>Gemini 2.5 Pro</h3>
-                <div class="model-params">1M context · Multimodal</div>
-                <p class="model-desc">Google's most capable model. Massive context window. Strong reasoning and multimodal abilities.</p>
-            </div>
-            <div class="model-card reveal">
-                <div class="model-badge">Meta</div>
-                <h3>Llama 3.3 70B</h3>
-                <div class="model-params">Groq · Together · OpenRouter</div>
-                <p class="model-desc">Best open-source model. Available via Groq (free tier), Together AI, and OpenRouter.</p>
-            </div>
-            <div class="model-card reveal">
-                <div class="model-badge">xAI</div>
-                <h3>Grok 3</h3>
-                <div class="model-params">Real-time · Reasoning</div>
-                <p class="model-desc">Real-time knowledge with strong reasoning. Built by xAI. Great for current events analysis.</p>
-            </div>
-            <div class="model-card reveal">
-                <div class="model-badge">DeepSeek</div>
-                <h3>DeepSeek-V3</h3>
-                <div class="model-params">671B MoE · Coding</div>
-                <p class="model-desc">Massive open model with exceptional coding and math. Available via DeepSeek and Together AI.</p>
-            </div>
-            <div class="model-card reveal">
-                <div class="model-badge">MiMo</div>
-                <h3>MiMo V2.5 Pro</h3>
-                <div class="model-params">Free tier · No credit card</div>
-                <p class="model-desc">Free tier available. Strong all-around model. Great for getting started with zero cost.</p>
-            </div>
-            <div class="model-card reveal">
-                <div class="model-badge">Mistral</div>
-                <h3>Mixtral 8x22B</h3>
-                <div class="model-params">Groq · Together · OpenRouter</div>
-                <p class="model-desc">Mistral's powerful MoE model. Fast inference on Groq. Strong multilingual performance.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Section 7: Benefits -->
-<section id="benefits">
-    <div class="container">
-        <div class="section-label reveal">Benefits</div>
-        <h2 class="section-title reveal">Why GitBlock?</h2>
-        <p class="section-desc reveal">The advantages of a truly open inference network.</p>
-        <div class="benefits-grid">
-            <div class="benefit-card reveal">
-                <div class="benefit-icon"><i class="fas fa-coins"></i></div>
-                <h3>Truly Zero Cost</h3>
-                <p>No hidden fees, no rate limits behind paywalls. The network runs on community-contributed compute.</p>
-            </div>
-            <div class="benefit-card reveal">
-                <div class="benefit-icon"><i class="fas fa-lock"></i></div>
-                <h3>Privacy First</h3>
-                <p>All requests use HTTPS encryption. No prompts are stored or used for training.</p>
-            </div>
-            <div class="benefit-card reveal">
-                <div class="benefit-icon"><i class="fas fa-signal"></i></div>
-                <h3>Always Online</h3>
-                <p>Reliable hosted infrastructure with automatic failover. Designed for consistent availability.</p>
-            </div>
-            <div class="benefit-card reveal">
-                <div class="benefit-icon"><i class="fas fa-earth-americas"></i></div>
-                <h3>Works Anywhere</h3>
-                <p>No geographic restrictions. Access the network from any country, any device, any time.</p>
-            </div>
-            <div class="benefit-card reveal">
-                <div class="benefit-icon"><i class="fas fa-route"></i></div>
-                <h3>Roadmap: Distributed</h3>
-                <p>Phase 3 will add a decentralized node network. Community members will contribute GPU compute for shared access.</p>
-            </div>
-            <div class="benefit-card reveal">
-                <div class="benefit-icon"><i class="fas fa-code-fork"></i></div>
-                <h3>Fork &amp; Build</h3>
-                <p>The entire codebase is open. Fork it, customize it, run your own private network.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Section 8: FAQ -->
-<section id="faq">
-    <div class="container">
-        <div class="section-label reveal">FAQ</div>
-        <h2 class="section-title reveal">Frequently Asked Questions</h2>
-        <p class="section-desc reveal">Everything you need to know about GitBlock.</p>
-        <div class="faq-list">
-            <div class="faq-item reveal">
-                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                    How is GitBlock free? What's the catch?
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-                <div class="faq-answer">
-                    <div class="faq-answer-inner">There's no catch. GitBlock is a community-driven project sustained by the team. Free access is a core principle — the goal is to make AI inference available to everyone. We plan to support community compute contributions in Phase 3.</div>
-                </div>
-            </div>
-            <div class="faq-item reveal">
-                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                    Is my data safe? Who can see my prompts?
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-                <div class="faq-answer">
-                    <div class="faq-answer-inner">All traffic is encrypted via HTTPS. Your prompts are not stored, logged, or used for training. We take privacy seriously and minimize data retention.</div>
-                </div>
-            </div>
-            <div class="faq-item reveal">
-                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                    Why do I need a wallet to get an API key?
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-                <div class="faq-answer">
-                    <div class="faq-answer-inner">Your wallet address is used to deterministically generate your API key. This means no sign-up forms, no email collection, and no central database of users. Your key is derived from your address and can be regenerated anytime.</div>
-                </div>
-            </div>
-            <div class="faq-item reveal">
-                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                    What models are available?
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-                <div class="faq-answer">
-                    <div class="faq-answer-inner">Currently 8 models are available including Llama 3.3, DeepSeek Coder, Qwen 2.5, Mistral, CodeLlama, Phi-3, Gemma 4, and Yi 1.5. We plan to expand the catalog as the project grows.</div>
-                </div>
-            </div>
-            <div class="faq-item reveal">
-                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                    Can I run my own node?
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-                <div class="faq-answer">
-                    <div class="faq-answer-inner">Not yet — but it's coming. Phase 3 of our roadmap includes a decentralized node network where anyone can contribute GPU compute. Join our GitHub to stay updated on development progress.</div>
-                </div>
-            </div>
-            <div class="faq-item reveal">
-                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                    How does this compare to OpenAI's API?
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-                <div class="faq-answer">
-                    <div class="faq-answer-inner">GitBlock uses the exact same API format as OpenAI. The only difference is the base URL — just point your client to api.xiaomimimo.com. The key difference: it's completely free.</div>
-                </div>
-            </div>
-            <div class="faq-item reveal">
-                <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-                    Is there a rate limit?
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-                <div class="faq-answer">
-                    <div class="faq-answer-inner">There are soft limits to prevent abuse (currently 20 requests per minute per key). If you need higher throughput, open an issue on GitHub and we'll work with you.</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Footer -->
-<footer>
+<!-- FOOTER -->
+<footer class="footer">
+<div class="container">
     <div class="footer-grid">
-            <div class="footer-col">
-                <h4><img src="assets/gitblock.jpg" alt="GitBlock" style="width:24px;height:24px;border-radius:6px;vertical-align:middle;margin-right:8px;object-fit:cover;">GitBlock</h4>
-            <p>Free AI inference for everyone. Open, accessible, and community-driven.</p>
-            <div class="footer-socials">
-                <a href="https://github.com/Gitblock17/Gitblock" target="_blank"><i class="fab fa-github"></i></a>
-                <a href="https://x.com/gitblock_" target="_blank"><i class="fab fa-x-twitter"></i></a>
-            </div>
+        <div class="footer-brand">
+            <div class="logo" style="color:var(--blue)"><img src="assets/gitblock.jpg" alt="GitBlock"> GitBlock</div>
+            <p>Real-time token scanner and analytics for Base chain. Track new launches, detect scams, rate tokens, and trade with confidence. Open source. Free forever.</p>
         </div>
         <div class="footer-col">
             <h4>Product</h4>
+            <a href="https://jepspows.github.io/base-token-detector/scanner.html">Scanner</a>
             <a href="#features">Features</a>
-            <a href="#api">API Access</a>
-            <a href="#models">Models</a>
-            <a href="usage">Code Examples</a>
+            <a href="#how-it-works">How It Works</a>
         </div>
         <div class="footer-col">
-            <h4>Developers</h4>
-            <a href="https://github.com/Gitblock17/Gitblock" target="_blank">GitHub</a>
-            <a href="usage">Documentation</a>
-            <a href="#faq">FAQ</a>
-            <a href="https://github.com/Gitblock17/Gitblock/issues" target="_blank">Report Issue</a>
+            <h4>Resources</h4>
+            <a href="https://github.com/jepspows/base-token-detector">GitHub</a>
+            <a href="https://docs.base.org">Base Docs</a>
+            <a href="https://dexscreener.com">DEX Screener</a>
         </div>
         <div class="footer-col">
             <h4>Community</h4>
-            <a href="https://github.com/Gitblock17/Gitblock" target="_blank">Contribute</a>
-            <a href="https://x.com/gitblock_" target="_blank">Twitter</a>
-            <a href="node">Run a Node</a>
+            <a href="https://x.com/gitlawb">Twitter / X</a>
+            <a href="https://gitblock.org">Website</a>
         </div>
     </div>
     <div class="footer-bottom">
-        &copy; 2026 GitBlock. Open source under MIT License.
+        <span>&copy; 2026 GitBlock. MIT Licensed. Open Source.</span>
+        <div class="footer-socials">
+            <a href="https://github.com/jepspows/base-token-detector"><i class="fab fa-github"></i></a>
+            <a href="https://x.com/gitlawb"><i class="fab fa-x-twitter"></i></a>
+        </div>
     </div>
+</div>
 </footer>
 
-<!-- Toast Container -->
-<div class="toast-container" id="toast-container"></div>
-
-<!-- JavaScript -->
 <script>
-    // --- State ---
-    let currentApiKey = null;
-    let currentWalletAddress = null;
-    let selectedModel = 'mimo-v2.5-pro';
-
-    // --- Model Metadata ---
-    const modelInfo = {
-        'mimo-v2.5-pro':      { params: '70B+', type: 'Flagship Reasoning', provider: 'Xiaomi MiMo' },
-        'mimo-v2.5':          { params: '70B+', type: 'General Purpose',   provider: 'Xiaomi MiMo' },
-        'mimo-v2-flash':      { params: '—',    type: 'Fast Inference',    provider: 'Xiaomi MiMo' },
-        'mimo-v2-omni':       { params: '—',    type: 'Multimodal',       provider: 'Xiaomi MiMo' }
-    };
-
-    // --- Toast ---
-    function showToast(msg, type = 'info') {
-        const container = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.textContent = msg;
-        container.appendChild(toast);
-        setTimeout(() => { toast.remove(); }, 3000);
-    }
-
-    // --- API Key Generation ---
-    async function generateApiKey(addr) {
-        const seed = 'gitblock-v2-' + addr.toLowerCase();
-        const encoder = new TextEncoder();
-        const data = encoder.encode(seed);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        return 'gb_' + hex;
-    }
-
-    // --- Wallet Connected ---
-    async function onWalletConnected(address, walletType) {
-        currentWalletAddress = address;
-        document.getElementById('wallet-connect-box').style.display = 'none';
-        document.getElementById('connected-section').classList.add('active');
-        document.getElementById('wallet-address').textContent = address.slice(0, 6) + '...' + address.slice(-4);
-
-        // Show wallet type badge
-        const walletBadge = document.getElementById('wallet-type-badge');
-        if (walletBadge) {
-            const icon = walletType === 'metamask' ? 'fab fa-ethereum' : 'fas fa-ghost';
-            const name = walletType === 'metamask' ? 'MetaMask' : 'Phantom';
-            walletBadge.innerHTML = '<i class="' + icon + '" style="margin-right:6px;"></i>' + name;
-        }
-
-        currentApiKey = await generateApiKey(address);
-        localStorage.setItem('gb_api_key', currentApiKey);  // share with agents + playground
-        document.getElementById('api-key-display').textContent = currentApiKey;
-        updateCliCommands(currentApiKey);
-        selectLLM(document.querySelector('.llm-card.selected'), selectedModel);
-        showToast('Wallet connected successfully!', 'success');
-    }
-
-    // --- CLI Commands ---
-    function updateCliCommands(key) {
-        document.getElementById('cli-curl').textContent =
-            `curl -X POST https://api.xiaomimimo.com/v1/chat/completions -H "Authorization: Bearer *** -H "Content-Type: application/json" -d '{"model":"${selectedModel}","messages":[{"role":"user","content":"Hello!"}]}'`;
-
-        document.getElementById('cli-export').textContent =
-            `export MIMO_API_KEY=${key}`;
-
-        document.getElementById('cli-base').textContent =
-            `export MIMO_BASE_URL=https://api.xiaomimimo.com/v1`;
-    }
-
-    // --- Model Selection ---
-    function selectLLM(el, model) {
-        selectedModel = model;
-        document.querySelectorAll('.llm-card').forEach(c => c.classList.remove('selected'));
-        if (el) el.classList.add('selected');
-        if (currentApiKey) updateCliCommands(currentApiKey);
-
-        // Update active model display
-        const info = modelInfo[model] || { params: '?', type: 'Unknown', provider: 'Unknown' };
-        const nameEl = document.getElementById('active-model-name');
-        const metaEl = document.getElementById('active-model-meta');
-        if (nameEl) nameEl.textContent = model;
-        if (metaEl) metaEl.textContent = info.params + ' params · ' + info.type + ' · ' + info.provider;
-    }
-
-    // --- Copy Model Name ---
-    function copyModelName() {
-        navigator.clipboard.writeText(selectedModel).then(() => showToast('Model name copied: ' + selectedModel, 'success'));
-    }
-
-    // --- Regenerate Key ---
-    function regenerateApiKey() {
-        generateApiKey(currentWalletAddress + Date.now()).then(key => {
-            currentApiKey = key;
-            document.getElementById('api-key-display').textContent = currentApiKey;
-            updateCliCommands(currentApiKey);
-            showToast('API key regenerated', 'info');
-        });
-    }
-
-    // --- Copy Functions ---
-    function copyCliCmd(id) {
-        const text = document.getElementById(id).textContent;
-        navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard', 'success'));
-    }
-
-    function copyAddress() {
-        if (currentWalletAddress) {
-            navigator.clipboard.writeText(currentWalletAddress).then(() => showToast('Address copied', 'success'));
-        }
-    }
-
-    function copyApiKey() {
-        if (currentApiKey) {
-            navigator.clipboard.writeText(currentApiKey).then(() => showToast('API key copied', 'success'));
-        }
-    }
-
-    // --- Wallet Connectors ---
-    async function connectMetaMask() {
-        if (!window.ethereum) {
-            showToast('MetaMask not found. Please install it.', 'error');
-            return;
-        }
-        try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            if (accounts && accounts[0]) onWalletConnected(accounts[0], 'metamask');
-        } catch (err) {
-            showToast('MetaMask connection rejected.', 'error');
-        }
-    }
-
-    async function connectPhantom() {
-        if (!window.solana || !window.solana.isPhantom) {
-            showToast('Phantom not found. Please install it.', 'error');
-            return;
-        }
-        try {
-            const resp = await window.solana.connect();
-            if (resp.publicKey) onWalletConnected(resp.publicKey.toString(), 'phantom');
-        } catch (err) {
-            showToast('Phantom connection rejected.', 'error');
-        }
-    }
-
-
-
-    // --- Agent Tabs ---
-    function showAgentTab(tabId, el) {
-        document.querySelectorAll('.agent-code-panel').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.agent-tab').forEach(t => t.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        if (el) el.classList.add('active');
-    }
-
-    // --- Intersection Observer ---
-    const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                revealObserver.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-
-    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-
-    // --- Header Scroll ---
-    window.addEventListener('scroll', () => {
-        const header = document.getElementById('main-header');
-        if (window.scrollY > 10) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+            setTimeout(() => entry.target.classList.add('visible'), i * 80);
+            observer.unobserve(entry.target);
         }
     });
-</script>
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
+const header = document.getElementById('header');
+window.addEventListener('scroll', () => header.classList.toggle('scrolled', window.scrollY > 50));
+</script>
 </body>
 </html>

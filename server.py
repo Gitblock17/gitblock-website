@@ -15,6 +15,17 @@ MIMO_API_URL = "https://api.xiaomimimo.com/v1/chat/completions"
 MIMO_API_KEY = os.environ.get("MIMO_API_KEY", "")
 
 class PlaygroundHandler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        # Clean URL support: /about → /about.html
+        parsed = urlparse(self.path)
+        path = parsed.path
+        if not os.path.exists(self.translate_path(path)):
+            html_path = path.rstrip("/") + ".html"
+            html_fs = self.translate_path(html_path)
+            if os.path.exists(html_fs):
+                self.path = html_path + ("?" + parsed.query if parsed.query else "")
+        super().do_GET()
+
     def do_POST(self):
         if self.path == "/api/chat":
             self.handle_chat()
