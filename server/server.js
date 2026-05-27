@@ -400,6 +400,36 @@ async function refreshCache() {
     }
     console.log(`  After DEX searches: ${fresh.length}`);
 
+    // 5b. Add Base token profiles not yet in cache (includes older tokens with logos)
+    const allProfiles = await fetchTokenProfiles();
+    const freshAddrs = new Set(fresh.map(t => t.address.toLowerCase()));
+    const cachedAddrs = new Set(cache.data.map(t => t.address.toLowerCase()));
+    const newProfiles = allProfiles.filter(p => {
+      const a = (p.tokenAddress || '').toLowerCase();
+      return a && !freshAddrs.has(a) && !cachedAddrs.has(a);
+    });
+    if (newProfiles.length > 0) {
+      console.log(`  Fetching pairs for ${newProfiles.length} new profiles...`);
+      // Batch fetch pairs (5 addresses per call)
+      const addrs = newProfiles.map(p => p.tokenAddress);
+      const pairMap = new Map();
+      for (let i = 0; i < addrs.length; i += 5) {
+        const batch = addrs.slice(i, i + 5);
+        const pairs = await fetchPairsForAddresses(batch);
+        for (const p of pairs) {
+          pairMap.set((p.baseToken?.address || '').toLowerCase(), p);
+        }
+      }
+      for (const profile of newProfiles) {
+        const addr = (profile.tokenAddress || '').toLowerCase();
+        const pair = pairMap.get(addr);
+        if (pair || profile.name) {
+          fresh.push(enrichToken(pair || { baseToken: { address: profile.tokenAddress, name: profile.name, symbol: profile.symbol || '???' } }, profile));
+        }
+      }
+    }
+    console.log(`  After token profiles: ${fresh.length}`);
+
     // 6. Merge with existing cache
     const merged = new Map();
     for (const t of cache.data) merged.set(t.address.toLowerCase(), t);
